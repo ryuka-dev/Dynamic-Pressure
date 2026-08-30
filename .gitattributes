@@ -1,0 +1,5 @@
+# The Thunderstore directory is packaging input: whatever is committed must be
+# byte-identical after a fresh clone, so no end-of-line conversion anywhere.
+* -text
+*.png binary
+*.dll binary
