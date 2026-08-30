@@ -1,0 +1,14 @@
+# Build output
+bin/
+obj/
+.vs/
+
+# Binaries and packages are never committed: the DLL is a build product that
+# lands in Thunderstore/ on release, and the zip is produced by the pack script.
+*.dll
+*.pdb
+*.zip
+*.psd
+
+# Machine-local path overrides (Directory.Build.props holds the defaults)
+Directory.Build.user.props
