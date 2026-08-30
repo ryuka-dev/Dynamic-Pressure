@@ -793,27 +793,30 @@ namespace Ryuka.Sulfur.DynamicPressure
                 if (!IsValidSpawnRoom(room))
                     continue;
 
-                NPCSpawn.Data[] spawns = room.GetNPCSpawns();
+                // Game 0.19 dropped the baked NPCSpawn.Data[] snapshot; GetNPCSpawns now hands back the
+                // room's own live NPCSpawn components, and unlike the old accessor it does not filter out
+                // destroyed entries - the game skips them one by one, so we do the same. The owning room is
+                // the room we asked, which is exactly what the retired Data.room used to carry.
+                NPCSpawn[] spawns = room.GetNPCSpawns();
                 if (spawns == null || spawns.Length == 0)
                     continue;
 
                 for (int i = 0; i < spawns.Length; i++)
                 {
-                    NPCSpawn.Data data = spawns[i];
-                    Room spawnRoom = data.room != null ? data.room : room;
-
-                    if (!IsValidSpawnRoom(spawnRoom))
+                    NPCSpawn spawn = spawns[i];
+                    if (spawn == null)
                         continue;
 
-                    if ((data.usableByTypes & unitSo.unitType) == 0)
+                    if ((spawn.usableByTypes & unitSo.unitType) == 0)
                         continue;
 
-                    float distance = Vector3.Distance(data.position, playerPos);
+                    Vector3 spawnPosition = spawn.transform.position;
+                    float distance = Vector3.Distance(spawnPosition, playerPos);
 
                     SpawnPointChoice choice = new SpawnPointChoice
                     {
-                        position = data.position,
-                        room = spawnRoom,
+                        position = spawnPosition,
+                        room = room,
                         distanceToPlayer = distance,
                         source = "GameManager.orderedRooms NPCSpawn"
                     };
