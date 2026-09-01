@@ -22,7 +22,7 @@ namespace Ryuka.Sulfur.DynamicPressure
     {
         public const string PluginGuid = "ryuka.sulfur.dynamicpressure";
         public const string PluginName = "Dynamic Pressure";
-        public const string PluginVersion = "0.1.6";
+        public const string PluginVersion = "0.1.7";
 
         private static DynamicPressurePlugin _instance;
         private Harmony _harmony;
@@ -72,6 +72,10 @@ namespace Ryuka.Sulfur.DynamicPressure
         private ConfigEntry<int> _style1MaxModPerLevel;
         private ConfigEntry<int> _style2MaxModPerLevel;
         private ConfigEntry<int> _style3MaxModPerLevel;
+
+        // A wave that places nothing leaves the pressure deficit untouched, so the next Update()
+        // would re-enter the whole attempt immediately. Back off for this long instead.
+        private const float FailedWaveRetrySeconds = 1.0f;
 
         private readonly List<UnitSO> _candidatePool = new List<UnitSO>();
         private readonly List<string> _recentEvents = new List<string>();
@@ -566,6 +570,18 @@ namespace Ryuka.Sulfur.DynamicPressure
             }
             finally
             {
+                // Only a spawning wave used to arm the cooldown, so any wave that broke out
+                // early - no candidate, no reachable NPCSpawn, room budget full, spawn failure -
+                // left _nextSpawnTime in the past and was retried on the very next frame. Each
+                // retry re-ran two ScanPressure passes plus a full orderedRooms x NPCSpawn sweep,
+                // for as long as the blocking condition held. Give the non-spawning outcomes a
+                // short backoff of their own so a persistently blocked wave costs one attempt per
+                // second rather than one per frame.
+                if (spawned == 0)
+                {
+                    _nextSpawnTime = Time.time + FailedWaveRetrySeconds;
+                }
+
                 _spawnInProgress = false;
                 ScanPressure();
             }
@@ -860,6 +876,15 @@ namespace Ryuka.Sulfur.DynamicPressure
                 return false;
 
             if (room.disallowEnemySpawn)
+                return false;
+
+            // The per-room budget has to be applied while choosing the point, not after. Choice is
+            // made among the points nearest the player, so once the player's own room was full it
+            // kept winning the selection and then failing the budget check, which aborted the wave
+            // and left the neighbouring rooms untried for as long as the player stayed there.
+            int roomCount;
+            _modSpawnedPerRoom.TryGetValue(GetRoomId(room), out roomCount);
+            if (roomCount >= GetMaxModPerRoom())
                 return false;
 
             return true;

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.7
+
+* Fixed a large frame rate drop that could persist while standing in one area. Once a room had taken its full share of extra enemies, the mod retried a spawn that could never succeed on every single frame.
+* Extra enemies now spill over into neighbouring rooms once a room is full, instead of the wave giving up.
+* Updated the spawn point search for SULFUR 0.19.
+
 ## 0.1.6
 
 * Fixed scripted encounter gates remaining locked when Dynamic Pressure enemies were still alive.
