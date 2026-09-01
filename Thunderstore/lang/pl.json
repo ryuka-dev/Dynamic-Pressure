@@ -335,6 +335,174 @@
     {
       "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.description",
       "value": "Max mod spawns per level."
+    },
+    {
+      "key": "overlay.title",
+      "value": "Dynamic Pressure — debug"
+    },
+    {
+      "key": "overlay.enabled",
+      "value": "Włączony"
+    },
+    {
+      "key": "overlay.autoSpawn",
+      "value": "Auto-spawn"
+    },
+    {
+      "key": "overlay.style",
+      "value": "Styl"
+    },
+    {
+      "key": "overlay.gameState",
+      "value": "Stan gry"
+    },
+    {
+      "key": "overlay.safeZone",
+      "value": "Strefa bezpieczna"
+    },
+    {
+      "key": "overlay.env",
+      "value": "Środowisko"
+    },
+    {
+      "key": "overlay.player",
+      "value": "Gracz"
+    },
+    {
+      "key": "overlay.ok",
+      "value": "OK"
+    },
+    {
+      "key": "overlay.missing",
+      "value": "Brak"
+    },
+    {
+      "key": "overlay.alive",
+      "value": "Żywy"
+    },
+    {
+      "key": "overlay.hp",
+      "value": "PŻ"
+    },
+    {
+      "key": "overlay.damageAgo",
+      "value": "Od ostatnich obrażeń"
+    },
+    {
+      "key": "overlay.room",
+      "value": "Pokój"
+    },
+    {
+      "key": "overlay.endRoom",
+      "value": "Pokój końcowy"
+    },
+    {
+      "key": "overlay.section.pressure",
+      "value": "Presja"
+    },
+    {
+      "key": "overlay.originalHostileAlive",
+      "value": "Żywi oryginalni wrogowie"
+    },
+    {
+      "key": "overlay.engaged",
+      "value": "W walce"
+    },
+    {
+      "key": "overlay.targeting",
+      "value": "Celują w gracza"
+    },
+    {
+      "key": "overlay.modHostileAlive",
+      "value": "Żywi wrogowie moda"
+    },
+    {
+      "key": "overlay.originalPressure",
+      "value": "Presja oryginalna"
+    },
+    {
+      "key": "overlay.modPressure",
+      "value": "Presja moda"
+    },
+    {
+      "key": "overlay.current",
+      "value": "Obecna"
+    },
+    {
+      "key": "overlay.deficit",
+      "value": "Deficyt"
+    },
+    {
+      "key": "overlay.section.spawnDecision",
+      "value": "Decyzja o spawnie"
+    },
+    {
+      "key": "overlay.lastDecision",
+      "value": "Ostatnia decyzja"
+    },
+    {
+      "key": "overlay.reason",
+      "value": "Powód"
+    },
+    {
+      "key": "overlay.nextSpawnIn",
+      "value": "Następny spawn za"
+    },
+    {
+      "key": "overlay.candidateSource",
+      "value": "Źródło kandydatów"
+    },
+    {
+      "key": "overlay.candidates",
+      "value": "Kandydaci"
+    },
+    {
+      "key": "overlay.section.modImpact",
+      "value": "Wpływ moda"
+    },
+    {
+      "key": "overlay.spawnedThisLevel",
+      "value": "Zespawnowani na tym poziomie"
+    },
+    {
+      "key": "overlay.spawnedSinceOriginalKill",
+      "value": "Zespawnowani od ostatniego oryginalnego zabójstwa"
+    },
+    {
+      "key": "overlay.timeSinceOriginalKill",
+      "value": "Od oryginalnego zabójstwa"
+    },
+    {
+      "key": "overlay.timeSinceModKill",
+      "value": "Od zabójstwa moda"
+    },
+    {
+      "key": "overlay.wouldDelayAllDead",
+      "value": "Opóźniłoby OnAllEnemiesDead"
+    },
+    {
+      "key": "overlay.lastSpawn",
+      "value": "Ostatni spawn"
+    },
+    {
+      "key": "overlay.lastAggroReport",
+      "value": "Ostatni raport aggro"
+    },
+    {
+      "key": "overlay.keys",
+      "value": "Klawisze: F8 ręczny spawn | F9 przełącz nakładkę"
+    },
+    {
+      "key": "overlay.section.recentEvents",
+      "value": "Ostatnie zdarzenia"
+    },
+    {
+      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
+      "value": "Loguj decyzje o spawnie"
+    },
+    {
+      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
+      "value": "Okresowo zapisuje podsumowanie fal spawnu do logu BepInEx. Tylko diagnostyka; nie wpływa na spawn."
     }
   ]
 }

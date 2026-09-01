@@ -335,6 +335,174 @@
     {
       "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.description",
       "value": "Max mod spawns per level."
+    },
+    {
+      "key": "overlay.title",
+      "value": "تصحيح Dynamic Pressure"
+    },
+    {
+      "key": "overlay.enabled",
+      "value": "مُفعّل"
+    },
+    {
+      "key": "overlay.autoSpawn",
+      "value": "توليد تلقائي"
+    },
+    {
+      "key": "overlay.style",
+      "value": "النمط"
+    },
+    {
+      "key": "overlay.gameState",
+      "value": "حالة اللعبة"
+    },
+    {
+      "key": "overlay.safeZone",
+      "value": "منطقة آمنة"
+    },
+    {
+      "key": "overlay.env",
+      "value": "البيئة"
+    },
+    {
+      "key": "overlay.player",
+      "value": "اللاعب"
+    },
+    {
+      "key": "overlay.ok",
+      "value": "سليم"
+    },
+    {
+      "key": "overlay.missing",
+      "value": "مفقود"
+    },
+    {
+      "key": "overlay.alive",
+      "value": "حي"
+    },
+    {
+      "key": "overlay.hp",
+      "value": "الصحة"
+    },
+    {
+      "key": "overlay.damageAgo",
+      "value": "منذ آخر ضرر"
+    },
+    {
+      "key": "overlay.room",
+      "value": "الغرفة"
+    },
+    {
+      "key": "overlay.endRoom",
+      "value": "الغرفة النهائية"
+    },
+    {
+      "key": "overlay.section.pressure",
+      "value": "الضغط"
+    },
+    {
+      "key": "overlay.originalHostileAlive",
+      "value": "الأعداء الأصليون الأحياء"
+    },
+    {
+      "key": "overlay.engaged",
+      "value": "في اشتباك"
+    },
+    {
+      "key": "overlay.targeting",
+      "value": "يستهدفون اللاعب"
+    },
+    {
+      "key": "overlay.modHostileAlive",
+      "value": "أعداء المود الأحياء"
+    },
+    {
+      "key": "overlay.originalPressure",
+      "value": "الضغط الأصلي"
+    },
+    {
+      "key": "overlay.modPressure",
+      "value": "ضغط المود"
+    },
+    {
+      "key": "overlay.current",
+      "value": "الحالي"
+    },
+    {
+      "key": "overlay.deficit",
+      "value": "العجز"
+    },
+    {
+      "key": "overlay.section.spawnDecision",
+      "value": "قرار التوليد"
+    },
+    {
+      "key": "overlay.lastDecision",
+      "value": "آخر قرار"
+    },
+    {
+      "key": "overlay.reason",
+      "value": "السبب"
+    },
+    {
+      "key": "overlay.nextSpawnIn",
+      "value": "التوليد التالي خلال"
+    },
+    {
+      "key": "overlay.candidateSource",
+      "value": "مصدر المرشحين"
+    },
+    {
+      "key": "overlay.candidates",
+      "value": "المرشحون"
+    },
+    {
+      "key": "overlay.section.modImpact",
+      "value": "تأثير المود"
+    },
+    {
+      "key": "overlay.spawnedThisLevel",
+      "value": "المولّدون في هذه المرحلة"
+    },
+    {
+      "key": "overlay.spawnedSinceOriginalKill",
+      "value": "المولّدون منذ آخر قتل أصلي"
+    },
+    {
+      "key": "overlay.timeSinceOriginalKill",
+      "value": "منذ آخر قتل أصلي"
+    },
+    {
+      "key": "overlay.timeSinceModKill",
+      "value": "منذ آخر قتل للمود"
+    },
+    {
+      "key": "overlay.wouldDelayAllDead",
+      "value": "سيؤخر OnAllEnemiesDead"
+    },
+    {
+      "key": "overlay.lastSpawn",
+      "value": "آخر توليد"
+    },
+    {
+      "key": "overlay.lastAggroReport",
+      "value": "آخر تقرير عدائية"
+    },
+    {
+      "key": "overlay.keys",
+      "value": "المفاتيح: F8 توليد يدوي | F9 تبديل التراكب"
+    },
+    {
+      "key": "overlay.section.recentEvents",
+      "value": "الأحداث الأخيرة"
+    },
+    {
+      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
+      "value": "تسجيل قرارات التوليد"
+    },
+    {
+      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
+      "value": "يكتب ملخصًا دوريًا لموجات التوليد في سجل BepInEx. للتشخيص فقط؛ لا يؤثر على التوليد."
     }
   ]
 }
