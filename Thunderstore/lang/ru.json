@@ -389,6 +389,18 @@
       "value": "С последнего урона"
     },
     {
+      "key": "overlay.never",
+      "value": "никогда"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "недоступно"
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "Ошибка обновления"
+    },
+    {
       "key": "overlay.room",
       "value": "Комната"
     },

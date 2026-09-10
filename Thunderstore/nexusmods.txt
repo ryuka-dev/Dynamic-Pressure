@@ -245,6 +245,13 @@ If you are another modder, feel free to study how the mod works or use it as a r
 
 [font=Arial Black][color=DarkOrange][size=5][b]Changelog[/b][/size][/color][/font]
 
+[color=RoyalBlue][b]0.1.9[/b][/color]
+
+[list]
+[*]Fixed the mod doing nothing at all on SULFUR 0.19.7. That version removed a property the mod read every frame to tell how long ago the player was last hurt, which threw on the first frame of every session: the overlay stayed empty, no enemies were ever detected, and a manual spawn reported a spawn exception. The mod now keeps that timer itself, so it no longer depends on that property.[/*]
+[*]The overlay reports it when a game update breaks something the mod reads, and the failure is logged once instead of once per frame. Previously a single missing member could write tens of thousands of identical errors into a run's log.[/*]
+[*]Removed a startup warning about a level transition method that has never existed. Level transitions were already detected through the methods the game does have.[/*]
+[/list]
 [color=RoyalBlue][b]0.1.8[/b][/color]
 
 [list]

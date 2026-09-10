@@ -389,6 +389,18 @@
       "value": "Sedan senaste skada"
     },
     {
+      "key": "overlay.never",
+      "value": "aldrig"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "otillgänglig"
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "Uppdateringsfel"
+    },
+    {
       "key": "overlay.room",
       "value": "Rum"
     },

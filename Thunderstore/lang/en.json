@@ -389,6 +389,18 @@
       "value": "DamageAgo"
     },
     {
+      "key": "overlay.never",
+      "value": "never"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "n/a"
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "Update Error"
+    },
+    {
       "key": "overlay.room",
       "value": "Room"
     },

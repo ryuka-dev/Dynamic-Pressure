@@ -389,6 +389,18 @@
       "value": "Od ostatnich obrażeń"
     },
     {
+      "key": "overlay.never",
+      "value": "nigdy"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "niedostępne"
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "Błąd aktualizacji"
+    },
+    {
       "key": "overlay.room",
       "value": "Pokój"
     },

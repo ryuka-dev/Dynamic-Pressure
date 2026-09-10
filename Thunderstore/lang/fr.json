@@ -389,6 +389,18 @@
       "value": "Dernier dégât"
     },
     {
+      "key": "overlay.never",
+      "value": "jamais"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "indisponible"
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "Erreur de mise à jour"
+    },
+    {
       "key": "overlay.room",
       "value": "Salle"
     },

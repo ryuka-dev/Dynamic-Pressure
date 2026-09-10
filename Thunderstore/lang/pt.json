@@ -389,6 +389,18 @@
       "value": "Último dano"
     },
     {
+      "key": "overlay.never",
+      "value": "nunca"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "indisp."
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "Erro de atualização"
+    },
+    {
       "key": "overlay.room",
       "value": "Sala"
     },

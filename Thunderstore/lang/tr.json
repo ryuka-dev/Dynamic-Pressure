@@ -389,6 +389,18 @@
       "value": "Son hasardan beri"
     },
     {
+      "key": "overlay.never",
+      "value": "hiç"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "kullanılamıyor"
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "Güncelleme hatası"
+    },
+    {
       "key": "overlay.room",
       "value": "Oda"
     },

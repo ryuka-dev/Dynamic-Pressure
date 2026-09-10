@@ -389,6 +389,18 @@
       "value": "Letzter Schaden"
     },
     {
+      "key": "overlay.never",
+      "value": "nie"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "n. v."
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "Update-Fehler"
+    },
+    {
       "key": "overlay.room",
       "value": "Raum"
     },

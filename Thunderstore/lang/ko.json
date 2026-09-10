@@ -389,6 +389,18 @@
       "value": "마지막 피해 이후"
     },
     {
+      "key": "overlay.never",
+      "value": "피해 없음"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "사용 불가"
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "업데이트 오류"
+    },
+    {
       "key": "overlay.room",
       "value": "방"
     },

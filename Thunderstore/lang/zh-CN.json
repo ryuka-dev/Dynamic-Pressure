@@ -389,6 +389,18 @@
       "value": "距上次受伤"
     },
     {
+      "key": "overlay.never",
+      "value": "未受伤"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "不可用"
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "帧更新错误"
+    },
+    {
       "key": "overlay.room",
       "value": "房间"
     },

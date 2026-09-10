@@ -23,7 +23,7 @@ namespace Ryuka.Sulfur.DynamicPressure
     {
         public const string PluginGuid = "ryuka.sulfur.dynamicpressure";
         public const string PluginName = "Dynamic Pressure";
-        public const string PluginVersion = "0.1.8";
+        public const string PluginVersion = "0.1.9";
 
         private static DynamicPressurePlugin _instance;
         private Harmony _harmony;
@@ -110,6 +110,18 @@ namespace Ryuka.Sulfur.DynamicPressure
         private float _lastOriginalKillTime = -9999f;
         private float _lastModKillTime = -9999f;
 
+        // Game 0.19.7 removed Unit.TimeSinceLastDamageTaken, which used to answer "how long has it
+        // been since the player was hit". Both readers of it were about the player only - one
+        // safety gate, one overlay readout - so Dynamic Pressure keeps the timestamp itself from
+        // the damage call rather than depending on a property the game may rename or drop again.
+        private const float NeverDamagedTime = -99999f;
+        private const float NeverDamagedSeconds = 9999f;
+        private static float _playerLastDamageTime = NeverDamagedTime;
+        private static bool _playerDamageTimerActive;
+
+        private string _lastUpdateFailure;
+        private int _updateFailureCount;
+
         private Snapshot _snapshot = new Snapshot();
         private SpawnBlockReason _lastBlockReason = SpawnBlockReason.None;
         private string _lastDecision = "None";
@@ -129,6 +141,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             TryPatchTransitions();
             TryPatchNpcDie();
             TryPatchAllDeadTrigger();
+            TryPatchPlayerDamageTimer();
 
             Log("Loaded.");
         }
@@ -212,6 +225,20 @@ namespace Ryuka.Sulfur.DynamicPressure
                 return;
             }
 
+            try
+            {
+                UpdatePressure();
+            }
+            catch (Exception e)
+            {
+                ReportUpdateFailure(e);
+            }
+
+            LogSpawnDiagnostics();
+        }
+
+        private void UpdatePressure()
+        {
             GameManager gm = StaticInstance<GameManager>.Instance;
             if (gm != null && gm.graphContext != null && !ReferenceEquals(_lastGraphContext, gm.graphContext))
             {
@@ -229,8 +256,37 @@ namespace Ryuka.Sulfur.DynamicPressure
             {
                 TryAutoSpawn();
             }
+        }
 
-            LogSpawnDiagnostics();
+        /// <summary>
+        /// A game update that removes or renames something read every frame used to take the whole
+        /// plugin down with it and bury the player's log: 0.19.7 dropping
+        /// Unit.TimeSinceLastDamageTaken threw on the first frame of the session and wrote roughly
+        /// 27000 stack traces into a single run, with no working overlay left to say why. Report a
+        /// given failure once, count the repeats, and leave the overlay and the keys alive so the
+        /// cause is still visible in game.
+        /// </summary>
+        private void ReportUpdateFailure(Exception e)
+        {
+            string signature = e.GetType().Name + ": " + e.Message;
+
+            if (signature != _lastUpdateFailure)
+            {
+                _lastUpdateFailure = signature;
+                _updateFailureCount = 0;
+                AddEvent("Pressure update failed: " + e.GetType().Name);
+                Logger.LogError(
+                    "Pressure update failed. Repeats of this same failure are counted, not logged."
+                );
+                Logger.LogError(e);
+            }
+
+            _updateFailureCount++;
+
+            // Nothing below this point produced a decision, so do not leave the last successful one
+            // on screen as though it still described the current frame.
+            _lastDecision = "FAILED";
+            _lastBlockReason = SpawnBlockReason.UpdateFailed;
         }
 
         /// <summary>
@@ -324,7 +380,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             s.hasPlayer = true;
             s.playerAlive = playerUnit.IsAlive;
             s.playerHp = SafeGetPlayerHp(playerUnit);
-            s.playerTimeSinceDamage = playerUnit.TimeSinceLastDamageTaken;
+            s.playerTimeSinceDamage = PlayerTimeSinceDamage;
             s.playerRoomName = playerRoom != null ? playerRoom.name : "null";
             s.playerRoomIsEndRoom = playerRoom != null && playerRoom.IsEndRoom;
 
@@ -485,7 +541,7 @@ namespace Ryuka.Sulfur.DynamicPressure
                 return false;
             }
 
-            if (playerUnit.TimeSinceLastDamageTaken <= _recentDamageStopWindow.Value)
+            if (PlayerTimeSinceDamage <= _recentDamageStopWindow.Value)
             {
                 blockReason = SpawnBlockReason.RecentDamage;
                 return false;
@@ -1033,6 +1089,29 @@ namespace Ryuka.Sulfur.DynamicPressure
             }
         }
 
+        /// <summary>
+        /// Seconds since the last hit that actually took health off the player, or
+        /// <see cref="NeverDamagedSeconds"/> if that has not happened yet this session.
+        /// </summary>
+        /// <remarks>
+        /// This replaces the removed Unit.TimeSinceLastDamageTaken. The timestamp comes from
+        /// <see cref="OnUnitReceiveDamagePostfix"/>, so the value stays meaningful across level
+        /// transitions - the player Unit is destroyed and rebuilt on every level, but the clock
+        /// this reads is Time.time, which is not.
+        /// </remarks>
+        private static float PlayerTimeSinceDamage
+        {
+            get
+            {
+                if (_playerLastDamageTime <= NeverDamagedTime)
+                {
+                    return NeverDamagedSeconds;
+                }
+
+                return Mathf.Clamp(Time.time - _playerLastDamageTime, 0f, NeverDamagedSeconds);
+            }
+        }
+
         private float SafeGetPlayerHp(Unit playerUnit)
         {
             try
@@ -1291,7 +1370,68 @@ namespace Ryuka.Sulfur.DynamicPressure
             TryPatchAllNamedMethods(typeof(GameManager), "GoToLevel", prefix);
             TryPatchAllNamedMethods(typeof(GameManager), "GoToChurchHub", prefix);
             TryPatchAllNamedMethods(typeof(GameManager), "GoToCarHub", prefix);
-            TryPatchAllNamedMethods(typeof(GameManager), "SwitchLevel", prefix);
+
+            // GameManager.SwitchLevel is deliberately not in that list. The actual level swap lives
+            // in the private coroutine SwitchLevelRoutine, and every way in already goes through a
+            // target above: GoToChurchHub and GoToCarHub both delegate to GoToLevel, and the two
+            // direct StartCoroutine(SwitchLevelRoutine(...)) calls are inside the routine that
+            // CompleteLevel starts. Asking for a public "SwitchLevel" only produced a startup
+            // warning about a method that has never existed in any shipped build.
+        }
+
+        /// <summary>
+        /// Records when the player last took damage. Unit.ReceiveDamage returns true only once the
+        /// hit has survived armour, mitigation, invulnerability and the player's i-frame window and
+        /// has been applied to health, which is exactly the "player is under fire" signal the
+        /// safety gate wants.
+        /// </summary>
+        private static void OnUnitReceiveDamagePostfix(Unit __instance, bool __result)
+        {
+            if (__result && __instance != null && __instance.isPlayer)
+            {
+                _playerLastDamageTime = Time.time;
+            }
+        }
+
+        /// <summary>
+        /// Patches the single damage entry point every hit funnels into. The other overload builds
+        /// a DamageSourceData and calls this one, and Npc's override ends in base.ReceiveDamage, so
+        /// one patch on Unit sees every unit's damage; the postfix filters down to the player.
+        /// </summary>
+        private void TryPatchPlayerDamageTimer()
+        {
+            try
+            {
+                MethodInfo target = AccessTools.Method(
+                    typeof(Unit),
+                    "ReceiveDamage",
+                    new[] { typeof(float), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) }
+                );
+                MethodInfo postfix = AccessTools.Method(
+                    typeof(DynamicPressurePlugin),
+                    nameof(OnUnitReceiveDamagePostfix)
+                );
+
+                if (target == null || postfix == null)
+                {
+                    Logger.LogWarning(
+                        "Failed to patch Unit.ReceiveDamage: method not found. The RecentDamage "
+                        + "safety hold is inactive - waves will not wait out incoming player damage."
+                    );
+                    return;
+                }
+
+                _harmony.Patch(target, postfix: new HarmonyMethod(postfix));
+                _playerDamageTimerActive = true;
+                Log("Patched Unit.ReceiveDamage (player damage timer).");
+            }
+            catch (Exception e)
+            {
+                Logger.LogWarning(
+                    "Failed to patch Unit.ReceiveDamage: " + e.Message
+                    + " | The RecentDamage safety hold is inactive."
+                );
+            }
         }
 
         private void TryPatchNpcDie()
@@ -1474,7 +1614,8 @@ namespace Ryuka.Sulfur.DynamicPressure
             if (reason == SpawnBlockReason.RoomSpawnBudgetExceeded
                 || reason == SpawnBlockReason.NoValidNpcSpawnPoint
                 || reason == SpawnBlockReason.NoCandidateUnits
-                || reason == SpawnBlockReason.SpawnAsyncFailed)
+                || reason == SpawnBlockReason.SpawnAsyncFailed
+                || reason == SpawnBlockReason.UpdateFailed)
             {
                 return OverlayPalette.Tint(OverlayPalette.Bad, reason);
             }
@@ -1535,9 +1676,20 @@ namespace Ryuka.Sulfur.DynamicPressure
                 + Separator() + Label("overlay.alive", "Alive") + OverlayPalette.Flag(_snapshot.playerAlive, true)
                 + Separator() + Label("overlay.hp", "HP") + OverlayPalette.Tint(hpHex, Mathf.RoundToInt(_snapshot.playerHp * 100f) + "%")
                 + Separator() + Label("overlay.damageAgo", "DamageAgo")
-                + OverlayPalette.Tint(
-                    _snapshot.playerTimeSinceDamage <= _recentDamageStopWindow.Value ? OverlayPalette.Warn : OverlayPalette.Value,
-                    _snapshot.playerTimeSinceDamage.ToString("0.0") + "s"));
+                + (_playerDamageTimerActive
+                    ? OverlayPalette.Tint(
+                        _snapshot.playerTimeSinceDamage <= _recentDamageStopWindow.Value ? OverlayPalette.Warn : OverlayPalette.Value,
+                        _snapshot.playerTimeSinceDamage >= NeverDamagedSeconds
+                            ? OverlayText.Get("overlay.never", "never")
+                            : _snapshot.playerTimeSinceDamage.ToString("0.0") + "s")
+                    : OverlayPalette.Tint(OverlayPalette.Bad, OverlayText.Get("overlay.unavailable", "n/a"))));
+
+            if (_lastUpdateFailure != null)
+            {
+                Row(Label("overlay.updateFailure", "Update Error")
+                    + OverlayPalette.Tint(OverlayPalette.Bad, _lastUpdateFailure)
+                    + OverlayPalette.Tint(OverlayPalette.Muted, " x" + _updateFailureCount));
+            }
 
             Row(Label("overlay.room", "Room") + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.playerRoomName)
                 + Separator() + Label("overlay.endRoom", "EndRoom") + OverlayPalette.Flag(_snapshot.playerRoomIsEndRoom, false));
@@ -1792,6 +1944,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         LevelTransition,
         RecentModKillOnly,
         NoOriginalKillProgress,
-        SpawnBudgetPerOriginalExceeded
+        SpawnBudgetPerOriginalExceeded,
+        UpdateFailed
     }
 }

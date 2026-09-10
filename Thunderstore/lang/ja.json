@@ -389,6 +389,18 @@
       "value": "被弾からの経過"
     },
     {
+      "key": "overlay.never",
+      "value": "被弾なし"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "利用不可"
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "更新エラー"
+    },
+    {
       "key": "overlay.room",
       "value": "ルーム"
     },

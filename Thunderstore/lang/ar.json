@@ -389,6 +389,18 @@
       "value": "منذ آخر ضرر"
     },
     {
+      "key": "overlay.never",
+      "value": "أبدًا"
+    },
+    {
+      "key": "overlay.unavailable",
+      "value": "غير متاح"
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "خطأ في التحديث"
+    },
+    {
       "key": "overlay.room",
       "value": "الغرفة"
     },

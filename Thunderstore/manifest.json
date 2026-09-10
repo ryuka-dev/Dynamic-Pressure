@@ -1,6 +1,6 @@
 {
   "name": "DynamicPressure",
-  "version_number": "0.1.8",
+  "version_number": "0.1.9",
   "website_url": "https://github.com/ryuka-dev/ryuka-sulfur-mods",
   "description": "Adds dynamic enemy pressure on top of vanilla spawns. Monitors real-time combat pressure and spawns extra enemies when pressure is too low. Includes Light, Heavy, and Nightmare styles plus a debug overlay for tuning.",
   "dependencies": [
