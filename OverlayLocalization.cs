@@ -37,7 +37,15 @@ namespace Ryuka.Sulfur.DynamicPressure
             try
             {
                 string code = I2.Loc.LocalizationManager.CurrentLanguageCode;
-                return string.IsNullOrEmpty(code) ? null : code;
+                if (string.IsNullOrEmpty(code))
+                {
+                    return null;
+                }
+
+                // The Traditional Chinese font set is its own I2 source, coded "zh". At startup it
+                // comes before the main source and wins the code lookup; after an in-game change it
+                // comes after it and the code is "zh-TW". Same language, so report one code.
+                return code == "zh" ? "zh-TW" : code;
             }
             catch (Exception)
             {
