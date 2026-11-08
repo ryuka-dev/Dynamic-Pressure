@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0
+
+The mod has been rebuilt around a pacing director.
+
+* Reinforcements now follow a cycle of build-up, peak, fade and rest, driven by the damage you actually take. Staying in control of a level shortens the rests and brings surges sooner.
+* Added surges: larger groups from one faction, with a short warning.
+* Fixed the mod stopping as soon as a couple of enemies noticed you. Every enemy counted the same no matter how dangerous it was, so busy fights and later levels got almost no reinforcements.
+* Budgets now come from each level's own enemy generation, so later environments get more reinforcements.
+* Reinforcements now appear out of sight and away from you, and are more likely ahead than behind. The new Spawn Position setting can keep them from ever spawning behind you.
+* Reinforcements are now picked from a checked list of enemies. Ghosts, immortal hunters, vehicles and turrets no longer appear as reinforcements.
+* Light no longer adds mutated or heavy enemies. Heavy adds them from Act 2, Nightmare from the start.
+* The director now stays out of boss fights, Endless and Crypt modes, and stops adding enemies while you are nearly dead.
+* Settings have been reduced to Enable Mod, Pressure Style and Spawn Position. Your Pressure Style carries over. Other old values no longer apply and are kept in a backup file next to the config.
+* Added Traditional Chinese.
+
 ## 0.1.9
 
 * Fixed the mod doing nothing at all on SULFUR 0.19.7. That version removed a property the mod read every frame to tell how long ago the player was last hurt, which threw on the first frame of every session: the overlay stayed empty, no enemies were ever detected, and a manual spawn reported a spawn exception. The mod now keeps that timer itself, so it no longer depends on that property.
