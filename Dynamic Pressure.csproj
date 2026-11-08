@@ -108,7 +108,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Plugin.cs" />
+    <Compile Include="Overlay.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Spawner.cs" />
     <Compile Include="OverlayLocalization.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
