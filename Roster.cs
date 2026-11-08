@@ -100,6 +100,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             PressurePreset preset,
             float packBudget,
             bool lateGame,
+            float eliteMultiplier,
             List<UnitSO> eligible)
         {
             eligible.Clear();
@@ -117,7 +118,7 @@ namespace Ryuka.Sulfur.DynamicPressure
                 {
                     if (environmentUnits[i].IsValid)
                     {
-                        AddIfEligible(environmentUnits[i].GetAsset(), preset, packBudget, lateGame, eligible);
+                        AddIfEligible(environmentUnits[i].GetAsset(), preset, packBudget, lateGame, eliteMultiplier, eligible);
                     }
                 }
             }
@@ -133,7 +134,7 @@ namespace Ryuka.Sulfur.DynamicPressure
                 Npc npc = alive[i];
                 if (npc != null && npc.IsAlive && npc.gameObject.activeInHierarchy)
                 {
-                    AddIfEligible(npc.unitSO, preset, packBudget, lateGame, eligible);
+                    AddIfEligible(npc.unitSO, preset, packBudget, lateGame, eliteMultiplier, eligible);
                 }
             }
         }
@@ -143,6 +144,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             PressurePreset preset,
             float packBudget,
             bool lateGame,
+            float eliteMultiplier,
             List<UnitSO> eligible)
         {
             RosterRole role;
@@ -156,7 +158,7 @@ namespace Ryuka.Sulfur.DynamicPressure
                 return;
             }
 
-            if (role == RosterRole.Tank && (!preset.AllowTanks || (preset.TanksOnlyLate && !lateGame)))
+            if (role == RosterRole.Tank && (eliteMultiplier <= 0f || !preset.AllowTanks || (preset.TanksOnlyLate && !lateGame)))
             {
                 return;
             }

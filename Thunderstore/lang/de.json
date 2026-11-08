@@ -13,6 +13,10 @@
       "value": "Allgemein"
     },
     {
+      "key": "section.Tuning",
+      "value": "Feinabstimmung"
+    },
+    {
       "key": "section.Debug Overlay",
       "value": "Debug-Overlay"
     },
@@ -65,6 +69,38 @@
       "value": "Überall"
     },
     {
+      "key": "entry.General.RecordCombatData.name",
+      "value": "Kampfdaten aufzeichnen"
+    },
+    {
+      "key": "entry.General.RecordCombatData.description",
+      "value": "Speichert detaillierte Kampfdaten auf deinem Computer, um beim Balancing der Mod zu helfen. Drücke die Export-Taste (standardmäßig F10), während das Spiel pausiert ist oder du im Hub bist, um eine Datei zu erstellen, die du an den Mod-Autor senden kannst. Sie enthält deine Ausrüstung, Kampfstatistiken und die Liste deiner installierten Mods, aber nichts, was dich identifiziert."
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.name",
+      "value": "Verstärkungs-Multiplikator"
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.description",
+      "value": "Skaliert, wie viel Verstärkung ein Level erhalten kann. 1 ist die normale Menge des Stils."
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.name",
+      "value": "Ruhe-Multiplikator"
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.description",
+      "value": "Skaliert, wie lange sich der Regisseur nach einem Höhepunkt zurückhält. Niedrigere Werte lassen weniger Zeit zur Erholung."
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.name",
+      "value": "Elite-Multiplikator"
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.description",
+      "value": "Skaliert die Chance auf mutierte Verstärkung. 0 entfernt außerdem schwere Einheiten. Hat keine Wirkung auf Stile, die sie nicht verwenden."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -95,6 +131,14 @@
     {
       "key": "entry.Debug Overlay.LogSpawnDecisions.description",
       "value": "Schreibt die Entscheidungen des Regisseurs in das BepInEx-Log. Nur Diagnose; beeinflusst das Spawnen nicht."
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.name",
+      "value": "Taste für Kampfdaten-Export"
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.description",
+      "value": "Taste, die aufgezeichnete Kampfdaten exportiert. Funktioniert, während das Spiel pausiert ist oder du im Hub bist."
     },
     {
       "key": "overlay.title",
@@ -223,6 +267,18 @@
     {
       "key": "alert.migrated",
       "value": "Dynamischer Druck: Deine alten Einstellungen wurden durch den neuen Regisseur ersetzt."
+    },
+    {
+      "key": "alert.exported",
+      "value": "Kampfdaten exportiert. Sende die markierte Datei an den Mod-Autor."
+    },
+    {
+      "key": "alert.exportEmpty",
+      "value": "Noch keine Kampfdaten zum Exportieren vorhanden."
+    },
+    {
+      "key": "alert.exportWhere",
+      "value": "Pausiere das Spiel oder gehe in den Hub, um Kampfdaten zu exportieren."
     }
   ]
 }

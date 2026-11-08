@@ -13,6 +13,8 @@ The mod has been rebuilt around a pacing director.
 * Light no longer adds mutated or heavy enemies. Heavy adds them from Act 2, Nightmare from the start.
 * The director now stays out of boss fights, Endless and Crypt modes, and stops adding enemies while you are nearly dead.
 * Settings have been reduced to Enable Mod, Pressure Style and Spawn Position. Your Pressure Style carries over. Other old values no longer apply and are kept in a backup file next to the config.
+* Added three optional multipliers for reinforcements, rest length and elites, found under the Advanced filter in SULFUR Config.
+* Added an optional Record Combat Data setting, off by default. Press F10 while paused or in the hub to export a file you can send to help with balance.
 * Added Traditional Chinese.
 
 ## 0.1.9

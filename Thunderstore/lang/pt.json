@@ -13,6 +13,10 @@
       "value": "Geral"
     },
     {
+      "key": "section.Tuning",
+      "value": "Ajustes"
+    },
+    {
       "key": "section.Debug Overlay",
       "value": "Sobreposição de depuração"
     },
@@ -65,6 +69,38 @@
       "value": "Qualquer lugar"
     },
     {
+      "key": "entry.General.RecordCombatData.name",
+      "value": "Registrar dados de combate"
+    },
+    {
+      "key": "entry.General.RecordCombatData.description",
+      "value": "Salva dados de combate detalhados no seu computador para ajudar a balancear o mod. Pressione a tecla de exportação (F10 por padrão) com o jogo pausado ou na base para criar um arquivo que você pode enviar ao autor do mod. Ele contém seu equipamento, suas estatísticas de combate e a lista de mods instalados, e nada que identifique você."
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.name",
+      "value": "Multiplicador de reforços"
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.description",
+      "value": "Ajusta quantos reforços um nível pode receber. 1 é a quantidade normal do estilo."
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.name",
+      "value": "Multiplicador de descanso"
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.description",
+      "value": "Ajusta por quanto tempo o diretor alivia a pressão após um pico. Valores menores deixam menos tempo para se recuperar."
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.name",
+      "value": "Multiplicador de elites"
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.description",
+      "value": "Ajusta a chance de reforços mutantes. 0 também remove as unidades pesadas. Não tem efeito em estilos que não os utilizam."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -95,6 +131,14 @@
     {
       "key": "entry.Debug Overlay.LogSpawnDecisions.description",
       "value": "Escreve as decisões do diretor no log do BepInEx. Apenas diagnóstico; não afeta o spawn."
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.name",
+      "value": "Tecla de exportação de dados de combate"
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.description",
+      "value": "Tecla que exporta os dados de combate registrados. Funciona com o jogo pausado ou na base."
     },
     {
       "key": "overlay.title",
@@ -223,6 +267,18 @@
     {
       "key": "alert.migrated",
       "value": "Pressão dinâmica: seus ajustes antigos foram substituídos pelo novo diretor."
+    },
+    {
+      "key": "alert.exported",
+      "value": "Dados de combate exportados. Envie o arquivo selecionado ao autor do mod."
+    },
+    {
+      "key": "alert.exportEmpty",
+      "value": "Ainda não há dados de combate para exportar."
+    },
+    {
+      "key": "alert.exportWhere",
+      "value": "Pause o jogo ou vá para a base para exportar os dados de combate."
     }
   ]
 }

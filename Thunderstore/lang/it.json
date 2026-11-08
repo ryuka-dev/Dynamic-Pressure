@@ -13,6 +13,10 @@
       "value": "Generale"
     },
     {
+      "key": "section.Tuning",
+      "value": "Regolazioni"
+    },
+    {
       "key": "section.Debug Overlay",
       "value": "Overlay di debug"
     },
@@ -65,6 +69,38 @@
       "value": "Ovunque"
     },
     {
+      "key": "entry.General.RecordCombatData.name",
+      "value": "Registra dati di combattimento"
+    },
+    {
+      "key": "entry.General.RecordCombatData.description",
+      "value": "Salva dati di combattimento dettagliati sul tuo computer per aiutare a bilanciare la mod. Premi il tasto di esportazione (F10 per impostazione predefinita) mentre il gioco è in pausa o alla base per creare un file da inviare all'autore della mod. Contiene il tuo equipaggiamento, le statistiche di combattimento e l'elenco delle mod installate, e nulla che possa identificarti."
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.name",
+      "value": "Moltiplicatore rinforzi"
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.description",
+      "value": "Regola quanti rinforzi può ricevere un livello. 1 è la quantità normale dello stile."
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.name",
+      "value": "Moltiplicatore riposo"
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.description",
+      "value": "Regola per quanto tempo il regista allenta la pressione dopo un picco. Valori più bassi lasciano meno tempo per riprendersi."
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.name",
+      "value": "Moltiplicatore élite"
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.description",
+      "value": "Regola la probabilità di rinforzi mutati. 0 rimuove anche le unità pesanti. Non ha effetto sugli stili che non li utilizzano."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -95,6 +131,14 @@
     {
       "key": "entry.Debug Overlay.LogSpawnDecisions.description",
       "value": "Scrive le decisioni del regista nel log di BepInEx. Solo diagnostica; non influisce sullo spawn."
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.name",
+      "value": "Tasto di esportazione dati di combattimento"
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.description",
+      "value": "Tasto che esporta i dati di combattimento registrati. Funziona mentre il gioco è in pausa o alla base."
     },
     {
       "key": "overlay.title",
@@ -223,6 +267,18 @@
     {
       "key": "alert.migrated",
       "value": "Pressione dinamica: le tue vecchie impostazioni sono state sostituite dal nuovo regista."
+    },
+    {
+      "key": "alert.exported",
+      "value": "Dati di combattimento esportati. Invia il file selezionato all'autore della mod."
+    },
+    {
+      "key": "alert.exportEmpty",
+      "value": "Ancora nessun dato di combattimento da esportare."
+    },
+    {
+      "key": "alert.exportWhere",
+      "value": "Metti in pausa il gioco o torna alla base per esportare i dati di combattimento."
     }
   ]
 }

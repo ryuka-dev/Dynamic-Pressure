@@ -18,6 +18,8 @@ Roster.cs                  the enemies the director may add
 Settings.cs                player settings
 ConfigMigration.cs         one-time move from the 0.1.x config layout
 Overlay.cs                 debug overlay
+CombatFeedback.cs          opt-in combat data collection and export
+CombatRecorder.cs          writes and exports the combat data files
 OverlayLocalization.cs     language resolution for overlay text
 Thunderstore/              the release package, flattened - this is the zip
   manifest.json            name / version / dependencies

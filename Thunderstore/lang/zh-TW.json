@@ -13,6 +13,10 @@
       "value": "一般"
     },
     {
+      "key": "section.Tuning",
+      "value": "調整"
+    },
+    {
       "key": "section.Debug Overlay",
       "value": "除錯覆疊層"
     },
@@ -65,6 +69,38 @@
       "value": "任意位置"
     },
     {
+      "key": "entry.General.RecordCombatData.name",
+      "value": "記錄戰鬥資料"
+    },
+    {
+      "key": "entry.General.RecordCombatData.description",
+      "value": "在你的電腦上儲存詳細的戰鬥資料,協助調整本 Mod 的平衡。在暫停時或據點內按下匯出鍵(預設為 F10),即可產生可傳送給 Mod 作者的檔案。檔案內含你的裝備、戰鬥統計與已安裝的 Mod 清單,不含任何可辨識個人身分的資訊。"
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.name",
+      "value": "增援倍率"
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.description",
+      "value": "調整單一關卡可出現的增援數量。1 代表該檔位的標準數量。"
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.name",
+      "value": "喘息倍率"
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.description",
+      "value": "調整導演在壓力高峰過後收手的時間。數值越低,喘息的時間就越短。"
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.name",
+      "value": "菁英倍率"
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.description",
+      "value": "調整突變增援出現的機率。設為 0 時也會移除重型單位。對未使用這些敵人的檔位沒有作用。"
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "啟用覆疊層"
     },
@@ -95,6 +131,14 @@
     {
       "key": "entry.Debug Overlay.LogSpawnDecisions.description",
       "value": "將導演的決策寫入 BepInEx 記錄檔。僅供診斷,不影響生怪行為。"
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.name",
+      "value": "戰鬥資料匯出鍵"
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.description",
+      "value": "匯出已記錄戰鬥資料的按鍵。在暫停時或據點內有效。"
     },
     {
       "key": "overlay.title",
@@ -223,6 +267,18 @@
     {
       "key": "alert.migrated",
       "value": "動態壓力:你原本的調整數值已由新的導演系統取代。"
+    },
+    {
+      "key": "alert.exported",
+      "value": "戰鬥資料已匯出。請將已選取的檔案傳送給 Mod 作者。"
+    },
+    {
+      "key": "alert.exportEmpty",
+      "value": "目前還沒有可匯出的戰鬥資料。"
+    },
+    {
+      "key": "alert.exportWhere",
+      "value": "請暫停遊戲或前往據點,才能匯出戰鬥資料。"
     }
   ]
 }

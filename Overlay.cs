@@ -62,15 +62,17 @@ namespace Ryuka.Sulfur.DynamicPressure
 
         private void OnGUI()
         {
-            if (!_settings.EnableOverlay.Value)
-            {
-                return;
-            }
-
             if (_overlayStyle == null)
             {
                 _overlayStyle = new GUIStyle(GUI.skin.label);
                 _overlayStyle.richText = true;
+            }
+
+            DrawFeedbackMessage();
+
+            if (!_settings.EnableOverlay.Value)
+            {
+                return;
             }
 
             const float margin = 20f;

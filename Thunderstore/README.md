@@ -23,13 +23,14 @@ Budgets are measured from each level's own enemy generation, so later environmen
 
 ## Settings
 
-There are only three, and all of them are in the General section.
+Three control the game, and one is for helping with balance. All of them are in the General section.
 
 | Setting | What it does |
 |---|---|
 | Enable Mod | Turns the mod on or off. |
 | Pressure Style | Light, Heavy or Nightmare. Higher styles send reinforcements more often and bring tougher enemies earlier. |
 | Spawn Position | Balanced: mostly ahead and to the sides, rarely behind. Ahead: never behind you. Anywhere: any direction, and they can appear in plain sight. |
+| Record Combat Data | Off by default. See Helping With Balance below. |
 
 What each style changes:
 
@@ -40,11 +41,32 @@ What each style changes:
 | Mutated enemies | None | From Act 2 | From the start |
 | Heavy units | None | From Act 2 | From the start |
 
+### Fine Tuning
+
+Turn on the Advanced filter in SULFUR Config for three multipliers that apply on top of any style. All of them default to 1.
+
+| Setting | What it does |
+|---|---|
+| Reinforcement Multiplier | How many reinforcements a level can receive, from 0.5 to 2. |
+| Rest Multiplier | How long the director backs off after a peak, from 0.5 to 2. |
+| Elite Multiplier | The chance of mutated reinforcements, from 0 to 2. At 0, heavy units are removed too. It does nothing on Light, which has none to begin with. |
+
 ## Fair Spawns
 
 Unless you choose Anywhere, reinforcements appear out of your sight and at least 15 meters away. Anything spawning behind you has to be at least 25 meters back. They are drawn from the enemies that belong in the current environment, one faction at a time, so they fight you and not each other.
 
 The director will not add enemies in safe zones, during boss fights, in the final room, while you are nearly dead, or in Endless and Crypt modes.
+
+## Helping With Balance
+
+Balance depends on how people really play, so the mod can record your fights if you choose to.
+
+1. Turn on Record Combat Data.
+2. Play normally.
+3. Pause the game or go to the hub, then press F10.
+4. Your file manager opens with the file selected. Send that file to me on GitHub or Nexus Mods.
+
+The file is only stored on your computer until you send it. It contains your gear, how your fights went, and the list of mods you have installed. It does not contain your name, your Steam account or your save file.
 
 ## Upgrading From 0.1.x
 

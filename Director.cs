@@ -31,6 +31,7 @@ namespace Ryuka.Sulfur.DynamicPressure
     internal sealed class PressurePreset
     {
         public float PeakIntensity;
+        public float InitialUnlockedFraction;
         public float FadeExitIntensity;
         public float FadeMaxSeconds;
         public float RelaxSeconds;
@@ -50,6 +51,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         private static readonly PressurePreset Light = new PressurePreset
         {
             PeakIntensity = 0.5f,
+            InitialUnlockedFraction = 0.25f,
             FadeExitIntensity = 0.25f,
             FadeMaxSeconds = 30f,
             RelaxSeconds = 45f,
@@ -70,6 +72,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         private static readonly PressurePreset Heavy = new PressurePreset
         {
             PeakIntensity = 0.65f,
+            InitialUnlockedFraction = 0.32f,
             FadeExitIntensity = 0.32f,
             FadeMaxSeconds = 20f,
             RelaxSeconds = 24f,
@@ -90,6 +93,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         private static readonly PressurePreset Nightmare = new PressurePreset
         {
             PeakIntensity = 0.8f,
+            InitialUnlockedFraction = 0.4f,
             FadeExitIntensity = 0.4f,
             FadeMaxSeconds = 12f,
             RelaxSeconds = 12f,
@@ -152,6 +156,15 @@ namespace Ryuka.Sulfur.DynamicPressure
         }
     }
 
+    /// <summary>The player's own scaling on top of a style. 1 changes nothing.</summary>
+    internal struct DirectorTuning
+    {
+        public float Reinforcement;
+        public float Rest;
+
+        public static readonly DirectorTuning Neutral = new DirectorTuning { Reinforcement = 1f, Rest = 1f };
+    }
+
     internal struct DirectorInput
     {
         public float Now;
@@ -195,13 +208,13 @@ namespace Ryuka.Sulfur.DynamicPressure
         private const float EngagementGraceSeconds = 10f;
         private const float PaceStepPerTimeout = 0.15f;
         private const float MinimumPace = 0.5f;
-        private const float InitialUnlockedFraction = 0.25f;
         private const float TrickleShareOfUnlocked = 0.7f;
 
         private readonly Func<float, float, float> _randomRange;
 
         private PressurePreset _preset;
         private LevelCalibration _level;
+        private DirectorTuning _tuning = DirectorTuning.Neutral;
         private float _phaseElapsed;
         private float _secondsSinceHit;
         private float _secondsSinceEngaged;
@@ -247,12 +260,12 @@ namespace Ryuka.Sulfur.DynamicPressure
 
         public float TargetThreat
         {
-            get { return _level.RoomThreat * _preset.TargetThreatPerRoom; }
+            get { return _level.RoomThreat * _preset.TargetThreatPerRoom * _tuning.Reinforcement; }
         }
 
         public float AliveCap
         {
-            get { return Math.Max(_preset.AliveCapFloor, _level.RoomThreat * _preset.AliveCapPerRoom); }
+            get { return Math.Max(_preset.AliveCapFloor, _level.RoomThreat * _preset.AliveCapPerRoom) * _tuning.Reinforcement; }
         }
 
         /// <summary>
@@ -266,7 +279,7 @@ namespace Ryuka.Sulfur.DynamicPressure
                 float progress = _level.RouteRooms <= 1
                     ? 1f
                     : Clamp01((float)_highestRoute / (_level.RouteRooms - 1));
-                return TotalBudget * (InitialUnlockedFraction + (1f - InitialUnlockedFraction) * progress);
+                return TotalBudget * (_preset.InitialUnlockedFraction + (1f - _preset.InitialUnlockedFraction) * progress);
             }
         }
 
@@ -276,6 +289,11 @@ namespace Ryuka.Sulfur.DynamicPressure
         }
 
         public void StartLevel(LevelCalibration level, PressurePreset preset)
+        {
+            StartLevel(level, preset, DirectorTuning.Neutral);
+        }
+
+        public void StartLevel(LevelCalibration level, PressurePreset preset, DirectorTuning tuning)
         {
             if (preset == null)
             {
@@ -287,10 +305,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             level.AverageUnitCost = NonNegative(level.AverageUnitCost);
 
             _level = level;
-            _preset = preset;
-            TotalBudget = Math.Max(
-                preset.MinimumUnitsPerLevel * level.AverageUnitCost,
-                level.LevelThreat * preset.LevelBudgetFraction);
+            ApplyStyle(preset, tuning);
 
             Phase = DirectorPhase.BuildUp;
             Intensity = 0f;
@@ -329,17 +344,27 @@ namespace Ryuka.Sulfur.DynamicPressure
         }
 
         /// <summary>Applies a new style to the level in progress without refunding what was spent.</summary>
-        public void ChangeStyle(PressurePreset preset)
+        public void ChangeStyle(PressurePreset preset, DirectorTuning tuning)
         {
             if (preset == null)
             {
                 throw new ArgumentNullException(nameof(preset));
             }
 
+            ApplyStyle(preset, tuning);
+        }
+
+        private void ApplyStyle(PressurePreset preset, DirectorTuning tuning)
+        {
             _preset = preset;
+            _tuning = new DirectorTuning
+            {
+                Reinforcement = PositiveOrOne(tuning.Reinforcement),
+                Rest = PositiveOrOne(tuning.Rest)
+            };
             TotalBudget = Math.Max(
                 preset.MinimumUnitsPerLevel * _level.AverageUnitCost,
-                _level.LevelThreat * preset.LevelBudgetFraction);
+                _level.LevelThreat * preset.LevelBudgetFraction) * _tuning.Reinforcement;
         }
 
         /// <summary>Commits the cost of a unit that was actually placed.</summary>
@@ -458,7 +483,7 @@ namespace Ryuka.Sulfur.DynamicPressure
                     break;
 
                 case DirectorPhase.Fade:
-                    if (Intensity < _preset.FadeExitIntensity || _phaseElapsed >= _preset.FadeMaxSeconds)
+                    if (Intensity < _preset.FadeExitIntensity || _phaseElapsed >= _preset.FadeMaxSeconds * _tuning.Rest)
                     {
                         _relaxStartRoom = _highestRoute;
                         Enter(DirectorPhase.Relax);
@@ -467,7 +492,7 @@ namespace Ryuka.Sulfur.DynamicPressure
                     break;
 
                 case DirectorPhase.Relax:
-                    if (_phaseElapsed >= _preset.RelaxSeconds * Pace
+                    if (_phaseElapsed >= _preset.RelaxSeconds * _tuning.Rest * Pace
                         || _highestRoute >= _relaxStartRoom + RelaxEndsAfterRooms)
                     {
                         Enter(DirectorPhase.BuildUp);
@@ -573,6 +598,11 @@ namespace Ryuka.Sulfur.DynamicPressure
         private void ScheduleNextSurge(float now)
         {
             _nextSurgeAt = now + _randomRange(_preset.SurgeIntervalMin, _preset.SurgeIntervalMax) * Pace;
+        }
+
+        private static float PositiveOrOne(float value)
+        {
+            return float.IsNaN(value) || float.IsInfinity(value) || value <= 0f ? 1f : value;
         }
 
         private static float NonNegative(float value)

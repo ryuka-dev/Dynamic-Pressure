@@ -13,6 +13,10 @@
       "value": "Genel"
     },
     {
+      "key": "section.Tuning",
+      "value": "Ayarlar"
+    },
+    {
       "key": "section.Debug Overlay",
       "value": "Hata ayıklama kaplaması"
     },
@@ -65,6 +69,38 @@
       "value": "Her yerde"
     },
     {
+      "key": "entry.General.RecordCombatData.name",
+      "value": "Savaş verilerini kaydet"
+    },
+    {
+      "key": "entry.General.RecordCombatData.description",
+      "value": "Modun dengelenmesine yardımcı olmak için ayrıntılı savaş verilerini bilgisayarınıza kaydeder. Oyun duraklatılmışken veya merkezdeyken dışa aktarma tuşuna (varsayılan olarak F10) basarak mod yapımcısına gönderebileceğiniz bir dosya oluşturun. Dosya ekipmanınızı, savaş istatistiklerinizi ve yüklü mod listenizi içerir; sizi tanımlayan hiçbir bilgi içermez."
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.name",
+      "value": "Takviye çarpanı"
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.description",
+      "value": "Bir bölümün alabileceği takviye sayısını ölçekler. 1, stilin normal miktarıdır."
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.name",
+      "value": "Dinlenme çarpanı"
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.description",
+      "value": "Yönetmenin bir zirveden sonra ne kadar süre geri çekileceğini ölçekler. Düşük değerler toparlanmak için daha az süre demektir."
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.name",
+      "value": "Elit çarpanı"
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.description",
+      "value": "Mutasyona uğramış takviyelerin çıkma şansını ölçekler. 0 ağır birimleri de kaldırır. Bunları kullanmayan stillerde etkisi yoktur."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -95,6 +131,14 @@
     {
       "key": "entry.Debug Overlay.LogSpawnDecisions.description",
       "value": "Yönetmenin kararlarını BepInEx günlüğüne yazar. Yalnızca tanılama; doğmayı etkilemez."
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.name",
+      "value": "Savaş verisi dışa aktarma tuşu"
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.description",
+      "value": "Kaydedilen savaş verilerini dışa aktaran tuş. Oyun duraklatılmışken veya merkezdeyken çalışır."
     },
     {
       "key": "overlay.title",
@@ -223,6 +267,18 @@
     {
       "key": "alert.migrated",
       "value": "Dinamik Baskı: Eski ayar değerleriniz yeni yönetmenle değiştirildi."
+    },
+    {
+      "key": "alert.exported",
+      "value": "Savaş verileri dışa aktarıldı. Seçili dosyayı mod yapımcısına gönderin."
+    },
+    {
+      "key": "alert.exportEmpty",
+      "value": "Henüz dışa aktarılacak savaş verisi yok."
+    },
+    {
+      "key": "alert.exportWhere",
+      "value": "Savaş verilerini dışa aktarmak için oyunu duraklatın veya merkeze gidin."
     }
   ]
 }

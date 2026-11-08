@@ -13,6 +13,10 @@
       "value": "عام"
     },
     {
+      "key": "section.Tuning",
+      "value": "الضبط"
+    },
+    {
       "key": "section.Debug Overlay",
       "value": "تراكب التصحيح"
     },
@@ -65,6 +69,38 @@
       "value": "في أي مكان"
     },
     {
+      "key": "entry.General.RecordCombatData.name",
+      "value": "تسجيل بيانات القتال"
+    },
+    {
+      "key": "entry.General.RecordCombatData.description",
+      "value": "يحفظ بيانات قتال مفصّلة على حاسوبك للمساعدة في موازنة المود. اضغط مفتاح التصدير (F10 افتراضيًا) أثناء الإيقاف المؤقت أو في القاعدة لإنشاء ملف يمكنك إرساله إلى مؤلف المود. يحتوي الملف على عتادك وإحصاءات قتالك وقائمة المودات المثبتة، ولا يتضمن أي شيء يحدد هويتك."
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.name",
+      "value": "مضاعف التعزيزات"
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.description",
+      "value": "يضبط عدد التعزيزات التي يمكن أن يتلقاها المستوى. القيمة 1 هي الكمية العادية للنمط."
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.name",
+      "value": "مضاعف الراحة"
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.description",
+      "value": "يضبط مدة تراجع المخرج بعد بلوغ الذروة. القيم الأقل تعني وقتًا أقصر للتعافي."
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.name",
+      "value": "مضاعف النخبة"
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.description",
+      "value": "يضبط فرصة ظهور التعزيزات المتحوّرة. القيمة 0 تزيل الوحدات الثقيلة أيضًا. لا تأثير لها على الأنماط التي لا تستخدمها."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -95,6 +131,14 @@
     {
       "key": "entry.Debug Overlay.LogSpawnDecisions.description",
       "value": "يكتب قرارات المخرج في سجل BepInEx. للتشخيص فقط؛ لا يؤثر على التوليد."
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.name",
+      "value": "مفتاح تصدير بيانات القتال"
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.description",
+      "value": "المفتاح الذي يصدّر بيانات القتال المسجلة. يعمل أثناء الإيقاف المؤقت أو في القاعدة."
     },
     {
       "key": "overlay.title",
@@ -223,6 +267,18 @@
     {
       "key": "alert.migrated",
       "value": "الضغط الديناميكي: تم استبدال قيم الضبط القديمة بالمخرج الجديد."
+    },
+    {
+      "key": "alert.exported",
+      "value": "تم تصدير بيانات القتال. أرسل الملف المحدد إلى مؤلف المود."
+    },
+    {
+      "key": "alert.exportEmpty",
+      "value": "لا توجد بيانات قتال للتصدير بعد."
+    },
+    {
+      "key": "alert.exportWhere",
+      "value": "أوقف اللعبة مؤقتًا أو اذهب إلى القاعدة لتصدير بيانات القتال."
     }
   ]
 }

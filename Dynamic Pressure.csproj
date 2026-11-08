@@ -114,6 +114,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CombatFeedback.cs" />
+    <Compile Include="CombatRecorder.cs" />
     <Compile Include="ConfigMigration.cs" />
     <Compile Include="Director.cs" />
     <Compile Include="Overlay.cs" />

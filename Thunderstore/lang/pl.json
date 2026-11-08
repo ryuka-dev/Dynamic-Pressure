@@ -13,6 +13,10 @@
       "value": "Ogólne"
     },
     {
+      "key": "section.Tuning",
+      "value": "Dostrajanie"
+    },
+    {
       "key": "section.Debug Overlay",
       "value": "Nakładka debugowania"
     },
@@ -65,6 +69,38 @@
       "value": "Gdziekolwiek"
     },
     {
+      "key": "entry.General.RecordCombatData.name",
+      "value": "Rejestruj dane walki"
+    },
+    {
+      "key": "entry.General.RecordCombatData.description",
+      "value": "Zapisuje szczegółowe dane walki na twoim komputerze, aby pomóc w balansowaniu moda. Naciśnij klawisz eksportu (domyślnie F10) podczas pauzy lub w bazie, aby utworzyć plik, który możesz wysłać autorowi moda. Zawiera twój ekwipunek, statystyki walki i listę zainstalowanych modów, ale nic, co mogłoby cię zidentyfikować."
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.name",
+      "value": "Mnożnik posiłków"
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.description",
+      "value": "Skaluje liczbę posiłków, które może otrzymać poziom. 1 to normalna ilość dla danego stylu."
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.name",
+      "value": "Mnożnik odpoczynku"
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.description",
+      "value": "Skaluje, jak długo reżyser odpuszcza po szczycie. Niższe wartości oznaczają mniej czasu na regenerację."
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.name",
+      "value": "Mnożnik elit"
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.description",
+      "value": "Skaluje szansę na zmutowane posiłki. 0 usuwa także ciężkie jednostki. Nie ma wpływu na style, które ich nie używają."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -95,6 +131,14 @@
     {
       "key": "entry.Debug Overlay.LogSpawnDecisions.description",
       "value": "Zapisuje decyzje reżysera do logu BepInEx. Tylko diagnostyka; nie wpływa na spawn."
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.name",
+      "value": "Klawisz eksportu danych walki"
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.description",
+      "value": "Klawisz eksportujący zapisane dane walki. Działa podczas pauzy lub w bazie."
     },
     {
       "key": "overlay.title",
@@ -223,6 +267,18 @@
     {
       "key": "alert.migrated",
       "value": "Dynamiczna presja: twoje stare ustawienia zostały zastąpione przez nowego reżysera."
+    },
+    {
+      "key": "alert.exported",
+      "value": "Dane walki wyeksportowane. Wyślij zaznaczony plik autorowi moda."
+    },
+    {
+      "key": "alert.exportEmpty",
+      "value": "Brak danych walki do wyeksportowania."
+    },
+    {
+      "key": "alert.exportWhere",
+      "value": "Zatrzymaj grę lub przejdź do bazy, aby wyeksportować dane walki."
     }
   ]
 }

@@ -13,6 +13,10 @@
       "value": "通用"
     },
     {
+      "key": "section.Tuning",
+      "value": "调整"
+    },
+    {
       "key": "section.Debug Overlay",
       "value": "调试覆盖层"
     },
@@ -65,6 +69,38 @@
       "value": "任意位置"
     },
     {
+      "key": "entry.General.RecordCombatData.name",
+      "value": "记录战斗数据"
+    },
+    {
+      "key": "entry.General.RecordCombatData.description",
+      "value": "在你的电脑上保存详细的战斗数据,用于帮助平衡本 Mod。在暂停时或据点内按导出键(默认 F10),即可生成一个可发送给 Mod 作者的文件。文件包含你的装备、战斗统计和已安装的 Mod 列表,不含任何能识别你身份的信息。"
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.name",
+      "value": "增援倍率"
+    },
+    {
+      "key": "entry.Tuning.ReinforcementMultiplier.description",
+      "value": "调整一个关卡可获得的增援数量。1 为该档位的正常数量。"
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.name",
+      "value": "休整倍率"
+    },
+    {
+      "key": "entry.Tuning.RestMultiplier.description",
+      "value": "调整导演在压力高峰后放缓的时长。数值越低,恢复时间越短。"
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.name",
+      "value": "精英倍率"
+    },
+    {
+      "key": "entry.Tuning.EliteMultiplier.description",
+      "value": "调整变异增援出现的几率。设为 0 时也会移除重型单位。对不使用它们的档位无效。"
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "启用覆盖层"
     },
@@ -95,6 +131,14 @@
     {
       "key": "entry.Debug Overlay.LogSpawnDecisions.description",
       "value": "将导演的决策写入 BepInEx 日志。仅用于诊断,不影响刷怪行为。"
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.name",
+      "value": "战斗数据导出键"
+    },
+    {
+      "key": "entry.Debug Overlay.ExportCombatDataKey.description",
+      "value": "导出已记录战斗数据的按键。在暂停时或据点内有效。"
     },
     {
       "key": "overlay.title",
@@ -223,6 +267,18 @@
     {
       "key": "alert.migrated",
       "value": "动态压力:你原来的调整数值已被新的导演系统取代。"
+    },
+    {
+      "key": "alert.exported",
+      "value": "战斗数据已导出。请将选中的文件发送给 Mod 作者。"
+    },
+    {
+      "key": "alert.exportEmpty",
+      "value": "暂无可导出的战斗数据。"
+    },
+    {
+      "key": "alert.exportWhere",
+      "value": "请暂停游戏或前往据点以导出战斗数据。"
     }
   ]
 }

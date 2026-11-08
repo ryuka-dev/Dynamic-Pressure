@@ -95,7 +95,7 @@ namespace Ryuka.Sulfur.DynamicPressure
 
             try
             {
-                Roster.CollectEligible(gm, CurrentPreset, _packBudget, _lateGame, _eligible);
+                Roster.CollectEligible(gm, CurrentPreset, _packBudget, _lateGame, _settings.EliteMultiplier.Value, _eligible);
                 if (_eligible.Count == 0)
                 {
                     Block(SpawnBlockReason.NoCandidateUnits);
@@ -298,6 +298,8 @@ namespace Ryuka.Sulfur.DynamicPressure
                 Logger.LogInfo("Spawned " + summary + " | cost " + unit.SpawnCost + " | " + reason);
             }
 
+            RecordSpawn(unit, point, reason, mutation);
+
             StartCoroutine(ReportPlayerPositionLater(npc));
             return true;
         }
@@ -309,12 +311,13 @@ namespace Ryuka.Sulfur.DynamicPressure
         private string TryApplyMutation(GameManager gm, Npc npc, UnitSO unit)
         {
             PressurePreset preset = CurrentPreset;
-            if (preset.MutationChance <= 0f
+            float chance = preset.MutationChance * _settings.EliteMultiplier.Value;
+            if (chance <= 0f
                 || (preset.MutationsOnlyLate && !_lateGame)
                 || unit.disableMutations
                 || npc.PreventMutations
                 || unit.availableMutations == null
-                || UnityEngine.Random.value > preset.MutationChance)
+                || UnityEngine.Random.value > chance)
             {
                 return null;
             }

@@ -13,15 +13,34 @@ namespace Ryuka.Sulfur.DynamicPressure
         private const string AdvancedTag = "Advanced";
         private const string GeneralSection = "General";
         private const string OverlaySection = "Debug Overlay";
+        private const string TuningSection = "Tuning";
 
         public ConfigEntry<bool> EnableMod { get; private set; }
         public ConfigEntry<PressureStyle> Style { get; private set; }
         public ConfigEntry<SpawnPosition> Position { get; private set; }
+        public ConfigEntry<bool> RecordCombatData { get; private set; }
+
+        public ConfigEntry<float> ReinforcementMultiplier { get; private set; }
+        public ConfigEntry<float> RestMultiplier { get; private set; }
+        public ConfigEntry<float> EliteMultiplier { get; private set; }
 
         public ConfigEntry<bool> EnableOverlay { get; private set; }
         public ConfigEntry<Key> OverlayToggleKey { get; private set; }
         public ConfigEntry<Key> ManualSpawnKey { get; private set; }
         public ConfigEntry<bool> LogSpawnDecisions { get; private set; }
+        public ConfigEntry<Key> ExportCombatDataKey { get; private set; }
+
+        public DirectorTuning Tuning
+        {
+            get
+            {
+                return new DirectorTuning
+                {
+                    Reinforcement = ReinforcementMultiplier.Value,
+                    Rest = RestMultiplier.Value
+                };
+            }
+        }
 
         /// <summary>
         /// The configured style, with anything outside the named values pulled to the nearest one.
@@ -62,6 +81,28 @@ namespace Ryuka.Sulfur.DynamicPressure
                 SpawnPosition.Balanced,
                 "Where reinforcements appear. Balanced: mostly ahead and to the sides, rarely behind. Ahead: never behind you. Anywhere: any direction, and they can appear in plain sight.");
 
+            settings.RecordCombatData = config.Bind(
+                GeneralSection,
+                "RecordCombatData",
+                false,
+                "Saves detailed combat data on your computer to help balance the mod. Press the export key (F10 by default) while paused or in the hub to create a file you can send to the mod author. It contains your gear, combat statistics and installed mod list, and nothing that identifies you.");
+
+            settings.ReinforcementMultiplier = config.Bind(
+                TuningSection,
+                "ReinforcementMultiplier",
+                1f,
+                new ConfigDescription("Scales how many reinforcements a level can receive. 1 is the style's normal amount.", new AcceptableValueRange<float>(0.5f, 2f), AdvancedTag));
+            settings.RestMultiplier = config.Bind(
+                TuningSection,
+                "RestMultiplier",
+                1f,
+                new ConfigDescription("Scales how long the director backs off after a peak. Lower values mean less time to recover.", new AcceptableValueRange<float>(0.5f, 2f), AdvancedTag));
+            settings.EliteMultiplier = config.Bind(
+                TuningSection,
+                "EliteMultiplier",
+                1f,
+                new ConfigDescription("Scales the chance of mutated reinforcements. 0 also removes heavy units. Has no effect on styles that do not use them.", new AcceptableValueRange<float>(0f, 2f), AdvancedTag));
+
             settings.EnableOverlay = config.Bind(
                 OverlaySection,
                 "EnableOverlay",
@@ -82,6 +123,12 @@ namespace Ryuka.Sulfur.DynamicPressure
                 "LogSpawnDecisions",
                 false,
                 new ConfigDescription("Write the director's decisions to the BepInEx log. Diagnostics only; does not affect spawning.", null, AdvancedTag));
+
+            settings.ExportCombatDataKey = config.Bind(
+                OverlaySection,
+                "ExportCombatDataKey",
+                Key.F10,
+                new ConfigDescription("Key that exports recorded combat data. Works while paused or in the hub.", null, AdvancedTag));
 
             return settings;
         }

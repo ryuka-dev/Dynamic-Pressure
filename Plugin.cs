@@ -51,6 +51,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         private int _seenGeneration;
         private bool _levelStarted;
         private PressureStyle _appliedStyle;
+        private DirectorTuning _appliedTuning;
         private float _packBudget;
         private bool _lateGame;
         private float _nextScanTime;
@@ -89,6 +90,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             _settings = Settings.Bind(Config);
             _pendingMigrationNotice = ConfigMigration.Run(Config, _settings, Logger);
             _director = new Director((min, max) => UnityEngine.Random.Range(min, max));
+            CreateRecorder();
 
             // The loader searches lang/ under here and, for managers that flatten a package, this
             // folder itself.
@@ -98,6 +100,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             TryPatchTransitions();
             TryPatchAllDeadTrigger();
             TryPatchPlayerHits();
+            TryPatchNpcDeath();
             TryPatchLevelBudget();
 
             Log("Loaded.");
@@ -106,6 +109,8 @@ namespace Ryuka.Sulfur.DynamicPressure
         private void OnDestroy()
         {
             StopFollowingLanguage();
+            RecordLevelEnd();
+            _recorder?.Stop();
 
             try
             {
@@ -126,6 +131,15 @@ namespace Ryuka.Sulfur.DynamicPressure
         {
             HandleKeys();
             EnsureLanguageSubscription();
+
+            try
+            {
+                SyncRecording();
+            }
+            catch (Exception e)
+            {
+                ReportUpdateFailure(e);
+            }
 
             if (!_settings.EnableMod.Value)
             {
@@ -167,10 +181,11 @@ namespace Ryuka.Sulfur.DynamicPressure
             {
                 BeginLevel(gm);
             }
-            else if (_levelStarted && _appliedStyle != _settings.EffectiveStyle)
+            else if (_levelStarted && (_appliedStyle != _settings.EffectiveStyle || TuningChanged()))
             {
                 _appliedStyle = _settings.EffectiveStyle;
-                _director.ChangeStyle(CurrentPreset);
+                _appliedTuning = _settings.Tuning;
+                _director.ChangeStyle(CurrentPreset, _appliedTuning);
             }
 
             Snapshot snapshot = ScanWorld(gm);
@@ -192,6 +207,14 @@ namespace Ryuka.Sulfur.DynamicPressure
             });
 
             CarryOutOrders(orders);
+            RecordTick(snapshot, delta);
+        }
+
+        private bool TuningChanged()
+        {
+            DirectorTuning current = _settings.Tuning;
+            return !Mathf.Approximately(current.Reinforcement, _appliedTuning.Reinforcement)
+                || !Mathf.Approximately(current.Rest, _appliedTuning.Rest);
         }
 
         private void CarryOutOrders(DirectorOrders orders)
@@ -269,10 +292,11 @@ namespace Ryuka.Sulfur.DynamicPressure
 
             _lateGame = IsLateGame(gm);
             _appliedStyle = _settings.EffectiveStyle;
+            _appliedTuning = _settings.Tuning;
             PressurePreset preset = CurrentPreset;
 
             List<UnitSO> eligible = new List<UnitSO>();
-            Roster.CollectEligible(gm, preset, _packBudget, _lateGame, eligible);
+            Roster.CollectEligible(gm, preset, _packBudget, _lateGame, _settings.EliteMultiplier.Value, eligible);
 
             float averageCost = eligible.Count > 0 ? (float)eligible.Average(u => u.SpawnCost) : 0f;
 
@@ -285,7 +309,8 @@ namespace Ryuka.Sulfur.DynamicPressure
                     RouteRooms = routeRooms,
                     AverageUnitCost = averageCost
                 },
-                preset);
+                preset,
+                _appliedTuning);
 
             _levelStarted = true;
             _lastTickTime = 0f;
@@ -295,6 +320,8 @@ namespace Ryuka.Sulfur.DynamicPressure
             {
                 eligible[i].FetchAndLoadUnitLoader();
             }
+
+            RecordLevelStart(gm, density, spawnableRooms, routeRooms, averageCost, measured);
 
             if (_pendingMigrationNotice)
             {
@@ -363,6 +390,12 @@ namespace Ryuka.Sulfur.DynamicPressure
             {
                 _ = SpawnBatchAsync(0f, 1, false, true, "Manual debug spawn");
             }
+
+            if (_settings.ExportCombatDataKey.Value != Key.None
+                && keyboard[_settings.ExportCombatDataKey.Value].wasPressedThisFrame)
+            {
+                ExportCombatData();
+            }
         }
 
         private Snapshot ScanWorld(GameManager gm)
@@ -418,7 +451,14 @@ namespace Ryuka.Sulfur.DynamicPressure
                     }
 
                     float distance = Vector3.Distance(npc.transform.position, gm.PlayerPosition);
-                    bool isMod = npc.GetComponent<DynamicPressureSpawnMarker>() != null;
+                    DynamicPressureSpawnMarker marker = npc.GetComponent<DynamicPressureSpawnMarker>();
+                    bool isMod = marker != null;
+
+                    if (isMod && targeting && marker.firstTargetTime < 0f)
+                    {
+                        marker.firstTargetTime = Time.time;
+                    }
+
                     int cost = npc.unitSO.SpawnCost;
 
                     if (isMod && (distance <= ModUnitTrackedDistance || targeting))
@@ -643,6 +683,7 @@ namespace Ryuka.Sulfur.DynamicPressure
 
         private void ResetLevelState(string reason)
         {
+            RecordLevelEnd();
             _recentEvents.Clear();
             _waveId = 0;
             _levelStarted = false;
@@ -710,6 +751,14 @@ namespace Ryuka.Sulfur.DynamicPressure
             _levelGeneration++;
         }
 
+        private static void OnGoToMainMenuPrefix()
+        {
+            if (_instance != null)
+            {
+                _instance.RecordLevelEnd();
+            }
+        }
+
         private static void OnLevelTransitionPrefix()
         {
             if (_instance == null)
@@ -721,13 +770,24 @@ namespace Ryuka.Sulfur.DynamicPressure
             _instance._inLevelTransition = true;
         }
 
-        private static void OnPlayerDamagePrefix(Unit __instance, out float __state)
+        private static void OnPlayerDamagePrefix(Unit __instance, DamageSourceData sourceData, out float __state)
         {
             __state = -1f;
 
-            if (__instance != null && __instance.isPlayer && _instance != null)
+            if (__instance == null || _instance == null)
+            {
+                return;
+            }
+
+            if (__instance.isPlayer)
             {
                 __state = __instance.GetCurrentHealth();
+            }
+            else if (_instance.IsRecording && __instance is Npc)
+            {
+                __state = __instance.GetCurrentHealth();
+                _hitIsFromPlayer = IsFromPlayer(sourceData);
+                _hitSource = sourceData;
             }
         }
 
@@ -737,17 +797,30 @@ namespace Ryuka.Sulfur.DynamicPressure
         /// </summary>
         private static void OnPlayerDamagePostfix(Unit __instance, bool __result, float __state, DamageSourceData sourceData)
         {
+            _hitIsFromPlayer = false;
+
             if (!__result || __state < 0f || _instance == null || __instance == null)
             {
+                return;
+            }
+
+            float lost = __state - __instance.GetCurrentHealth();
+
+            if (!__instance.isPlayer)
+            {
+                if (IsFromPlayer(sourceData))
+                {
+                    _instance.RecordDamageDealt(lost, sourceData);
+                }
+
                 return;
             }
 
             float maxHealth = __instance.Stats.GetAttribute(EntityAttributes.Stat_MaxHealth);
             if (maxHealth > 0f)
             {
-                _instance._director.ReportPlayerHit(
-                    (__state - __instance.GetCurrentHealth()) / maxHealth,
-                    sourceData.states.isPeriodicModifier);
+                _instance._director.ReportPlayerHit(lost / maxHealth, sourceData.states.isPeriodicModifier);
+                _instance.RecordPlayerHit(__instance, lost, maxHealth, sourceData);
             }
         }
 
@@ -760,6 +833,11 @@ namespace Ryuka.Sulfur.DynamicPressure
             TryPatchAllNamedMethods(typeof(GameManager), "GoToLevel", prefix);
             TryPatchAllNamedMethods(typeof(GameManager), "GoToChurchHub", prefix);
             TryPatchAllNamedMethods(typeof(GameManager), "GoToCarHub", prefix);
+
+            TryPatchAllNamedMethods(
+                typeof(GameManager),
+                "GoToMainMenu",
+                AccessTools.Method(typeof(DynamicPressurePlugin), nameof(OnGoToMainMenuPrefix)));
 
             MethodInfo levelRoutine = AccessTools.Method(typeof(GameManager), "StartLevelRoutineGraph");
             MethodInfo levelPrefix = AccessTools.Method(typeof(DynamicPressurePlugin), nameof(OnStartLevelRoutinePrefix));
@@ -803,6 +881,36 @@ namespace Ryuka.Sulfur.DynamicPressure
             catch (Exception e)
             {
                 Logger.LogWarning("Failed to patch Unit.ReceiveDamage: " + e.Message + " | The director will not feel incoming damage.");
+            }
+        }
+
+        private static void OnNpcDiePostfix(Npc __instance)
+        {
+            if (_instance != null && __instance != null && _instance.IsRecording)
+            {
+                _instance.RecordDeath(__instance);
+            }
+        }
+
+        private void TryPatchNpcDeath()
+        {
+            try
+            {
+                MethodInfo target = AccessTools.Method(typeof(Npc), "Die");
+                MethodInfo postfix = AccessTools.Method(typeof(DynamicPressurePlugin), nameof(OnNpcDiePostfix));
+
+                if (target == null || postfix == null)
+                {
+                    Logger.LogWarning("Failed to patch Npc.Die: method not found. Combat data will not include kills.");
+                    return;
+                }
+
+                _harmony.Patch(target, postfix: new HarmonyMethod(postfix));
+                Log("Patched Npc.Die (combat data).");
+            }
+            catch (Exception e)
+            {
+                Logger.LogWarning("Failed to patch Npc.Die: " + e.Message + " | Combat data will not include kills.");
             }
         }
 
@@ -946,6 +1054,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         public Room spawnRoom;
         public string spawnReason;
         public int waveId;
+        public float firstTargetTime = -1f;
     }
 
     public enum SpawnBlockReason
