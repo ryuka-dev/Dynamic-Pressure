@@ -321,7 +321,8 @@ namespace Ryuka.Sulfur.DynamicPressure
                 eligible[i].FetchAndLoadUnitLoader();
             }
 
-            RecordLevelStart(gm, density, spawnableRooms, routeRooms, averageCost, measured);
+            RememberLevelCalibration(density, spawnableRooms, routeRooms, averageCost, measured);
+            RecordLevelStart(gm, false);
 
             if (_pendingMigrationNotice)
             {
@@ -770,9 +771,11 @@ namespace Ryuka.Sulfur.DynamicPressure
             _instance._inLevelTransition = true;
         }
 
-        private static void OnPlayerDamagePrefix(Unit __instance, DamageSourceData sourceData, out float __state)
+        private static void OnPlayerDamagePrefix(Unit __instance, DamageSourceData sourceData, out HitState __state)
         {
-            __state = -1f;
+            // Damage can nest (a linked enemy, reflected damage), so each hit restores what the
+            // one around it had set.
+            __state = new HitState { Health = -1f, OuterFromPlayer = _hitIsFromPlayer, OuterSource = _hitSource };
 
             if (__instance == null || _instance == null)
             {
@@ -781,11 +784,11 @@ namespace Ryuka.Sulfur.DynamicPressure
 
             if (__instance.isPlayer)
             {
-                __state = __instance.GetCurrentHealth();
+                __state.Health = __instance.GetCurrentHealth();
             }
             else if (_instance.IsRecording && __instance is Npc)
             {
-                __state = __instance.GetCurrentHealth();
+                __state.Health = __instance.GetCurrentHealth();
                 _hitIsFromPlayer = IsFromPlayer(sourceData);
                 _hitSource = sourceData;
             }
@@ -795,16 +798,17 @@ namespace Ryuka.Sulfur.DynamicPressure
         /// Feeds the director what a hit actually took off the player's health, after armour and
         /// the game's own damage scaling, which is what the player feels.
         /// </summary>
-        private static void OnPlayerDamagePostfix(Unit __instance, bool __result, float __state, DamageSourceData sourceData)
+        private static void OnPlayerDamagePostfix(Unit __instance, bool __result, HitState __state, DamageSourceData sourceData)
         {
-            _hitIsFromPlayer = false;
+            _hitIsFromPlayer = __state.OuterFromPlayer;
+            _hitSource = __state.OuterSource;
 
-            if (!__result || __state < 0f || _instance == null || __instance == null)
+            if (!__result || __state.Health < 0f || _instance == null || __instance == null)
             {
                 return;
             }
 
-            float lost = __state - __instance.GetCurrentHealth();
+            float lost = __state.Health - __instance.GetCurrentHealth();
 
             if (!__instance.isPlayer)
             {
@@ -1044,6 +1048,13 @@ namespace Ryuka.Sulfur.DynamicPressure
             public bool spawningAllowed;
             public SpawnBlockReason blockReason;
         }
+    }
+
+    internal struct HitState
+    {
+        public float Health;
+        public bool OuterFromPlayer;
+        public DamageSourceData OuterSource;
     }
 
     public sealed class DynamicPressureSpawnMarker : MonoBehaviour

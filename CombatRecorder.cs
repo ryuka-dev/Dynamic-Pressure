@@ -24,6 +24,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         private const string Extension = ".jsonl";
 
         private const int FlushAtLines = 2000;
+        private const int FlushRetryLines = 500;
         private const int KeepSessions = 20;
         private const int KeepExports = 3;
         private const int ExportSessions = 5;
@@ -42,6 +43,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         private bool _stopped;
         private bool _unavailable;
         private int _flushFailures;
+        private int _flushAtLines = FlushAtLines;
 
         public CombatRecorder(string directory, ManualLogSource log, Func<DateTime> now = null)
         {
@@ -152,7 +154,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             line.Append('}');
             _buffer.Add(line.ToString());
 
-            if (_buffer.Count >= FlushAtLines)
+            if (_buffer.Count >= _flushAtLines)
             {
                 Flush();
             }
@@ -194,7 +196,10 @@ namespace Ryuka.Sulfur.DynamicPressure
             }
             catch (Exception e)
             {
-                // Often a brief lock by an antivirus or backup tool; the next flush retries.
+                // Often a brief lock by an antivirus or backup tool, so wait for more lines before
+                // retrying instead of burning the failures on the very next event.
+                _flushAtLines = _buffer.Count + FlushRetryLines;
+
                 if (++_flushFailures >= MaxFlushFailures)
                 {
                     Silence("Combat data recording stopped: " + e.GetType().Name);
@@ -204,6 +209,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             }
 
             _flushFailures = 0;
+            _flushAtLines = FlushAtLines;
             _sessionBytes += size;
             _buffer.RemoveRange(0, lines);
 

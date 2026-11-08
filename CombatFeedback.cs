@@ -25,6 +25,12 @@ namespace Ryuka.Sulfur.DynamicPressure
         private float _nextSampleTime;
         private string _feedbackMessage;
         private float _feedbackMessageUntil;
+        private bool _sessionRecorded;
+        private float _levelDensity;
+        private int _levelSpawnableRooms;
+        private int _levelRouteRooms;
+        private float _levelAverageCost;
+        private bool _levelMeasured;
 
         // Set while a hit from the player is being applied, so a death that hit causes can be
         // credited to it: the game runs Die inside ReceiveDamage, and last-damaged-by is not
@@ -74,15 +80,23 @@ namespace Ryuka.Sulfur.DynamicPressure
             if (wanted && !_recorder.NeedsStop)
             {
                 _recorder.Start();
-                if (IsRecording)
-                {
-                    RecordSession();
-                }
+                _sessionRecorded = false;
+                ResumeLevelRecord();
             }
             else if (!wanted && _recorder.NeedsStop)
             {
                 RecordLevelEnd();
                 _recorder.Stop();
+            }
+        }
+
+        // Recording switched on during a level would otherwise lose everything until the next one.
+        private void ResumeLevelRecord()
+        {
+            GameManager gm = StaticInstance<GameManager>.Instance;
+            if (IsRecording && gm != null && gm.PlayerUnit != null && _levelStarted && !_inLevelTransition)
+            {
+                RecordLevelStart(gm, true);
             }
         }
 
@@ -107,11 +121,28 @@ namespace Ryuka.Sulfur.DynamicPressure
                 "plugins", plugins);
         }
 
-        private void RecordLevelStart(GameManager gm, float density, int spawnableRooms, int routeRooms, float averageCost, bool measured)
+        private void RememberLevelCalibration(float density, int spawnableRooms, int routeRooms, float averageCost, bool measured)
+        {
+            _levelDensity = density;
+            _levelSpawnableRooms = spawnableRooms;
+            _levelRouteRooms = routeRooms;
+            _levelAverageCost = averageCost;
+            _levelMeasured = measured;
+        }
+
+        private void RecordLevelStart(GameManager gm, bool joinedPartway)
         {
             if (!IsRecording)
             {
                 return;
+            }
+
+            // Written here rather than when recording starts, so a launch that never reaches a
+            // level leaves no file to take up a place in the export.
+            if (!_sessionRecorded)
+            {
+                _sessionRecorded = true;
+                RecordSession();
             }
 
             _levelRecord = new LevelRecord { StartTime = Time.time };
@@ -122,6 +153,7 @@ namespace Ryuka.Sulfur.DynamicPressure
                 Time.time,
                 "env", gm.currentEnvironment != null ? gm.currentEnvironment.id.ToString() : null,
                 "level", gm.currentLevelIndex,
+                "partial", joinedPartway,
                 "difficulty", SaveDifficulty(),
                 "style", _appliedStyle.ToString(),
                 "position", _settings.Position.Value.ToString(),
@@ -129,11 +161,11 @@ namespace Ryuka.Sulfur.DynamicPressure
                 "rest", _settings.RestMultiplier.Value,
                 "elite", _settings.EliteMultiplier.Value,
                 "pack_budget", _packBudget,
-                "density", density,
-                "rooms", spawnableRooms,
-                "route_rooms", routeRooms,
-                "avg_cost", averageCost,
-                "measured", measured,
+                "density", _levelDensity,
+                "rooms", _levelSpawnableRooms,
+                "route_rooms", _levelRouteRooms,
+                "avg_cost", _levelAverageCost,
+                "measured", _levelMeasured,
                 "late", _lateGame,
                 "budget", _director.TotalBudget,
                 "target", _director.TargetThreat,
