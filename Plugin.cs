@@ -196,6 +196,12 @@ namespace Ryuka.Sulfur.DynamicPressure
 
         private void CarryOutOrders(DirectorOrders orders)
         {
+            if (!_snapshot.spawningAllowed)
+            {
+                _pendingSurgeBudget = 0f;
+                return;
+            }
+
             if (orders.SurgeWarning)
             {
                 ShowAlert(OverlayText.Get("alert.surge", "Something is coming..."));
@@ -344,12 +350,14 @@ namespace Ryuka.Sulfur.DynamicPressure
                 return;
             }
 
-            if (keyboard[_settings.OverlayToggleKey.Value].wasPressedThisFrame)
+            if (_settings.OverlayToggleKey.Value != Key.None
+                && keyboard[_settings.OverlayToggleKey.Value].wasPressedThisFrame)
             {
                 _settings.EnableOverlay.Value = !_settings.EnableOverlay.Value;
             }
 
             if (_settings.EnableOverlay.Value
+                && _settings.ManualSpawnKey.Value != Key.None
                 && keyboard[_settings.ManualSpawnKey.Value].wasPressedThisFrame
                 && !_spawnInProgress)
             {

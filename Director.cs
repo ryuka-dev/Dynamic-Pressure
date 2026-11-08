@@ -186,9 +186,11 @@ namespace Ryuka.Sulfur.DynamicPressure
         private const float TrickleIntervalMin = 3f;
         private const float TrickleIntervalMax = 6f;
         private const float SurgeWarningSeconds = 2.5f;
+        private const float EngagementGraceSeconds = 10f;
         private const float PaceStepPerTimeout = 0.15f;
         private const float MinimumPace = 0.5f;
         private const float InitialUnlockedFraction = 0.25f;
+        private const float TrickleShareOfUnlocked = 0.7f;
 
         private readonly Func<float, float, float> _randomRange;
 
@@ -196,6 +198,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         private LevelCalibration _level;
         private float _phaseElapsed;
         private float _secondsSinceHit;
+        private float _secondsSinceEngaged;
         private float _nextTrickleAt;
         private float _nextSurgeAt;
         private float _surgeFireAt;
@@ -288,6 +291,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             SpentThreat = 0f;
             _phaseElapsed = 0f;
             _secondsSinceHit = float.MaxValue;
+            _secondsSinceEngaged = float.MaxValue;
             _nextTrickleAt = 0f;
             _nextSurgeAt = float.MaxValue;
             _surgeFireAt = 0f;
@@ -360,6 +364,10 @@ namespace Ryuka.Sulfur.DynamicPressure
 
             AdvancePhase(input, delta);
 
+            _secondsSinceEngaged = input.Engaged
+                ? 0f
+                : _secondsSinceEngaged < float.MaxValue ? _secondsSinceEngaged + delta : float.MaxValue;
+
             if (input.Engaged)
             {
                 _sawEngagementThisBuildUp = true;
@@ -378,7 +386,7 @@ namespace Ryuka.Sulfur.DynamicPressure
 
             IssueSurge(input, ref orders);
 
-            if (orders.SurgeBudget <= 0f)
+            if (orders.SurgeBudget <= 0f && WantsReinforcements(input))
             {
                 IssueTrickle(input, ref orders);
             }
@@ -485,6 +493,16 @@ namespace Ryuka.Sulfur.DynamicPressure
             get { return Phase == DirectorPhase.BuildUp || Phase == DirectorPhase.Sustain; }
         }
 
+        /// <summary>
+        /// False while the player is nearly dead, which has had enough already, and between
+        /// fights, where enemies sent now would only spend the level's budget on empty rooms.
+        /// </summary>
+        private bool WantsReinforcements(DirectorInput input)
+        {
+            return input.PlayerHealthFraction > CriticalHealthFraction
+                && _secondsSinceEngaged <= EngagementGraceSeconds;
+        }
+
         private void IssueTrickle(DirectorInput input, ref DirectorOrders orders)
         {
             if (!IsAddingPhase || input.Now < _nextTrickleAt)
@@ -502,7 +520,9 @@ namespace Ryuka.Sulfur.DynamicPressure
             float deficit = TargetThreat - input.WeightedThreat;
             if (deficit > 0f)
             {
-                orders.TrickleBudget = Math.Min(deficit, AvailableBudget);
+                // Steady reinforcements must not eat what the next surge needs.
+                float trickleRoom = Math.Max(0f, UnlockedBudget * TrickleShareOfUnlocked - SpentThreat);
+                orders.TrickleBudget = Math.Min(deficit, Math.Min(trickleRoom, AvailableBudget));
             }
         }
 
@@ -510,11 +530,16 @@ namespace Ryuka.Sulfur.DynamicPressure
         {
             if (_surgeWarned)
             {
-                // A warned surge always arrives: the player was told it is coming.
+                // A warned surge arrives unless the player has since dropped to critical health.
                 if (input.Now >= _surgeFireAt)
                 {
                     _surgeWarned = false;
-                    orders.SurgeBudget = Math.Min(_surgeReserved, RemainingBudget);
+
+                    if (input.PlayerHealthFraction > CriticalHealthFraction)
+                    {
+                        orders.SurgeBudget = Math.Min(_surgeReserved, RemainingBudget);
+                    }
+
                     _surgeReserved = 0f;
                     ScheduleNextSurge(input.Now);
                 }
@@ -525,6 +550,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             float surgeBudget = Math.Min(_level.PackBudget, AvailableBudget);
 
             if (Phase != DirectorPhase.BuildUp
+                || !WantsReinforcements(input)
                 || input.Now < _nextSurgeAt
                 || surgeBudget <= 0f
                 || input.ModAliveCost >= AliveCap)

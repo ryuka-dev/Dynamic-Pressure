@@ -246,9 +246,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         {
             Unit spawned = await unit.SpawnUnitAsync(this, point.position, Quaternion.identity);
 
-            // The level can change during the await; a unit from the old level is gone with it and
-            // must not be charged to the new one.
-            if (spawned == null || generation != _levelGeneration)
+            if (spawned == null)
             {
                 return false;
             }
@@ -264,12 +262,6 @@ namespace Ryuka.Sulfur.DynamicPressure
                 return false;
             }
 
-            npc.currentRoom = point.room;
-            npc.lastValidCurrentRoom = point.room;
-            npc.lastRoomCalcPosition = npc.transform.position;
-
-            string mutation = TryApplyMutation(gm, npc, unit);
-
             DynamicPressureSpawnMarker marker = npc.gameObject.AddComponent<DynamicPressureSpawnMarker>();
             marker.sourceUnitSo = unit;
             marker.spawnTime = Time.time;
@@ -277,6 +269,19 @@ namespace Ryuka.Sulfur.DynamicPressure
             marker.spawnRoom = point.room;
             marker.spawnReason = reason;
             marker.waveId = _waveId;
+
+            // The level can change during the await. A unit that outlives it keeps its marker, so
+            // no encounter waits on it, but it is not charged to the new level.
+            if (generation != _levelGeneration)
+            {
+                return false;
+            }
+
+            npc.currentRoom = point.room;
+            npc.lastValidCurrentRoom = point.room;
+            npc.lastRoomCalcPosition = npc.transform.position;
+
+            string mutation = TryApplyMutation(gm, npc, unit);
 
             if (chargeBudget)
             {
