@@ -7,7 +7,7 @@ using BepInEx.Logging;
 namespace Ryuka.Sulfur.DynamicPressure
 {
     /// <summary>
-    /// Moves a pre-0.2 configuration onto the simplified settings, once.
+    /// Moves a pre-2.0 configuration onto the simplified settings, once.
     /// </summary>
     /// <remarks>
     /// The difficulty carries over by itself because PressureStyle keeps its section and key. The
@@ -18,7 +18,7 @@ namespace Ryuka.Sulfur.DynamicPressure
     internal static class ConfigMigration
     {
         private const string LegacyMarker = "[Style 1 - Light]";
-        private const string BackupSuffix = ".pre-0.2.bak";
+        private const string BackupSuffix = ".pre-2.0.bak";
         private const string AbsentValue = "__dynamic_pressure_absent__";
         private const string AutoSpawnKey = "EnableAutoSpawn";
         private const string GeneralSection = "General";

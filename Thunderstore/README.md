@@ -91,7 +91,7 @@ The file stays on your computer unless you send it. It has your gear, how your f
 
 ## Upgrading From 0.1.x
 
-Your Pressure Style carries over. The old tuning values (target pressure, cooldowns and so on) are gone, so any changes you made to them won't apply. Your old settings are backed up next to the config as `ryuka.sulfur.dynamicpressure.cfg.pre-0.2.bak`.
+Your Pressure Style carries over. The old tuning values (target pressure, cooldowns and so on) are gone, so any changes you made to them won't apply. Your old settings are backed up next to the config as `ryuka.sulfur.dynamicpressure.cfg.pre-2.0.bak`.
 
 If you had Enable Auto Spawn off, the mod is now off through Enable Mod instead. Turn that back on to use it.
 

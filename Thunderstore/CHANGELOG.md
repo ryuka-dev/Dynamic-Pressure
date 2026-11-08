@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0
+## 2.0.0
 
 The mod has been rebuilt around a pacing director.
 

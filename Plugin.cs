@@ -23,7 +23,7 @@ namespace Ryuka.Sulfur.DynamicPressure
     {
         public const string PluginGuid = "ryuka.sulfur.dynamicpressure";
         public const string PluginName = "Dynamic Pressure";
-        public const string PluginVersion = "0.2.0";
+        public const string PluginVersion = "2.0.0";
 
         private const float ScanIntervalSeconds = 0.5f;
         private const float DiagLogIntervalSeconds = 5.0f;
