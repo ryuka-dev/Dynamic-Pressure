@@ -31,6 +31,8 @@ namespace Ryuka.Sulfur.DynamicPressure
     internal sealed class PressurePreset
     {
         public float PeakIntensity;
+        public float FadeExitIntensity;
+        public float FadeMaxSeconds;
         public float RelaxSeconds;
         public float BuildUpTimeoutSeconds;
         public float TargetThreatPerRoom;
@@ -48,6 +50,8 @@ namespace Ryuka.Sulfur.DynamicPressure
         private static readonly PressurePreset Light = new PressurePreset
         {
             PeakIntensity = 0.5f,
+            FadeExitIntensity = 0.25f,
+            FadeMaxSeconds = 30f,
             RelaxSeconds = 45f,
             BuildUpTimeoutSeconds = 40f,
             TargetThreatPerRoom = 1.0f,
@@ -66,7 +70,9 @@ namespace Ryuka.Sulfur.DynamicPressure
         private static readonly PressurePreset Heavy = new PressurePreset
         {
             PeakIntensity = 0.65f,
-            RelaxSeconds = 30f,
+            FadeExitIntensity = 0.32f,
+            FadeMaxSeconds = 20f,
+            RelaxSeconds = 24f,
             BuildUpTimeoutSeconds = 60f,
             TargetThreatPerRoom = 1.5f,
             LevelBudgetFraction = 0.5f,
@@ -84,7 +90,9 @@ namespace Ryuka.Sulfur.DynamicPressure
         private static readonly PressurePreset Nightmare = new PressurePreset
         {
             PeakIntensity = 0.8f,
-            RelaxSeconds = 20f,
+            FadeExitIntensity = 0.4f,
+            FadeMaxSeconds = 12f,
+            RelaxSeconds = 12f,
             BuildUpTimeoutSeconds = 90f,
             TargetThreatPerRoom = 2.2f,
             LevelBudgetFraction = 0.8f,
@@ -180,8 +188,6 @@ namespace Ryuka.Sulfur.DynamicPressure
         private const float DecayHoldAfterHitSeconds = 15f;
         private const float CriticalHealthFraction = 0.25f;
         private const float SustainSeconds = 4f;
-        private const float FadeExitIntensity = 0.25f;
-        private const float FadeMaxSeconds = 30f;
         private const int RelaxEndsAfterRooms = 2;
         private const float TrickleIntervalMin = 3f;
         private const float TrickleIntervalMax = 6f;
@@ -452,7 +458,7 @@ namespace Ryuka.Sulfur.DynamicPressure
                     break;
 
                 case DirectorPhase.Fade:
-                    if (Intensity < FadeExitIntensity || _phaseElapsed >= FadeMaxSeconds)
+                    if (Intensity < _preset.FadeExitIntensity || _phaseElapsed >= _preset.FadeMaxSeconds)
                     {
                         _relaxStartRoom = _highestRoute;
                         Enter(DirectorPhase.Relax);
