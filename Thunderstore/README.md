@@ -23,33 +23,58 @@ Budgets are measured from each level's own enemy generation, so later environmen
 
 ## Settings
 
-Three control the game, and one is for helping with balance. All of them are in the General section.
+Three settings control the game, and one helps with balance. All four are in the General section.
 
-| Setting | What it does |
-|---|---|
-| Enable Mod | Turns the mod on or off. |
-| Pressure Style | Light, Heavy or Nightmare. Higher styles send reinforcements more often and bring tougher enemies earlier. |
-| Spawn Position | Balanced: mostly ahead and to the sides, rarely behind. Ahead: never behind you. Anywhere: any direction, and they can appear in plain sight. |
-| Record Combat Data | Off by default. See Helping With Balance below. |
+### Enable Mod
 
-What each style changes:
+```ini
+EnableMod = true
+```
 
-| | Light | Heavy | Nightmare |
-|---|---|---|---|
-| Rest between peaks | Longest | Medium | Shortest |
-| Surges | Rare | Regular | Frequent |
-| Mutated enemies | None | From Act 2 | From the start |
-| Heavy units | None | From Act 2 | From the start |
+Turns the mod on or off.
+
+### Pressure Style
+
+```ini
+PressureStyle = Light
+```
+
+Light, Heavy or Nightmare. Higher styles send reinforcements more often and bring tougher enemies earlier.
+
+* **Light:** the longest rests, rare surges, no mutated enemies or heavy units.
+* **Heavy:** shorter rests, regular surges, mutated enemies and heavy units from Act 2.
+* **Nightmare:** the shortest rests, frequent surges, mutated enemies and heavy units from the start.
+
+### Spawn Position
+
+```ini
+SpawnPosition = Balanced
+```
+
+Balanced: mostly ahead and to the sides, rarely behind. Ahead: never behind you. Anywhere: any direction, and they can appear in plain sight.
+
+### Record Combat Data
+
+```ini
+RecordCombatData = false
+```
+
+Off by default. See Helping With Balance below.
 
 ### Fine Tuning
 
 Turn on the Advanced filter in SULFUR Config for three multipliers that apply on top of any style. All of them default to 1.
 
-| Setting | What it does |
-|---|---|
-| Reinforcement Multiplier | How many reinforcements a level can receive, from 0.5 to 2. |
-| Rest Multiplier | How long the director backs off after a peak, from 0.5 to 2. |
-| Elite Multiplier | The chance of mutated reinforcements, from 0 to 2. At 0, heavy units are removed too. It does nothing on Light, which has none to begin with. |
+```ini
+[Tuning]
+ReinforcementMultiplier = 1
+RestMultiplier = 1
+EliteMultiplier = 1
+```
+
+* **Reinforcement Multiplier:** how many reinforcements a level can receive, from 0.5 to 2.
+* **Rest Multiplier:** how long the director backs off after a peak, from 0.5 to 2.
+* **Elite Multiplier:** the chance of mutated reinforcements, from 0 to 2. At 0, heavy units are removed too. It does nothing on Light, which has none to begin with.
 
 ## Fair Spawns
 
