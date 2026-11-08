@@ -3,248 +3,134 @@
 You started an arms race.  
 Now the enemies are joining it too.
 
-Dynamic Pressure adds extra enemy pressure on top of the original game without replacing or reducing vanilla spawns. The mod watches the current combat state in real time and only adds enemies when the surrounding pressure is considered too low.
+Dynamic Pressure adds a director that paces extra enemies around how your fights are going. It only ever adds enemies. Vanilla spawns aren't reduced or replaced.
 
-[color=RoyalBlue][b]What It Does[/b][/color]
+[color=RoyalBlue][b]How It Plays[/b][/color]
 
-Dynamic Pressure monitors the current level and calculates a pressure value based on nearby hostile NPCs, engaged enemies, enemies targeting the player, and enemies that know the player position.
+While you're on top of things, it keeps sending more enemies. Once you've been hurt badly enough, it stops and gives you a moment to recover. Push two rooms ahead and that break ends early.
 
-When the pressure is below the configured target, the mod can spawn additional enemies using the current level's existing enemy pool. Vanilla enemy spawning is not reduced or replaced.
+Every so often you'll get a surge, a bigger group from one faction, with a short warning first.
 
-The goal is not to turn every room into an endless monster flood. The goal is to reduce low-pressure gaps and make the run feel more aggressive.
+If nothing's really hurting you, the breaks get shorter and surges come sooner. A fight that does hurt resets that, and so does the next level.
 
-[color=RoyalBlue][b]Current Balance Status[/b][/color]
+Extra enemies only come while you're fighting, so a cleared room stays clear until the next fight.
 
-Balance is still experimental.
+The number of extra enemies depends on how many the level already has, so later areas get more.
 
-The pressure calculation itself appears to be working, but the default balance is not fully tuned yet. In particular, the current Nightmare style may not feel as nightmarish as expected under the default settings.
+[color=RoyalBlue][b]Settings[/b][/color]
 
-You can enable the debug overlay to see the real-time pressure value, spawn decisions, block reasons, and current mod impact. Use those values to tune the difficulty to your preference.
+Three settings control the game and one helps with balance. They're all in the General section.
 
-[color=RoyalBlue][b]Pressure Styles[/b][/color]
+[color=DodgerBlue][b]Enable Mod[/b][/color]
 
-The mod has three configurable pressure styles:
+[code]EnableMod = true[/code]
+Turns the mod on or off.
 
-[color=DodgerBlue][b]Style 1 - Light[/b][/color]
+[color=DodgerBlue][b]Pressure Style[/b][/color]
 
-A small pressure increase.  
-Intended to fill low-pressure gaps without changing the overall feel too much.
+[code]PressureStyle = Light[/code]
+Higher styles send extra enemies more often and bring tougher ones earlier.
 
-[color=DodgerBlue][b]Style 2 - Heavy[/b][/color]
+[list]
+[*][b]Light:[/b] long breaks, rare surges, no mutated or heavy enemies.[/*]
+[*][b]Heavy:[/b] shorter breaks, regular surges, mutated and heavy enemies from Act 2 on.[/*]
+[*][b]Nightmare:[/b] short breaks, frequent surges, mutated and heavy enemies from the start.[/*]
+[/list]
+[color=DodgerBlue][b]Spawn Position[/b][/color]
 
-A stronger pressure increase.  
-Low-pressure rooms should feel more active, and combat downtime should be reduced.
+[code]SpawnPosition = Balanced[/code]
+Balanced puts them mostly ahead of you and to the sides, and rarely behind. Ahead never puts them behind you. Anywhere can use any direction, and they can appear in plain sight.
 
-[color=DodgerBlue][b]Style 3 - Nightmare[/b][/color]
+[color=DodgerBlue][b]Record Combat Data[/b][/color]
 
-The highest pressure setting.  
-This is intended to create a more oppressive experience, but the current default values may still be too conservative. Increase the recommended values below if you want a harsher version.
+[code]RecordCombatData = false[/code]
+Off by default. See Helping With Balance below.
 
-[color=RoyalBlue][b]Important Config[/b][/color]
+[color=DodgerBlue][b]Fine Tuning[/b][/color]
 
-[code][General]
-EnableMod = true
-EnableAutoSpawn = true
-PressureStyle = 1[/code]
-[color=#ffff00]EnableAutoSpawn[/color] must be [color=#ffff00]true[/color] for the mod to spawn enemies automatically.
+Turn on the Advanced filter in SULFUR Config to get three multipliers. They work with any style and all default to 1.
 
-If it is [color=#ffff00]false[/color], the mod will still load and show debug information, but it will not actively spawn enemies except through manual debug testing.
+[code][Tuning]
+ReinforcementMultiplier = 1
+RestMultiplier = 1
+EliteMultiplier = 1[/code]
+[list]
+[*][b]Reinforcement Multiplier:[/b] how many extra enemies a level can get, from 0.5 to 2.[/*]
+[*][b]Rest Multiplier:[/b] how long the breaks last, from 0.5 to 2.[/*]
+[*][b]Elite Multiplier:[/b] the chance of mutated enemies, from 0 to 2. At 0 you won't get heavy enemies either. It does nothing on Light, since Light doesn't use them.[/*]
+[/list]
+[color=RoyalBlue][b]Where Enemies Appear[/b][/color]
+
+Unless you pick Anywhere, they spawn where you can't see them and at least 15 meters away. If they spawn behind you, it's at least 25 meters back. They come from the enemies that belong in the area, one faction at a time, so they go after you instead of each other.
+
+No extra enemies appear in safe zones, during boss fights, in the final room, in Endless or Crypt modes, or while you're nearly dead.
+
+[color=RoyalBlue][b]Helping With Balance[/b][/color]
+
+I can't test every build myself, so if you'd like to help, the mod can record your fights.
+
+[list=1]
+[*]Turn on Record Combat Data.[/*]
+[*]Play normally.[/*]
+[*]Pause the game or go to the hub, then press F10.[/*]
+[*]Your file manager opens with the file selected. Send it to me on GitHub or Nexus Mods.[/*]
+[/list]
+The file stays on your computer unless you send it. It has your gear, how your fights went and your mod list. It doesn't have your name, your Steam account or your save.
+
+[color=RoyalBlue][b]Upgrading From 0.1.x[/b][/color]
+
+Your Pressure Style carries over. The old tuning values (target pressure, cooldowns and so on) are gone, so any changes you made to them won't apply. Your old settings are backed up next to the config as [color=#ffff00]ryuka.sulfur.dynamicpressure.cfg.pre-0.2.bak[/color].
+
+If you had Enable Auto Spawn off, the mod is now off through Enable Mod instead. Turn that back on to use it.
 
 [color=RoyalBlue][b]Debug Overlay[/b][/color]
 
-The debug overlay is strongly recommended while tuning the mod.
+Press F9 to see what the director is doing: its phase, intensity, threat and budget. The overlay settings are under the Advanced filter in SULFUR Config.
 
-It shows information such as:
+[color=RoyalBlue][b]Progression[/b][/color]
 
-[list]
-[*]Current pressure[/*]
-[*]Target pressure[/*]
-[*]Pressure deficit[/*]
-[*]Original hostile count[/*]
-[*]Mod-spawned hostile count[/*]
-[*]Spawn decision[/*]
-[*]Block reason[/*]
-[*]Last spawned enemy[/*]
-[*]Whether mod-spawned enemies are targeting the player[/*]
-[/list]
-Useful block reasons include:
+Extra enemies never count toward encounters, so they can't keep a gate locked once the required enemies are dead.
 
-[code]PressureAlreadyHigh
-NoEngagedOriginalHostiles
-NoValidNpcSpawnPoint
-RecentDamage
-LowHealth
-MaxModSpawnedAlive
-NoOriginalKillProgress
-SpawnBudgetPerOriginalExceeded[/code]
-If the mod is not spawning, check the overlay first. It usually explains why.
+[color=RoyalBlue][b]Known Limitations[/b][/color]
 
-[color=RoyalBlue][b]Recommended Settings[/b][/color]
+Balance is still being worked on, so let me know how it feels.
 
-The following settings are recommended as a better starting point than the early debug defaults.
+Enemies that spawn far ahead can take a while to reach you.
 
-[color=DodgerBlue][b]Light[/b][/color]
+In very open areas there may be no hidden spot nearby. On Ahead, the director waits instead of spawning anything behind you.
 
-[code][Style 1 - Light]
-TargetPressure = 6
-SpawnCooldown = 16
-MaxSpawnPerWave = 1
-MaxModSpawnedAlive = 2
-MaxModSpawnedPerRoom = 3
-MaxModSpawnedPerLevel = 8[/code]
-[color=DodgerBlue][b]Heavy[/b][/color]
+I haven't tested this version with SULFUR Together.
 
-[code][Style 2 - Heavy]
-TargetPressure = 9
-SpawnCooldown = 10
-MaxSpawnPerWave = 1
-MaxModSpawnedAlive = 4
-MaxModSpawnedPerRoom = 5
-MaxModSpawnedPerLevel = 16[/code]
-[color=DodgerBlue][b]Nightmare[/b][/color]
+[color=RoyalBlue][b]Localization[/b][/color]
 
-[code][Style 3 - Nightmare]
-TargetPressure = 13
-SpawnCooldown = 7
-MaxSpawnPerWave = 2
-MaxModSpawnedAlive = 6
-MaxModSpawnedPerRoom = 8
-MaxModSpawnedPerLevel = 28[/code]
-If Nightmare still feels too mild, try:
+Settings and the overlay follow the game's language. Most of the newer text is machine translated, so corrections are welcome.
 
-[code][Style 3 - Nightmare]
-TargetPressure = 16
-SpawnCooldown = 5
-MaxSpawnPerWave = 2
-MaxModSpawnedAlive = 8
-MaxModSpawnedPerRoom = 10
-MaxModSpawnedPerLevel = 36[/code]
-For a more extreme test:
-
-[code][Style 3 - Nightmare]
-TargetPressure = 18
-SpawnCooldown = 4
-MaxSpawnPerWave = 3
-MaxModSpawnedAlive = 10
-MaxModSpawnedPerRoom = 14
-MaxModSpawnedPerLevel = 45[/code]
-[color=RoyalBlue][b]Anti-Loop Protection[/b][/color]
-
-The mod includes safeguards to avoid endless spawning.
-
-[code][Anti Loop]
-MinOriginalEngagedHostilesForSpawn = 1
-CooldownAfterModKillOnly = 8
-MaxSecondsWithoutOriginalKill = 30
-MaxModSpawnsPerOriginalEngaged = 2[/code]
-These settings prevent the mod from repeatedly spawning enemies when only a stuck or unreachable original enemy remains.
-
-For Nightmare, you can make the mod more aggressive with:
-
-[code][Anti Loop]
-MaxModSpawnsPerOriginalEngaged = 3
-MaxSecondsWithoutOriginalKill = 40
-CooldownAfterModKillOnly = 5[/code]
-Do not raise these too much unless you specifically want a chaotic or unstable experience.
-
-[color=RoyalBlue][b]Spawn Distance[/b][/color]
-
-If the mod often shows [color=#ffff00]NoValidNpcSpawnPoint[/color], increase the spawn distance range:
-
-[code][Spawn]
-SpawnDistanceMin = 8
-SpawnDistanceMax = 60[/code]
-For testing:
-
-[code][Spawn]
-SpawnDistanceMin = 6
-SpawnDistanceMax = 120[/code]
-A larger value makes it easier for the mod to find valid spawn points, but enemies may spawn farther away and take longer to apply pressure.
-
-[color=RoyalBlue][b]Notes[/b][/color]
-
-Dynamic Pressure does not reduce vanilla enemy spawns.
-
-It does not delete vanilla enemies.
-
-It does not replace the original level generation.
-
-It only adds extra enemies when the pressure system decides that the current situation is below the configured target.
-
-[color=RoyalBlue][b]Progression Safety[/b][/color]
-
-Mod-spawned enemies are treated as additional combat pressure, not as required objectives for scripted encounters.
-
-They are excluded from vanilla [color=#ffff00]AllDeadTrigger[/color] progression checks, preventing extra enemies from keeping encounter gates locked after the original required enemies have been defeated.
-
-Enemy aggro initialization now uses the known player unit directly instead of performing an unnecessary GameObject-to-Unit lookup. This prevents Dynamic Pressure from corrupting the game's internal player lookup cache and breaking player-activated gates or scripted fight triggers.
-
-These fixes preserve the original encounter logic. The mod does not force gates open, skip required enemies, or modify vanilla player triggers.
-
-
-[color=RoyalBlue][b]Known Issues / Current Limitations[/b][/color]
-
-Balance is not final.
-
-Nightmare mode may still be too mild under the default settings.
-
-Some rooms may not have valid spawn points close enough to the player.
-
-If the current pressure is already high, the mod may not spawn anything for long periods. This is intentional.
-
-If the player is low on health or was recently damaged, the mod may stop spawning temporarily.
-
-[color=RoyalBlue][b]Suggested Tuning Process[/b][/color]
-
-[list=1]
-[*]Enable the debug overlay.[/*]
-[*]Play one or two levels.[/*]
-[*]Watch the average pressure and the block reasons.[/*]
-[*]If pressure is often below target, raise [color=#ffff00]TargetPressure[/color].[/*]
-[*]If enemies do not appear often enough, lower [color=#ffff00]SpawnCooldown[/color].[/*]
-[*]If too few enemies remain alive, raise [color=#ffff00]MaxModSpawnedAlive[/color].[/*]
-[*]If rooms feel overcrowded, lower [color=#ffff00]MaxModSpawnedPerRoom[/color].[/*]
-[*]If the mod stops too easily in Nightmare, raise [color=#ffff00]MaxModSpawnsPerOriginalEngaged[/color] from [color=#ffff00]2[/color] to [color=#ffff00]3[/color].[/*]
-[/list]
-[color=RoyalBlue][b]SULFUR Config Localization Support[/b][/color]
-
-This mod includes localization files for SULFUR Config.
-
-This localization support is only for the in-game configuration page provided by SULFUR Config. It localizes the mod name, config sections, setting names, and setting descriptions shown in the config UI.
-
-It does not change the game’s own text, item names, dialogue, or gameplay content.
-
-Supported SULFUR Config languages:
-
-[list]
-[*]English[/*]
-[*]Simplified Chinese[/*]
-[*]Swedish[/*]
-[*]French[/*]
-[*]Italian[/*]
-[*]German[/*]
-[*]Spanish[/*]
-[*]Portuguese[/*]
-[*]Russian[/*]
-[*]Polish[/*]
-[*]Japanese[/*]
-[*]Korean[/*]
-[*]Turkish[/*]
-[*]Arabic[/*]
-[/list]
 [color=RoyalBlue][b]Source Code[/b][/color]
 
-The source code for this mod is available in my GitHub repository.
-
-It is shared for learning, reference, and transparency.
-The repository only contains my original mod source code and packaging text. It does not include SULFUR game files, Unity assemblies, BepInEx binaries, paid assets, or decompiled game source.
-
-If you are another modder, feel free to study how the mod works or use it as a reference for your own implementation.
+The source is on my GitHub if you want to read it or use it as a reference for your own mod. It's only my own code and packaging text, with no SULFUR game files, Unity assemblies, BepInEx binaries, paid assets or decompiled game source.
 
 [url=https://github.com/ryuka-dev/ryuka-sulfur-mods]ryuka-sulfur-mods[/url]
 
 [font=Arial Black][color=DarkOrange][size=5][b]Changelog[/b][/size][/color][/font]
 
+[color=RoyalBlue][b]0.2.0[/b][/color]
+
+The mod has been rebuilt around a pacing director.
+
+[list]
+[*]Extra enemies now come and go in a cycle based on the damage you actually take. If nothing's really hurting you, the breaks get shorter and surges come sooner.[/*]
+[*]Added surges, bigger groups from one faction with a short warning first.[/*]
+[*]Fixed the mod stopping as soon as a couple of enemies noticed you. Every enemy counted the same no matter how dangerous it was, so busy fights and later levels got almost no extra enemies.[/*]
+[*]The number of extra enemies now depends on how many the level already has, so later areas get more.[/*]
+[*]Extra enemies now spawn out of sight and further away, and more often ahead of you than behind. The new Spawn Position setting can stop them spawning behind you at all.[/*]
+[*]Extra enemies now come from a hand-picked list, so you won't get ghosts, immortal hunters, vehicles or turrets.[/*]
+[*]Light no longer adds mutated or heavy enemies. Heavy adds them from Act 2, Nightmare from the start.[/*]
+[*]No more extra enemies in boss fights, Endless or Crypt modes, or while you're nearly dead.[/*]
+[*]Settings have been reduced to Enable Mod, Pressure Style and Spawn Position. Your Pressure Style carries over. Other old values no longer apply, and there's a backup next to the config.[/*]
+[*]Added multipliers for extra enemies, break length and elites, under the Advanced filter in SULFUR Config.[/*]
+[*]Added Record Combat Data, off by default. Press F10 while paused or in the hub to get a file you can send me to help with balance.[/*]
+[*]Added Traditional Chinese.[/*]
+[/list]
 [color=RoyalBlue][b]0.1.9[/b][/color]
 
 [list]

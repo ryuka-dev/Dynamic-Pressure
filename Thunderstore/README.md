@@ -3,27 +3,23 @@
 You started an arms race.  
 Now the enemies are joining it too.
 
-Dynamic Pressure adds a pacing director on top of the original game. It watches how a fight is going and sends reinforcements when you have room to breathe, then backs off when you have had enough. It only ever adds enemies. Vanilla spawns are not reduced or replaced.
+Dynamic Pressure adds a director that paces extra enemies around how your fights are going. It only ever adds enemies. Vanilla spawns aren't reduced or replaced.
 
 ## How It Plays
 
-The director runs in a cycle:
+While you're on top of things, it keeps sending more enemies. Once you've been hurt badly enough, it stops and gives you a moment to recover. Push two rooms ahead and that break ends early.
 
-1. **Build-up:** reinforcements arrive while you are in control.
-2. **Peak:** taking real damage pushes the director to its peak.
-3. **Fade and relax:** it stops adding enemies and gives you time to recover. Pushing two rooms forward ends the rest early.
+Every so often you'll get a surge, a bigger group from one faction, with a short warning first.
 
-Every so often a **surge** arrives: a larger group from one faction, with a short warning first.
+If nothing's really hurting you, the breaks get shorter and surges come sooner. A fight that does hurt resets that, and so does the next level.
 
-If you stay in control of a level without ever reaching a peak, the director notices. Rests get shorter and surges come sooner, so a strong build keeps being tested. A hard enough fight resets this, and so does the next level.
+Extra enemies only come while you're fighting, so a cleared room stays clear until the next fight.
 
-Reinforcements only come while you are fighting, so a cleared room stays cleared until the next fight.
-
-Budgets are measured from each level's own enemy generation, so later environments automatically get more reinforcements.
+The number of extra enemies depends on how many the level already has, so later areas get more.
 
 ## Settings
 
-Three settings control the game, and one helps with balance. All four are in the General section.
+Three settings control the game and one helps with balance. They're all in the General section.
 
 ### Enable Mod
 
@@ -39,11 +35,11 @@ Turns the mod on or off.
 PressureStyle = Light
 ```
 
-Light, Heavy or Nightmare. Higher styles send reinforcements more often and bring tougher enemies earlier.
+Higher styles send extra enemies more often and bring tougher ones earlier.
 
-* **Light:** the longest rests, rare surges, no mutated enemies or heavy units.
-* **Heavy:** shorter rests, regular surges, mutated enemies and heavy units from Act 2.
-* **Nightmare:** the shortest rests, frequent surges, mutated enemies and heavy units from the start.
+* **Light:** long breaks, rare surges, no mutated or heavy enemies.
+* **Heavy:** shorter breaks, regular surges, mutated and heavy enemies from Act 2 on.
+* **Nightmare:** short breaks, frequent surges, mutated and heavy enemies from the start.
 
 ### Spawn Position
 
@@ -51,7 +47,7 @@ Light, Heavy or Nightmare. Higher styles send reinforcements more often and brin
 SpawnPosition = Balanced
 ```
 
-Balanced: mostly ahead and to the sides, rarely behind. Ahead: never behind you. Anywhere: any direction, and they can appear in plain sight.
+Balanced puts them mostly ahead of you and to the sides, and rarely behind. Ahead never puts them behind you. Anywhere can use any direction, and they can appear in plain sight.
 
 ### Record Combat Data
 
@@ -63,7 +59,7 @@ Off by default. See Helping With Balance below.
 
 ### Fine Tuning
 
-Turn on the Advanced filter in SULFUR Config for three multipliers that apply on top of any style. All of them default to 1.
+Turn on the Advanced filter in SULFUR Config to get three multipliers. They work with any style and all default to 1.
 
 ```ini
 [Tuning]
@@ -72,62 +68,57 @@ RestMultiplier = 1
 EliteMultiplier = 1
 ```
 
-* **Reinforcement Multiplier:** how many reinforcements a level can receive, from 0.5 to 2.
-* **Rest Multiplier:** how long the director backs off after a peak, from 0.5 to 2.
-* **Elite Multiplier:** the chance of mutated reinforcements, from 0 to 2. At 0, heavy units are removed too. It does nothing on Light, which has none to begin with.
+* **Reinforcement Multiplier:** how many extra enemies a level can get, from 0.5 to 2.
+* **Rest Multiplier:** how long the breaks last, from 0.5 to 2.
+* **Elite Multiplier:** the chance of mutated enemies, from 0 to 2. At 0 you won't get heavy enemies either. It does nothing on Light, since Light doesn't use them.
 
-## Fair Spawns
+## Where Enemies Appear
 
-Unless you choose Anywhere, reinforcements appear out of your sight and at least 15 meters away. Anything spawning behind you has to be at least 25 meters back. They are drawn from the enemies that belong in the current environment, one faction at a time, so they fight you and not each other.
+Unless you pick Anywhere, they spawn where you can't see them and at least 15 meters away. If they spawn behind you, it's at least 25 meters back. They come from the enemies that belong in the area, one faction at a time, so they go after you instead of each other.
 
-The director will not add enemies in safe zones, during boss fights, in the final room, while you are nearly dead, or in Endless and Crypt modes.
+No extra enemies appear in safe zones, during boss fights, in the final room, in Endless or Crypt modes, or while you're nearly dead.
 
 ## Helping With Balance
 
-Balance depends on how people really play, so the mod can record your fights if you choose to.
+I can't test every build myself, so if you'd like to help, the mod can record your fights.
 
 1. Turn on Record Combat Data.
 2. Play normally.
 3. Pause the game or go to the hub, then press F10.
-4. Your file manager opens with the file selected. Send that file to me on GitHub or Nexus Mods.
+4. Your file manager opens with the file selected. Send it to me on GitHub or Nexus Mods.
 
-The file is only stored on your computer until you send it. It contains your gear, how your fights went, and the list of mods you have installed. It does not contain your name, your Steam account or your save file.
+The file stays on your computer unless you send it. It has your gear, how your fights went and your mod list. It doesn't have your name, your Steam account or your save.
 
 ## Upgrading From 0.1.x
 
-Your Pressure Style carries over. The old tuning values (target pressure, cooldowns, per-style limits and so on) no longer exist, so if you changed any of them they will not apply. A copy of your old settings is saved next to the config file as `ryuka.sulfur.dynamicpressure.cfg.pre-0.2.bak`.
+Your Pressure Style carries over. The old tuning values (target pressure, cooldowns and so on) are gone, so any changes you made to them won't apply. Your old settings are backed up next to the config as `ryuka.sulfur.dynamicpressure.cfg.pre-0.2.bak`.
 
-If you had Enable Auto Spawn turned off, the mod is now turned off through Enable Mod. Turn it back on to use the director.
+If you had Enable Auto Spawn off, the mod is now off through Enable Mod instead. Turn that back on to use it.
 
 ## Debug Overlay
 
-Advanced players can show the director's state with F9: current phase, intensity, threat and budget. In SULFUR Config these settings are under the Advanced filter.
+Press F9 to see what the director is doing: its phase, intensity, threat and budget. The overlay settings are under the Advanced filter in SULFUR Config.
 
-## Progression Safety
+## Progression
 
-Mod-spawned enemies are extra pressure, not objectives. They are excluded from vanilla `AllDeadTrigger` checks, so they can never keep an encounter gate locked after the required enemies are dead.
+Extra enemies never count toward encounters, so they can't keep a gate locked once the required enemies are dead.
 
 ## Known Limitations
 
-Balance is still being tuned, and feedback is welcome.
+Balance is still being worked on, so let me know how it feels.
 
-Enemies placed far ahead can take a while to reach you.
+Enemies that spawn far ahead can take a while to reach you.
 
-In a very open area there may be no hidden spawn point nearby. With Ahead, the director then waits rather than spawning behind you.
+In very open areas there may be no hidden spot nearby. On Ahead, the director waits instead of spawning anything behind you.
 
-Co-op through SULFUR Together has not been tested with this version.
+I haven't tested this version with SULFUR Together.
 
 ## Localization
 
-Settings and the debug overlay follow the game language, in all 15 languages the game ships. Most of the newer translations are machine translated, and corrections are welcome.
+Settings and the overlay follow the game's language. Most of the newer text is machine translated, so corrections are welcome.
 
 ## Source Code
 
-The source code for this mod is available in my GitHub repository.
-
-It is shared for learning, reference, and transparency.
-The repository only contains my original mod source code and packaging text. It does not include SULFUR game files, Unity assemblies, BepInEx binaries, paid assets, or decompiled game source.
-
-If you are another modder, feel free to study how the mod works or use it as a reference for your own implementation.
+The source is on my GitHub if you want to read it or use it as a reference for your own mod. It's only my own code and packaging text, with no SULFUR game files, Unity assemblies, BepInEx binaries, paid assets or decompiled game source.
 
 [ryuka-sulfur-mods](https://github.com/ryuka-dev/ryuka-sulfur-mods)

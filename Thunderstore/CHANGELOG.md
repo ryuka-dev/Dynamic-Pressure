@@ -4,17 +4,17 @@
 
 The mod has been rebuilt around a pacing director.
 
-* Reinforcements now follow a cycle of build-up, peak, fade and rest, driven by the damage you actually take. Staying in control of a level shortens the rests and brings surges sooner.
-* Added surges: larger groups from one faction, with a short warning.
-* Fixed the mod stopping as soon as a couple of enemies noticed you. Every enemy counted the same no matter how dangerous it was, so busy fights and later levels got almost no reinforcements.
-* Budgets now come from each level's own enemy generation, so later environments get more reinforcements.
-* Reinforcements now appear out of sight and away from you, and are more likely ahead than behind. The new Spawn Position setting can keep them from ever spawning behind you.
-* Reinforcements are now picked from a checked list of enemies. Ghosts, immortal hunters, vehicles and turrets no longer appear as reinforcements.
+* Extra enemies now come and go in a cycle based on the damage you actually take. If nothing's really hurting you, the breaks get shorter and surges come sooner.
+* Added surges, bigger groups from one faction with a short warning first.
+* Fixed the mod stopping as soon as a couple of enemies noticed you. Every enemy counted the same no matter how dangerous it was, so busy fights and later levels got almost no extra enemies.
+* The number of extra enemies now depends on how many the level already has, so later areas get more.
+* Extra enemies now spawn out of sight and further away, and more often ahead of you than behind. The new Spawn Position setting can stop them spawning behind you at all.
+* Extra enemies now come from a hand-picked list, so you won't get ghosts, immortal hunters, vehicles or turrets.
 * Light no longer adds mutated or heavy enemies. Heavy adds them from Act 2, Nightmare from the start.
-* The director now stays out of boss fights, Endless and Crypt modes, and stops adding enemies while you are nearly dead.
-* Settings have been reduced to Enable Mod, Pressure Style and Spawn Position. Your Pressure Style carries over. Other old values no longer apply and are kept in a backup file next to the config.
-* Added three optional multipliers for reinforcements, rest length and elites, found under the Advanced filter in SULFUR Config.
-* Added an optional Record Combat Data setting, off by default. Press F10 while paused or in the hub to export a file you can send to help with balance.
+* No more extra enemies in boss fights, Endless or Crypt modes, or while you're nearly dead.
+* Settings have been reduced to Enable Mod, Pressure Style and Spawn Position. Your Pressure Style carries over. Other old values no longer apply, and there's a backup next to the config.
+* Added multipliers for extra enemies, break length and elites, under the Advanced filter in SULFUR Config.
+* Added Record Combat Data, off by default. Press F10 while paused or in the hub to get a file you can send me to help with balance.
 * Added Traditional Chinese.
 
 ## 0.1.9
