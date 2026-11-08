@@ -132,7 +132,8 @@ namespace Ryuka.Sulfur.DynamicPressure
 
         private void RecordLevelStart(GameManager gm, bool joinedPartway)
         {
-            if (!IsRecording)
+            // The hub has no fights, only noise for whoever reads the file.
+            if (!IsRecording || gm.InSafeZone || gm.IsPlayerAtChurch)
             {
                 return;
             }
