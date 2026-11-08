@@ -121,4 +121,4 @@ Settings and the overlay follow the game's language. Most of the newer text is m
 
 The source is on my GitHub if you want to read it or use it as a reference for your own mod. It's only my own code and packaging text, with no SULFUR game files, Unity assemblies, BepInEx binaries, paid assets or decompiled game source.
 
-[ryuka-sulfur-mods](https://github.com/ryuka-dev/ryuka-sulfur-mods)
+[Dynamic-Pressure](https://github.com/ryuka-dev/Dynamic-Pressure)
