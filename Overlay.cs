@@ -1,20 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using BepInEx;
-using BepInEx.Configuration;
-using HarmonyLib;
+using System;
 using PerfectRandom.Sulfur.Core;
-using PerfectRandom.Sulfur.Core.LevelGeneration;
-using PerfectRandom.Sulfur.Core.Units;
-using PerfectRandom.Sulfur.Core.Units.AI;
 using PerfectRandom.Sulfur.Core.Utilities;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Ryuka.Sulfur.DynamicPressure
 {
@@ -35,10 +22,6 @@ namespace Ryuka.Sulfur.DynamicPressure
             return OverlayPalette.Tint(OverlayPalette.Muted, "  |  ");
         }
 
-        /// <summary>
-        /// Colour for a decision word: a wave that placed enemies reads green, a wave that was
-        /// held back reads amber, and a wave that tried and failed reads red.
-        /// </summary>
         private static string TintDecision(string decision)
         {
             if (decision == "SPAWNED")
@@ -59,11 +42,6 @@ namespace Ryuka.Sulfur.DynamicPressure
             return OverlayPalette.Tint(OverlayPalette.Muted, decision);
         }
 
-        /// <summary>
-        /// Colour for a block reason. The reasons raised from inside a wave mean the wave ran its
-        /// full cost and still placed nothing, so they read red; the reasons that stop a wave
-        /// before it starts are ordinary pacing and read amber.
-        /// </summary>
         private static string TintReason(SpawnBlockReason reason)
         {
             if (reason == SpawnBlockReason.None)
@@ -71,8 +49,7 @@ namespace Ryuka.Sulfur.DynamicPressure
                 return OverlayPalette.Tint(OverlayPalette.Good, reason);
             }
 
-            if (reason == SpawnBlockReason.RoomSpawnBudgetExceeded
-                || reason == SpawnBlockReason.NoValidNpcSpawnPoint
+            if (reason == SpawnBlockReason.NoFairSpawnPoint
                 || reason == SpawnBlockReason.NoCandidateUnits
                 || reason == SpawnBlockReason.SpawnAsyncFailed
                 || reason == SpawnBlockReason.UpdateFailed)
@@ -85,7 +62,7 @@ namespace Ryuka.Sulfur.DynamicPressure
 
         private void OnGUI()
         {
-            if (!_enableOverlay.Value)
+            if (!_settings.EnableOverlay.Value)
             {
                 return;
             }
@@ -96,9 +73,6 @@ namespace Ryuka.Sulfur.DynamicPressure
                 _overlayStyle.richText = true;
             }
 
-            // The panel grows with the window instead of being a fixed 620x620, and its body
-            // scrolls, so a long recent-events list or a language whose labels wrap onto extra
-            // lines cannot push content out of sight.
             const float margin = 20f;
             const float top = 120f;
             float width = Mathf.Min(680f, Screen.width - margin * 2f);
@@ -110,39 +84,22 @@ namespace Ryuka.Sulfur.DynamicPressure
             GUILayout.BeginArea(new Rect(rect.x + 10f, rect.y + 25f, rect.width - 20f, rect.height - 35f));
             _overlayScroll = GUILayout.BeginScrollView(_overlayScroll);
 
-            Row(Label("overlay.enabled", "Enabled") + OverlayPalette.Flag(_enableMod.Value, true)
-                + Separator() + Label("overlay.autoSpawn", "AutoSpawn") + OverlayPalette.Flag(_enableAutoSpawn.Value, true)
-                + Separator() + Label("overlay.style", "Style") + OverlayPalette.Tint(OverlayPalette.Accent, GetStyle()));
+            Row(Label("overlay.enabled", "Enabled") + OverlayPalette.Flag(_settings.EnableMod.Value, true)
+                + Separator() + Label("overlay.style", "Style") + OverlayPalette.Tint(OverlayPalette.Accent, _settings.EffectiveStyle)
+                + Separator() + Label("overlay.position", "Position") + OverlayPalette.Tint(OverlayPalette.Accent, _settings.Position.Value));
 
             Row(Label("overlay.gameState", "GameState")
                 + OverlayPalette.Tint(_snapshot.gameState == "Running" ? OverlayPalette.Good : OverlayPalette.Warn, _snapshot.gameState)
                 + Separator() + Label("overlay.safeZone", "SafeZone") + OverlayPalette.Flag(_snapshot.inSafeZone, false)
                 + Separator() + Label("overlay.env", "Env") + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.currentEnvironment));
 
-            string hpHex = OverlayPalette.Good;
-            if (_snapshot.playerHp <= _lowHealthStopThreshold.Value)
-            {
-                hpHex = OverlayPalette.Bad;
-            }
-            else if (_snapshot.playerHp < 0.5f)
-            {
-                hpHex = OverlayPalette.Warn;
-            }
-
             Row(Label("overlay.player", "Player")
                 + (_snapshot.hasPlayer
                     ? OverlayPalette.Tint(OverlayPalette.Good, OverlayText.Get("overlay.ok", "OK"))
                     : OverlayPalette.Tint(OverlayPalette.Bad, OverlayText.Get("overlay.missing", "Missing")))
-                + Separator() + Label("overlay.alive", "Alive") + OverlayPalette.Flag(_snapshot.playerAlive, true)
-                + Separator() + Label("overlay.hp", "HP") + OverlayPalette.Tint(hpHex, Mathf.RoundToInt(_snapshot.playerHp * 100f) + "%")
-                + Separator() + Label("overlay.damageAgo", "DamageAgo")
-                + (_playerDamageTimerActive
-                    ? OverlayPalette.Tint(
-                        _snapshot.playerTimeSinceDamage <= _recentDamageStopWindow.Value ? OverlayPalette.Warn : OverlayPalette.Value,
-                        _snapshot.playerTimeSinceDamage >= NeverDamagedSeconds
-                            ? OverlayText.Get("overlay.never", "never")
-                            : _snapshot.playerTimeSinceDamage.ToString("0.0") + "s")
-                    : OverlayPalette.Tint(OverlayPalette.Bad, OverlayText.Get("overlay.unavailable", "n/a"))));
+                + Separator() + Label("overlay.hp", "HP")
+                + OverlayPalette.Tint(_snapshot.playerHp < 0.5f ? OverlayPalette.Warn : OverlayPalette.Good, Mathf.RoundToInt(_snapshot.playerHp * 100f) + "%")
+                + (_hitPatchActive ? string.Empty : Separator() + OverlayPalette.Tint(OverlayPalette.Bad, OverlayText.Get("overlay.noHitSensor", "no hit sensor"))));
 
             if (_lastUpdateFailure != null)
             {
@@ -152,49 +109,28 @@ namespace Ryuka.Sulfur.DynamicPressure
             }
 
             Row(Label("overlay.room", "Room") + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.playerRoomName)
-                + Separator() + Label("overlay.endRoom", "EndRoom") + OverlayPalette.Flag(_snapshot.playerRoomIsEndRoom, false));
+                + Separator() + Label("overlay.route", "Route") + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.routeRoomIndex));
 
             GUILayout.Space(8f);
-            Row(Header("overlay.section.pressure", "Pressure"));
-            Row(Label("overlay.originalHostileAlive", "Original Hostile Alive") + OverlayPalette.Count(_snapshot.originalHostileAlive)
-                + Separator() + Label("overlay.engaged", "Engaged") + OverlayPalette.Count(_snapshot.originalEngagedHostiles)
-                + Separator() + Label("overlay.targeting", "Targeting") + OverlayPalette.Count(_snapshot.originalTargetingPlayer));
-
-            Row(Label("overlay.modHostileAlive", "Mod Hostile Alive") + OverlayPalette.Budget(_snapshot.modHostileAlive, GetMaxModAlive())
-                + Separator() + Label("overlay.targeting", "Targeting") + OverlayPalette.Count(_snapshot.modTargetingPlayer));
-
-            Row(Label("overlay.originalPressure", "Original Pressure") + OverlayPalette.Count(_snapshot.originalPressure)
-                + Separator() + Label("overlay.modPressure", "Mod Pressure") + OverlayPalette.Count(_snapshot.modPressure)
-                + Separator() + Label("overlay.current", "Current")
-                + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.currentPressure)
-                + OverlayPalette.Tint(OverlayPalette.Muted, " / " + _snapshot.targetPressure)
-                + Separator() + Label("overlay.deficit", "Deficit")
-                + OverlayPalette.Tint(_snapshot.deficit > 0 ? OverlayPalette.Warn : OverlayPalette.Good, _snapshot.deficit));
+            Row(Header("overlay.section.director", "Director"));
+            Row(Label("overlay.phase", "Phase") + OverlayPalette.Tint(OverlayPalette.Accent, _director.Phase)
+                + Separator() + Label("overlay.intensity", "Intensity") + OverlayPalette.Tint(OverlayPalette.Value, _director.Intensity.ToString("0.00"))
+                + Separator() + Label("overlay.pace", "Pace") + OverlayPalette.Tint(OverlayPalette.Value, _director.Pace.ToString("0.00")));
+            Row(Label("overlay.threat", "Threat")
+                + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.weightedThreat.ToString("0.0"))
+                + OverlayPalette.Tint(OverlayPalette.Muted, " / " + _director.TargetThreat.ToString("0.0"))
+                + Separator() + Label("overlay.engaged", "Engaged") + OverlayPalette.Flag(_snapshot.engaged, true)
+                + Separator() + Label("overlay.present", "Present") + OverlayPalette.Count(_snapshot.threatsPresent));
+            Row(Label("overlay.modAlive", "Mod Alive")
+                + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.modAlive + " (" + _snapshot.modAliveCost.ToString("0") + "/" + _director.AliveCap.ToString("0") + ")")
+                + Separator() + Label("overlay.budget", "Budget")
+                + OverlayPalette.Tint(OverlayPalette.Value, _director.SpentThreat.ToString("0") + " / " + _director.UnlockedBudget.ToString("0") + " / " + _director.TotalBudget.ToString("0")));
 
             GUILayout.Space(8f);
             Row(Header("overlay.section.spawnDecision", "Spawn Decision"));
             Row(Label("overlay.lastDecision", "Last Decision") + TintDecision(_lastDecision)
                 + Separator() + Label("overlay.reason", "Reason") + TintReason(_lastBlockReason));
-
-            Row(Label("overlay.nextSpawnIn", "Next Spawn In")
-                + OverlayPalette.Tint(_snapshot.nextSpawnIn > 0f ? OverlayPalette.Value : OverlayPalette.Muted,
-                    _snapshot.nextSpawnIn.ToString("0.0") + "s")
-                + Separator() + Label("overlay.candidateSource", "Candidate Source")
-                + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.candidateSource)
-                + Separator() + Label("overlay.candidates", "Candidates")
-                + OverlayPalette.Tint(_snapshot.candidateCount > 0 ? OverlayPalette.Value : OverlayPalette.Bad, _snapshot.candidateCount));
-
-            GUILayout.Space(8f);
-            Row(Header("overlay.section.modImpact", "Mod Impact"));
-            Row(Label("overlay.spawnedThisLevel", "Spawned This Level") + OverlayPalette.Budget(_spawnedThisLevel, GetMaxModPerLevel()));
-            Row(Label("overlay.spawnedSinceOriginalKill", "Spawned Since Last Original Kill") + OverlayPalette.Count(_spawnedSinceLastOriginalKill));
-            Row(Label("overlay.timeSinceOriginalKill", "Time Since Original Kill")
-                + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.timeSinceLastOriginalKill.ToString("0.0") + "s")
-                + Separator() + Label("overlay.timeSinceModKill", "Time Since Mod Kill")
-                + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.timeSinceLastModKill.ToString("0.0") + "s"));
-            Row(Label("overlay.wouldDelayAllDead", "Would Delay OnAllEnemiesDead") + OverlayPalette.Flag(_snapshot.wouldDelayOnAllEnemiesDead, false));
             Row(Label("overlay.lastSpawn", "Last Spawn") + OverlayPalette.Tint(OverlayPalette.Value, _lastSpawnSummary));
-            Row(Label("overlay.lastAggroReport", "Last Aggro Report") + OverlayPalette.Tint(OverlayPalette.Value, _lastAggroReport));
 
             GUILayout.Space(8f);
             Row(OverlayPalette.Tint(OverlayPalette.Muted,

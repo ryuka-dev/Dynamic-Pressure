@@ -17,52 +17,12 @@
       "value": "调试覆盖层"
     },
     {
-      "key": "section.Pressure",
-      "value": "压力"
-    },
-    {
-      "key": "section.Safety",
-      "value": "安全"
-    },
-    {
-      "key": "section.Anti Loop",
-      "value": "防循环"
-    },
-    {
-      "key": "section.Candidates",
-      "value": "候选池"
-    },
-    {
-      "key": "section.Spawn",
-      "value": "刷怪"
-    },
-    {
-      "key": "section.Style 1 - Light",
-      "value": "风格 1 - 轻度"
-    },
-    {
-      "key": "section.Style 2 - Heavy",
-      "value": "风格 2 - 重度"
-    },
-    {
-      "key": "section.Style 3 - Nightmare",
-      "value": "风格 3 - 噩梦"
-    },
-    {
       "key": "entry.General.EnableMod.name",
       "value": "启用Mod"
     },
     {
       "key": "entry.General.EnableMod.description",
-      "value": "Enable Dynamic Pressure."
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.name",
-      "value": "启用自动刷怪"
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.description",
-      "value": "Enable automatic dynamic pressure spawning. Keep false for first debug testing."
+      "value": "开启或关闭动态压力。"
     },
     {
       "key": "entry.General.PressureStyle.name",
@@ -70,7 +30,39 @@
     },
     {
       "key": "entry.General.PressureStyle.description",
-      "value": "1 = Light, 2 = Heavy, 3 = Nightmare."
+      "value": "导演施压的力度。档位越高,增援越频繁,强敌也出现得越早。"
+    },
+    {
+      "key": "value.General.PressureStyle.Light",
+      "value": "轻度"
+    },
+    {
+      "key": "value.General.PressureStyle.Heavy",
+      "value": "重度"
+    },
+    {
+      "key": "value.General.PressureStyle.Nightmare",
+      "value": "噩梦"
+    },
+    {
+      "key": "entry.General.SpawnPosition.name",
+      "value": "刷怪位置"
+    },
+    {
+      "key": "entry.General.SpawnPosition.description",
+      "value": "增援出现的位置。均衡:大多在前方和两侧,很少在身后。前方:绝不会在身后。任意位置:任何方向都可能,甚至直接在视野内出现。"
+    },
+    {
+      "key": "value.General.SpawnPosition.Balanced",
+      "value": "均衡"
+    },
+    {
+      "key": "value.General.SpawnPosition.Ahead",
+      "value": "前方"
+    },
+    {
+      "key": "value.General.SpawnPosition.Anywhere",
+      "value": "任意位置"
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.name",
@@ -78,7 +70,7 @@
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.description",
-      "value": "Show debug overlay."
+      "value": "显示导演的调试覆盖层。"
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.name",
@@ -86,7 +78,7 @@
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.description",
-      "value": "Toggle overlay key."
+      "value": "显示或隐藏调试覆盖层的按键。"
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.name",
@@ -94,247 +86,15 @@
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.description",
-      "value": "Manual debug spawn key."
+      "value": "刷出一个敌人用于测试。仅在调试覆盖层显示时有效。"
     },
     {
-      "key": "entry.Pressure.ScanInterval.name",
-      "value": "扫描间隔"
+      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
+      "value": "记录刷怪决策"
     },
     {
-      "key": "entry.Pressure.ScanInterval.description",
-      "value": "Seconds between pressure scans."
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.name",
-      "value": "敌人扫描半径"
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.description",
-      "value": "Nearby enemy scan radius."
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.name",
-      "value": "近距离敌人距离"
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.description",
-      "value": "Enemies closer than this add extra pressure."
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.name",
-      "value": "低生命值停止阈值"
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.description",
-      "value": "Do not spawn if player health is below this normalized value."
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.name",
-      "value": "最近伤害停止窗口"
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.description",
-      "value": "Do not spawn if player was damaged within this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.name",
-      "value": "最小原始交战敌人用于刷怪"
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.description",
-      "value": "Require this many engaged original hostiles before spawning mod enemies."
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.name",
-      "value": "冷却后Mod击杀仅"
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.description",
-      "value": "If only mod enemies are dying, pause spawning for this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.name",
-      "value": "最大秒无原始击杀"
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.description",
-      "value": "Stop spawning if no original enemy has died for this long after mod spawns."
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.name",
-      "value": "最大ModSpawns每原始交战"
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.description",
-      "value": "Soft budget: each engaged original enemy can support this many mod spawns."
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.name",
-      "value": "允许环境备用候选"
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.description",
-      "value": "Use current environment enemy metadata if current level alive NPC candidate pool is empty."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.name",
-      "value": "刷怪距离最小"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.description",
-      "value": "Minimum spawn distance from player."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.name",
-      "value": "刷怪距离最大"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.description",
-      "value": "Maximum spawn distance from player."
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.name",
-      "value": "目标压力"
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.name",
-      "value": "刷怪冷却"
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.name",
-      "value": "最大刷怪每波次"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.name",
-      "value": "最大ModSpawned存活"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.name",
-      "value": "最大ModSpawned每房间"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.name",
-      "value": "最大ModSpawned每关卡"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.name",
-      "value": "目标压力"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.name",
-      "value": "刷怪冷却"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.name",
-      "value": "最大刷怪每波次"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.name",
-      "value": "最大ModSpawned存活"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.name",
-      "value": "最大ModSpawned每房间"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.name",
-      "value": "最大ModSpawned每关卡"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.name",
-      "value": "目标压力"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.name",
-      "value": "刷怪冷却"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.name",
-      "value": "最大刷怪每波次"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.name",
-      "value": "最大ModSpawned存活"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.name",
-      "value": "最大ModSpawned每房间"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.name",
-      "value": "最大ModSpawned每关卡"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
+      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
+      "value": "将导演的决策写入 BepInEx 日志。仅用于诊断,不影响刷怪行为。"
     },
     {
       "key": "overlay.title",
@@ -345,12 +105,12 @@
       "value": "启用"
     },
     {
-      "key": "overlay.autoSpawn",
-      "value": "自动刷怪"
-    },
-    {
       "key": "overlay.style",
       "value": "档位"
+    },
+    {
+      "key": "overlay.position",
+      "value": "位置"
     },
     {
       "key": "overlay.gameState",
@@ -377,24 +137,12 @@
       "value": "缺失"
     },
     {
-      "key": "overlay.alive",
-      "value": "存活"
-    },
-    {
       "key": "overlay.hp",
       "value": "生命"
     },
     {
-      "key": "overlay.damageAgo",
-      "value": "距上次受伤"
-    },
-    {
-      "key": "overlay.never",
-      "value": "未受伤"
-    },
-    {
-      "key": "overlay.unavailable",
-      "value": "不可用"
+      "key": "overlay.noHitSensor",
+      "value": "无受击检测"
     },
     {
       "key": "overlay.updateFailure",
@@ -405,44 +153,44 @@
       "value": "房间"
     },
     {
-      "key": "overlay.endRoom",
-      "value": "终点房间"
+      "key": "overlay.route",
+      "value": "路线"
     },
     {
-      "key": "overlay.section.pressure",
-      "value": "压力"
+      "key": "overlay.section.director",
+      "value": "导演"
     },
     {
-      "key": "overlay.originalHostileAlive",
-      "value": "原版敌人存活"
+      "key": "overlay.phase",
+      "value": "阶段"
+    },
+    {
+      "key": "overlay.intensity",
+      "value": "强度"
+    },
+    {
+      "key": "overlay.pace",
+      "value": "节奏"
+    },
+    {
+      "key": "overlay.threat",
+      "value": "威胁"
     },
     {
       "key": "overlay.engaged",
       "value": "交战中"
     },
     {
-      "key": "overlay.targeting",
-      "value": "锁定玩家"
+      "key": "overlay.present",
+      "value": "在场"
     },
     {
-      "key": "overlay.modHostileAlive",
+      "key": "overlay.modAlive",
       "value": "Mod 敌人存活"
     },
     {
-      "key": "overlay.originalPressure",
-      "value": "原版压力"
-    },
-    {
-      "key": "overlay.modPressure",
-      "value": "Mod 压力"
-    },
-    {
-      "key": "overlay.current",
-      "value": "当前"
-    },
-    {
-      "key": "overlay.deficit",
-      "value": "缺口"
+      "key": "overlay.budget",
+      "value": "预算"
     },
     {
       "key": "overlay.section.spawnDecision",
@@ -457,48 +205,8 @@
       "value": "原因"
     },
     {
-      "key": "overlay.nextSpawnIn",
-      "value": "下次刷怪"
-    },
-    {
-      "key": "overlay.candidateSource",
-      "value": "候选来源"
-    },
-    {
-      "key": "overlay.candidates",
-      "value": "候选数"
-    },
-    {
-      "key": "overlay.section.modImpact",
-      "value": "Mod 影响"
-    },
-    {
-      "key": "overlay.spawnedThisLevel",
-      "value": "本关已刷"
-    },
-    {
-      "key": "overlay.spawnedSinceOriginalKill",
-      "value": "距上次原版击杀已刷"
-    },
-    {
-      "key": "overlay.timeSinceOriginalKill",
-      "value": "距上次原版击杀"
-    },
-    {
-      "key": "overlay.timeSinceModKill",
-      "value": "距上次 Mod 击杀"
-    },
-    {
-      "key": "overlay.wouldDelayAllDead",
-      "value": "会延迟全灭判定"
-    },
-    {
       "key": "overlay.lastSpawn",
       "value": "上次刷怪"
-    },
-    {
-      "key": "overlay.lastAggroReport",
-      "value": "上次仇恨报告"
     },
     {
       "key": "overlay.keys",
@@ -509,12 +217,12 @@
       "value": "最近事件"
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
-      "value": "记录刷怪决策"
+      "key": "alert.surge",
+      "value": "有什么东西来了..."
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
-      "value": "将刷怪波次结果定期写入 BepInEx 日志。仅用于诊断,不影响刷怪行为。"
+      "key": "alert.migrated",
+      "value": "动态压力:你原来的调整数值已被新的导演系统取代。"
     }
   ]
 }

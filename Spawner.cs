@@ -1,296 +1,88 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using BepInEx;
-using BepInEx.Configuration;
-using HarmonyLib;
 using PerfectRandom.Sulfur.Core;
 using PerfectRandom.Sulfur.Core.LevelGeneration;
+using PerfectRandom.Sulfur.Core.Stats;
 using PerfectRandom.Sulfur.Core.Units;
-using PerfectRandom.Sulfur.Core.Units.AI;
 using PerfectRandom.Sulfur.Core.Utilities;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Ryuka.Sulfur.DynamicPressure
 {
     public sealed partial class DynamicPressurePlugin
     {
-        private void ScanPressure()
+        private const int TrickleMaxUnits = 3;
+        private const int SurgeMaxUnits = 12;
+
+        private const float LegacyDistanceMin = 8f;
+        private const float DistanceMax = 60f;
+        private const float FairDistanceMin = 15f;
+        private const float RearDistanceMin = 25f;
+        private const float SurgeClusterRadius = 14f;
+
+        // Behind is more than about 105 degrees off where the camera points.
+        private const float RearDotThreshold = -0.25f;
+        private const int MaxLineChecksPerPick = 16;
+        private const int NearestPointsToChooseFrom = 5;
+        private const float ViewportMargin = 0.05f;
+        private const float SightCheckHeight = 1.2f;
+        private const float BigSightCheckHeight = 2.5f;
+
+        private static readonly MutationDefinitions[] AllowedMutations =
         {
-            Snapshot s = new Snapshot();
-            _candidatePool.Clear();
+            MutationDefinitions.Mutation_Big,
+            MutationDefinitions.Mutation_Fire,
+            MutationDefinitions.Mutation_Frost,
+            MutationDefinitions.Mutation_Poison,
+            MutationDefinitions.Mutation_Surge,
+        };
 
-            GameManager gm = StaticInstance<GameManager>.Instance;
-            if (gm == null)
+        private readonly List<UnitSO> _eligible = new List<UnitSO>();
+        private readonly List<MutationDefinitions> _mutationChoices = new List<MutationDefinitions>();
+        private readonly HashSet<NPCSpawn> _usedThisBatch = new HashSet<NPCSpawn>();
+
+        private enum SpawnZone
+        {
+            Ahead,
+            Side,
+            Rear
+        }
+
+        private sealed class ZoneBuckets
+        {
+            public readonly List<SpawnPointChoice> Ahead = new List<SpawnPointChoice>();
+            public readonly List<SpawnPointChoice> Side = new List<SpawnPointChoice>();
+            public readonly List<SpawnPointChoice> Rear = new List<SpawnPointChoice>();
+
+            public List<SpawnPointChoice> For(SpawnZone zone)
             {
-                _snapshot = s;
-                _lastBlockReason = SpawnBlockReason.NoGameManager;
-                return;
-            }
-
-            s.hasGameManager = true;
-            s.gameState = gm.gameState.ToString();
-            s.inSafeZone = gm.InSafeZone;
-            s.currentEnvironment = gm.currentEnvironment != null ? gm.currentEnvironment.id.ToString() : "null";
-
-            if (gm.PlayerUnit == null || gm.PlayerObject == null)
-            {
-                _snapshot = s;
-                _lastBlockReason = SpawnBlockReason.NoPlayer;
-                return;
-            }
-
-            Unit playerUnit = gm.PlayerUnit;
-            Room playerRoom = GetUnitRoom(playerUnit);
-
-            s.hasPlayer = true;
-            s.playerAlive = playerUnit.IsAlive;
-            s.playerHp = SafeGetPlayerHp(playerUnit);
-            s.playerTimeSinceDamage = PlayerTimeSinceDamage;
-            s.playerRoomName = playerRoom != null ? playerRoom.name : "null";
-            s.playerRoomIsEndRoom = playerRoom != null && playerRoom.IsEndRoom;
-
-            List<Npc> alive = gm.aliveNpcs;
-            s.aliveNpcs = alive != null ? alive.Count : 0;
-
-            if (alive != null)
-            {
-                for (int i = 0; i < alive.Count; i++)
+                switch (zone)
                 {
-                    Npc npc = alive[i];
-                    if (!IsValidAliveNpc(npc))
-                    {
-                        continue;
-                    }
-
-                    DynamicPressureSpawnMarker marker = npc.GetComponent<DynamicPressureSpawnMarker>();
-                    bool isMod = marker != null;
-                    bool hostile = IsHostileToPlayer(npc);
-                    if (!hostile)
-                    {
-                        continue;
-                    }
-
-                    float distance = Vector3.Distance(npc.transform.position, gm.PlayerPosition);
-                    bool nearby = distance <= _enemyScanRadius.Value;
-                    bool targeting = SafeTargetIsPlayer(npc);
-                    bool knowsPlayer = SafeHasKnownPlayerPosition(npc, gm.PlayerUnit);
-                    bool roomRelevant = IsSameOrConnectedRoom(GetUnitRoom(npc), playerRoom);
-                    bool engaged = nearby || targeting || knowsPlayer || roomRelevant;
-
-                    int pressure = CalculateNpcPressure(npc, distance, targeting, knowsPlayer);
-
-                    if (isMod)
-                    {
-                        s.modHostileAlive++;
-                        if (nearby)
-                        {
-                            s.nearbyModHostiles++;
-                            s.modPressure += pressure;
-                        }
-
-                        if (targeting)
-                        {
-                            s.modTargetingPlayer++;
-                        }
-                    }
-                    else
-                    {
-                        s.originalHostileAlive++;
-
-                        if (engaged)
-                        {
-                            s.originalEngagedHostiles++;
-                        }
-
-                        if (nearby)
-                        {
-                            s.nearbyOriginalHostiles++;
-                            s.originalPressure += pressure;
-                        }
-
-                        if (targeting)
-                        {
-                            s.originalTargetingPlayer++;
-                        }
-
-                        TryAddCandidateFromNpc(npc);
-                    }
+                    case SpawnZone.Ahead:
+                        return Ahead;
+                    case SpawnZone.Side:
+                        return Side;
+                    default:
+                        return Rear;
                 }
             }
-
-            if (_candidatePool.Count == 0 && _allowEnvironmentFallbackCandidates.Value)
-            {
-                AddEnvironmentFallbackCandidates(gm);
-                s.candidateSource = _candidatePool.Count > 0 ? "EnvironmentMetadata" : "None";
-            }
-            else
-            {
-                s.candidateSource = _candidatePool.Count > 0 ? "CurrentLevelAliveNpcs" : "None";
-            }
-
-            s.candidateCount = _candidatePool.Count;
-            s.targetPressure = GetTargetPressure();
-            s.currentPressure = s.originalPressure + s.modPressure;
-            s.deficit = s.targetPressure - s.currentPressure;
-            s.spawnedThisLevel = _spawnedThisLevel;
-            s.spawnedSinceLastOriginalKill = _spawnedSinceLastOriginalKill;
-            s.timeSinceLastOriginalKill = Time.time - _lastOriginalKillTime;
-            s.timeSinceLastModKill = Time.time - _lastModKillTime;
-            s.nextSpawnIn = Mathf.Max(0f, _nextSpawnTime - Time.time);
-
-            s.wouldDelayOnAllEnemiesDead = s.originalHostileAlive == 0 && s.modHostileAlive > 0;
-
-            _snapshot = s;
         }
 
-        private void TryAutoSpawn()
+        /// <summary>
+        /// Places up to <paramref name="maxUnits"/> units of one faction, one per frame, spending
+        /// from <paramref name="budget"/> and reporting each placed unit to the director.
+        /// </summary>
+        private async Task SpawnBatchAsync(float budget, int maxUnits, bool surge, bool manual, string reason)
         {
-            SpawnBlockReason blockReason;
-            int spawnCount;
-
-            if (!CanSpawn(out blockReason, out spawnCount))
+            if (_spawnInProgress)
             {
-                _lastDecision = "BLOCKED";
-                _lastBlockReason = blockReason;
                 return;
             }
 
-            _ = SpawnWaveAsync(spawnCount, "Auto pressure deficit");
-        }
-
-        private bool CanSpawn(out SpawnBlockReason blockReason, out int spawnCount)
-        {
-            spawnCount = 0;
-
             GameManager gm = StaticInstance<GameManager>.Instance;
-            if (gm == null)
-            {
-                blockReason = SpawnBlockReason.NoGameManager;
-                return false;
-            }
-
-            if (_inLevelTransition)
-            {
-                blockReason = SpawnBlockReason.LevelTransition;
-                return false;
-            }
-
-            if (gm.PlayerUnit == null || gm.PlayerObject == null)
-            {
-                blockReason = SpawnBlockReason.NoPlayer;
-                return false;
-            }
-
-            if (gm.gameState.ToString() != "Running")
-            {
-                blockReason = SpawnBlockReason.GameStateNotRunning;
-                return false;
-            }
-
-            if (gm.InSafeZone)
-            {
-                blockReason = SpawnBlockReason.SafeZone;
-                return false;
-            }
-
-            Unit playerUnit = gm.PlayerUnit;
-            if (!playerUnit.IsAlive)
-            {
-                blockReason = SpawnBlockReason.PlayerDead;
-                return false;
-            }
-
-            if (SafeGetPlayerHp(playerUnit) <= _lowHealthStopThreshold.Value)
-            {
-                blockReason = SpawnBlockReason.LowHealth;
-                return false;
-            }
-
-            if (PlayerTimeSinceDamage <= _recentDamageStopWindow.Value)
-            {
-                blockReason = SpawnBlockReason.RecentDamage;
-                return false;
-            }
-
-            Room playerRoom = GetUnitRoom(playerUnit);
-            if (playerRoom != null && playerRoom.IsEndRoom)
-            {
-                blockReason = SpawnBlockReason.EndRoomBlocked;
-                return false;
-            }
-
-            if (_snapshot.originalEngagedHostiles < _minOriginalEngagedHostilesForSpawn.Value)
-            {
-                blockReason = SpawnBlockReason.NoEngagedOriginalHostiles;
-                return false;
-            }
-
-            if (_snapshot.currentPressure >= _snapshot.targetPressure)
-            {
-                blockReason = SpawnBlockReason.PressureAlreadyHigh;
-                return false;
-            }
-
-            if (_snapshot.modHostileAlive >= GetMaxModAlive())
-            {
-                blockReason = SpawnBlockReason.MaxModSpawnedAlive;
-                return false;
-            }
-
-            if (_spawnedThisLevel >= GetMaxModPerLevel())
-            {
-                blockReason = SpawnBlockReason.LevelSpawnBudgetExceeded;
-                return false;
-            }
-
-            int supportedSpawnBudget = Mathf.Max(1, _snapshot.originalEngagedHostiles) * Mathf.Max(1, _maxModSpawnsPerOriginalEngaged.Value);
-            if (_spawnedSinceLastOriginalKill >= supportedSpawnBudget)
-            {
-                blockReason = SpawnBlockReason.SpawnBudgetPerOriginalExceeded;
-                return false;
-            }
-
-            if (_spawnedSinceLastOriginalKill > 0 && Time.time - _lastOriginalKillTime > _maxSecondsWithoutOriginalKill.Value)
-            {
-                blockReason = SpawnBlockReason.NoOriginalKillProgress;
-                return false;
-            }
-
-            if (_lastModKillTime > _lastOriginalKillTime && Time.time - _lastModKillTime < _cooldownAfterModKillOnly.Value)
-            {
-                blockReason = SpawnBlockReason.RecentModKillOnly;
-                return false;
-            }
-
-            if (_candidatePool.Count == 0)
-            {
-                blockReason = SpawnBlockReason.NoCandidateUnits;
-                return false;
-            }
-
-            spawnCount = Mathf.Min(GetMaxSpawnPerWave(), Mathf.Max(1, _snapshot.deficit));
-            spawnCount = Mathf.Min(spawnCount, GetMaxModAlive() - _snapshot.modHostileAlive);
-            spawnCount = Mathf.Min(spawnCount, GetMaxModPerLevel() - _spawnedThisLevel);
-
-            if (spawnCount <= 0)
-            {
-                blockReason = SpawnBlockReason.MaxModSpawnedAlive;
-                return false;
-            }
-
-            blockReason = SpawnBlockReason.None;
-            return true;
-        }
-
-        private async Task SpawnWaveAsync(int count, string reason)
-        {
-            if (_spawnInProgress)
+            if (gm == null || gm.graphContext == null)
             {
                 return;
             }
@@ -298,107 +90,173 @@ namespace Ryuka.Sulfur.DynamicPressure
             _spawnInProgress = true;
             _waveId++;
 
-            int spawned = 0;
+            int generation = _levelGeneration;
+            int placed = 0;
 
             try
             {
-                ScanPressure();
-
-                for (int i = 0; i < count; i++)
+                Roster.CollectEligible(gm, CurrentPreset, _packBudget, _lateGame, _eligible);
+                if (_eligible.Count == 0)
                 {
-                    UnitSO unitSo = PickCandidate();
-                    if (unitSo == null)
-                    {
-                        _lastDecision = "BLOCKED";
-                        _lastBlockReason = SpawnBlockReason.NoCandidateUnits;
-                        AddEvent("Spawn blocked: no candidate.");
-                        break;
-                    }
-
-                    SpawnPointChoice spawnPoint;
-                    if (!TryFindSpawnPoint(unitSo, out spawnPoint))
-                    {
-                        _lastDecision = "BLOCKED";
-                        _lastBlockReason = SpawnBlockReason.NoValidNpcSpawnPoint;
-                        AddEvent("Spawn blocked: no valid NPCSpawn point.");
-                        break;
-                    }
-
-                    int roomId = GetRoomId(spawnPoint.room);
-                    int roomCount;
-                    _modSpawnedPerRoom.TryGetValue(roomId, out roomCount);
-                    if (roomCount >= GetMaxModPerRoom())
-                    {
-                        _lastDecision = "BLOCKED";
-                        _lastBlockReason = SpawnBlockReason.RoomSpawnBudgetExceeded;
-                        AddEvent("Spawn blocked: room budget exceeded.");
-                        break;
-                    }
-
-                    bool ok = await SpawnOneAsync(unitSo, spawnPoint, reason);
-                    if (!ok)
-                    {
-                        _lastDecision = "FAILED";
-                        _lastBlockReason = SpawnBlockReason.SpawnAsyncFailed;
-                        break;
-                    }
-
-                    spawned++;
+                    Block(SpawnBlockReason.NoCandidateUnits);
+                    return;
                 }
 
-                if (spawned > 0)
+                KeepOneFaction(gm, _eligible);
+                _usedThisBatch.Clear();
+
+                float spent = 0f;
+                bool anchored = false;
+                Vector3 anchor = Vector3.zero;
+
+                while (placed < maxUnits && (manual || spent < budget))
+                {
+                    UnitSO unit;
+                    SpawnPointChoice point;
+                    if (!TryChooseUnitAndPoint(gm, anchored, anchor, out unit, out point))
+                    {
+                        Block(SpawnBlockReason.NoFairSpawnPoint);
+                        break;
+                    }
+
+                    _usedThisBatch.Add(point.spawn);
+
+                    if (!await SpawnOneAsync(gm, generation, unit, point, reason, !manual))
+                    {
+                        break;
+                    }
+
+                    placed++;
+                    spent += unit.SpawnCost;
+
+                    if (surge && !anchored)
+                    {
+                        anchored = true;
+                        anchor = point.position;
+                    }
+
+                    // Rebuilding the game's NPC lists per spawn is not free; give each one a frame.
+                    await Task.Yield();
+                }
+
+                if (placed > 0)
                 {
                     _lastDecision = "SPAWNED";
                     _lastBlockReason = SpawnBlockReason.None;
-                    _nextSpawnTime = Time.time + GetSpawnCooldown();
                 }
             }
             catch (Exception e)
             {
+                Block(SpawnBlockReason.SpawnAsyncFailed);
                 _lastDecision = "FAILED";
-                _lastBlockReason = SpawnBlockReason.SpawnAsyncFailed;
                 AddEvent("Spawn exception: " + e.GetType().Name);
                 Logger.LogError(e);
             }
             finally
             {
-                // Only a spawning wave used to arm the cooldown, so any wave that broke out
-                // early - no candidate, no reachable NPCSpawn, room budget full, spawn failure -
-                // left _nextSpawnTime in the past and was retried on the very next frame. Each
-                // retry re-ran two ScanPressure passes plus a full orderedRooms x NPCSpawn sweep,
-                // for as long as the blocking condition held. Give the non-spawning outcomes a
-                // short backoff of their own so a persistently blocked wave costs one attempt per
-                // second rather than one per frame.
-                if (spawned == 0)
-                {
-                    _nextSpawnTime = Time.time + FailedWaveRetrySeconds;
-                }
-
-                _diagWindowWaves++;
-                _diagWindowSpawned += spawned;
-
+                _diagWindowBatches++;
+                _diagWindowSpawned += placed;
                 _spawnInProgress = false;
-                ScanPressure();
             }
         }
 
-        private async Task<bool> SpawnOneAsync(UnitSO unitSo, SpawnPointChoice spawnPoint, string reason)
+        private void Block(SpawnBlockReason reason)
         {
-            if (unitSo == null)
+            _lastDecision = "BLOCKED";
+            _lastBlockReason = reason;
+        }
+
+        /// <summary>
+        /// One pack, one faction, as vanilla does: factions that hate each other would otherwise
+        /// spend the wave fighting among themselves. Reinforce whoever the player is fighting.
+        /// </summary>
+        private void KeepOneFaction(GameManager gm, List<UnitSO> units)
+        {
+            FactionIds faction = FactionFightingPlayer(gm);
+
+            if (faction == FactionIds.None || !units.Exists(u => u.factionId == faction))
+            {
+                faction = units[UnityEngine.Random.Range(0, units.Count)].factionId;
+            }
+
+            units.RemoveAll(u => u.factionId != faction);
+        }
+
+        private FactionIds FactionFightingPlayer(GameManager gm)
+        {
+            FactionIds faction = FactionIds.None;
+            float nearest = float.MaxValue;
+            List<Npc> alive = gm.aliveNpcs;
+
+            for (int i = 0; i < alive.Count; i++)
+            {
+                Npc npc = alive[i];
+                if (!IsActiveThreat(npc) || !SafeTargetIsPlayer(npc))
+                {
+                    continue;
+                }
+
+                float distance = Vector3.Distance(npc.transform.position, gm.PlayerPosition);
+                if (distance < nearest)
+                {
+                    nearest = distance;
+                    faction = npc.unitSO.factionId;
+                }
+            }
+
+            return faction;
+        }
+
+        private bool TryChooseUnitAndPoint(
+            GameManager gm,
+            bool anchored,
+            Vector3 anchor,
+            out UnitSO unit,
+            out SpawnPointChoice point)
+        {
+            // Not every unit fits every spawn point, so one that fits nowhere must not end the wave.
+            int start = UnityEngine.Random.Range(0, _eligible.Count);
+            for (int i = 0; i < _eligible.Count; i++)
+            {
+                unit = _eligible[(start + i) % _eligible.Count];
+
+                if (anchored && TryFindPointNear(gm, unit, anchor, out point))
+                {
+                    return true;
+                }
+
+                if (TryFindSpawnPoint(gm, unit, out point))
+                {
+                    return true;
+                }
+            }
+
+            unit = null;
+            point = default(SpawnPointChoice);
+            return false;
+        }
+
+        private async Task<bool> SpawnOneAsync(
+            GameManager gm,
+            int generation,
+            UnitSO unit,
+            SpawnPointChoice point,
+            string reason,
+            bool chargeBudget)
+        {
+            Unit spawned = await unit.SpawnUnitAsync(this, point.position, Quaternion.identity);
+
+            // The level can change during the await; a unit from the old level is gone with it and
+            // must not be charged to the new one.
+            if (spawned == null || generation != _levelGeneration)
             {
                 return false;
             }
 
-            Unit spawnedUnit = await unitSo.SpawnUnitAsync(this, spawnPoint.position, Quaternion.identity);
-            if (spawnedUnit == null)
-            {
-                return false;
-            }
-
-            Npc npc = spawnedUnit as Npc;
+            Npc npc = spawned as Npc;
             if (npc == null)
             {
-                npc = spawnedUnit.GetComponent<Npc>();
+                npc = spawned.GetComponent<Npc>();
             }
 
             if (npc == null)
@@ -406,57 +264,91 @@ namespace Ryuka.Sulfur.DynamicPressure
                 return false;
             }
 
-            if (spawnPoint.room != null)
-            {
-                npc.currentRoom = spawnPoint.room;
-                npc.lastValidCurrentRoom = spawnPoint.room;
-                npc.lastRoomCalcPosition = npc.transform.position;
-            }
+            npc.currentRoom = point.room;
+            npc.lastValidCurrentRoom = point.room;
+            npc.lastRoomCalcPosition = npc.transform.position;
+
+            string mutation = TryApplyMutation(gm, npc, unit);
 
             DynamicPressureSpawnMarker marker = npc.gameObject.AddComponent<DynamicPressureSpawnMarker>();
-            marker.sourceUnitSo = unitSo;
+            marker.sourceUnitSo = unit;
             marker.spawnTime = Time.time;
-            marker.spawnPosition = spawnPoint.position;
-            marker.spawnRoom = spawnPoint.room;
+            marker.spawnPosition = point.position;
+            marker.spawnRoom = point.room;
             marker.spawnReason = reason;
             marker.waveId = _waveId;
 
-            int roomId = GetRoomId(spawnPoint.room);
-            int roomCount;
-            _modSpawnedPerRoom.TryGetValue(roomId, out roomCount);
-            _modSpawnedPerRoom[roomId] = roomCount + 1;
+            if (chargeBudget)
+            {
+                _director.ReportSpent(unit.SpawnCost);
+            }
 
-            _spawnedThisLevel++;
-            _spawnedSinceLastOriginalKill++;
+            string summary = unit.name + (mutation != null ? " [" + mutation + "]" : string.Empty)
+                + " " + point.zone + " " + point.distanceToPlayer.ToString("0") + "m";
+            _lastSpawnSummary = summary;
+            AddEvent("Spawned: " + summary);
 
-            _lastSpawnSummary = string.Format(
-                "{0} at {1}, room={2}, source={3}",
-                unitSo.name,
-                spawnPoint.position,
-                spawnPoint.room != null ? spawnPoint.room.name : "null",
-                spawnPoint.source
-            );
+            if (_settings.LogSpawnDecisions.Value)
+            {
+                Logger.LogInfo("Spawned " + summary + " | cost " + unit.SpawnCost + " | " + reason);
+            }
 
-            AddEvent("Spawned: " + unitSo.name);
-            StartCoroutine(ReportPlayerPositionLater(npc, marker));
-
+            StartCoroutine(ReportPlayerPositionLater(npc));
             return true;
         }
 
-        private IEnumerator ReportPlayerPositionLater(Npc npc, DynamicPressureSpawnMarker marker)
+        /// <summary>
+        /// Rolls the style's chance of a mutated enemy, using the same entry point Endless mode
+        /// calls right after spawning.
+        /// </summary>
+        private string TryApplyMutation(GameManager gm, Npc npc, UnitSO unit)
+        {
+            PressurePreset preset = CurrentPreset;
+            if (preset.MutationChance <= 0f
+                || (preset.MutationsOnlyLate && !_lateGame)
+                || unit.disableMutations
+                || npc.PreventMutations
+                || unit.availableMutations == null
+                || UnityEngine.Random.value > preset.MutationChance)
+            {
+                return null;
+            }
+
+            _mutationChoices.Clear();
+            List<MutationDefinitions> disabled = gm.Settings != null ? gm.Settings.disabledMutations : null;
+
+            for (int i = 0; i < AllowedMutations.Length; i++)
+            {
+                MutationDefinitions candidate = AllowedMutations[i];
+                if (Array.IndexOf(unit.availableMutations, candidate) >= 0
+                    && (disabled == null || !disabled.Contains(candidate)))
+                {
+                    _mutationChoices.Add(candidate);
+                }
+            }
+
+            if (_mutationChoices.Count == 0)
+            {
+                return null;
+            }
+
+            MutationDefinitions chosen = _mutationChoices[UnityEngine.Random.Range(0, _mutationChoices.Count)];
+            npc.ToggleMutation(chosen, state: true);
+            return chosen.ToString();
+        }
+
+        private IEnumerator ReportPlayerPositionLater(Npc npc)
         {
             yield return new WaitForSeconds(0.5f);
 
             GameManager gm = StaticInstance<GameManager>.Instance;
             if (gm == null || gm.PlayerObject == null || gm.PlayerUnit == null)
             {
-                _lastAggroReport = "Failed: no player";
                 yield break;
             }
 
             if (npc == null || !npc.IsAlive || npc.AiAgent == null)
             {
-                _lastAggroReport = "Failed: invalid npc";
                 yield break;
             }
 
@@ -465,372 +357,312 @@ namespace Ryuka.Sulfur.DynamicPressure
                 // Use the Unit overload directly. The GameObject overload routes through
                 // UnitManager.TryGetUnitFromObject, whose negative cache can incorrectly
                 // classify the already-known player root after repeated reports.
-                // Supplying the known PlayerUnit preserves the original successful path
-                // without touching UnitManager or any global player-trigger behavior.
                 npc.AiAgent.ReportLastSeen(
                     gm.PlayerUnit,
                     gm.PlayerUnit.transform.position,
                     npc.AiAgent.transform.position,
                     npc.AiAgent.propagateToGroup
                 );
-
-                marker.aggroReported = true;
-                marker.lastAggroReportTime = Time.time;
-                marker.targetingPlayerAfterReport = SafeTargetIsPlayer(npc);
-                marker.hasKnownPlayerPositionAfterReport = SafeHasKnownPlayerPosition(npc, gm.PlayerUnit);
-
-                _lastAggroReport = marker.targetingPlayerAfterReport || marker.hasKnownPlayerPositionAfterReport
-                    ? "Success"
-                    : "Reported but not targeting yet";
-
-                AddEvent("ReportLastSeen: " + _lastAggroReport);
             }
             catch (Exception e)
             {
-                _lastAggroReport = "Exception: " + e.GetType().Name;
                 Logger.LogWarning(e);
             }
         }
 
-        private UnitSO PickCandidate()
+        private bool TryFindSpawnPoint(GameManager gm, UnitSO unit, out SpawnPointChoice result)
         {
-            if (_candidatePool.Count == 0)
-            {
-                return null;
-            }
-
-            return _candidatePool[UnityEngine.Random.Range(0, _candidatePool.Count)];
-        }
-
-        private void TryAddCandidateFromNpc(Npc npc)
-        {
-            if (npc == null || npc.unitSO == null)
-            {
-                return;
-            }
-
-            UnitSO so = npc.unitSO;
-            if (!IsValidCandidateUnitSo(so))
-            {
-                return;
-            }
-
-            if (!_candidatePool.Contains(so))
-            {
-                _candidatePool.Add(so);
-            }
-        }
-
-        private void AddEnvironmentFallbackCandidates(GameManager gm)
-        {
-            try
-            {
-                if (gm == null || gm.environmentsInOrder == null || gm.currentEnvironment == null)
-                {
-                    return;
-                }
-
-                WorldEnvironmentList.Metadata metadata = gm.environmentsInOrder.GetMetadata(gm.currentEnvironment.id);
-                if (metadata.availableEnemiesReadOnly == null)
-                {
-                    return;
-                }
-
-                for (int i = 0; i < metadata.availableEnemiesReadOnly.Length; i++)
-                {
-                    UnitSO so = metadata.availableEnemiesReadOnly[i].GetAsset();
-                    if (so != null && IsValidCandidateUnitSo(so) && !_candidatePool.Contains(so))
-                    {
-                        _candidatePool.Add(so);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                AddEvent("Candidate fallback failed: " + e.GetType().Name);
-            }
-        }
-
-        private bool IsValidCandidateUnitSo(UnitSO so)
-        {
-            if (so == null)
-            {
-                return false;
-            }
-
-            if (so.isCivilian)
-            {
-                return false;
-            }
-
-            if (so.isProtectedNpc)
-            {
-                return false;
-            }
-
-            if (so.ExperienceOnKill <= 0)
-            {
-                return false;
-            }
-
-            if ((so.unitType & UnitType.Boss) != 0)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool TryFindSpawnPoint(UnitSO unitSo, out SpawnPointChoice result)
-        {
-            result = default;
-
-            GameManager gm = StaticInstance<GameManager>.Instance;
-            if (gm == null || gm.PlayerUnit == null || gm.PlayerObject == null || unitSo == null)
-                return false;
-
-            Vector3 playerPos = gm.PlayerPosition;
-
-            List<SpawnPointChoice> strictChoices = new List<SpawnPointChoice>();
-            List<SpawnPointChoice> looseChoices = new List<SpawnPointChoice>();
+            result = default(SpawnPointChoice);
 
             List<Room> rooms = gm.orderedRooms;
-            if (rooms == null || rooms.Count == 0)
+            if (rooms == null || rooms.Count == 0 || gm.PlayerUnit == null)
+            {
                 return false;
+            }
+
+            bool anywhere = _settings.Position.Value == SpawnPosition.Anywhere;
+            float minimum = anywhere ? LegacyDistanceMin : FairDistanceMin;
+
+            Room playerRoom = GetUnitRoom(gm.PlayerUnit);
+            Camera camera = PlayerCamera(gm);
+            Vector3 playerPosition = gm.PlayerPosition;
+
+            ZoneBuckets strict = new ZoneBuckets();
+            ZoneBuckets loose = new ZoneBuckets();
 
             for (int r = 0; r < rooms.Count; r++)
             {
                 Room room = rooms[r];
-                if (!IsValidSpawnRoom(room))
+                if (!IsValidSpawnRoom(room, anywhere))
+                {
                     continue;
+                }
 
-                // Game 0.19 dropped the baked NPCSpawn.Data[] snapshot; GetNPCSpawns now hands back the
-                // room's own live NPCSpawn components, and unlike the old accessor it does not filter out
-                // destroyed entries - the game skips them one by one, so we do the same. The owning room is
-                // the room we asked, which is exactly what the retired Data.room used to carry.
                 NPCSpawn[] spawns = room.GetNPCSpawns();
-                if (spawns == null || spawns.Length == 0)
+                if (spawns == null)
+                {
                     continue;
+                }
 
                 for (int i = 0; i < spawns.Length; i++)
                 {
                     NPCSpawn spawn = spawns[i];
-                    if (spawn == null)
+                    if (spawn == null || _usedThisBatch.Contains(spawn) || (spawn.usableByTypes & unit.unitType) == 0)
+                    {
                         continue;
+                    }
 
-                    if ((spawn.usableByTypes & unitSo.unitType) == 0)
+                    Vector3 position = spawn.transform.position;
+                    float distance = Vector3.Distance(position, playerPosition);
+                    if (distance < minimum || distance > DistanceMax * 2f)
+                    {
                         continue;
+                    }
 
-                    Vector3 spawnPosition = spawn.transform.position;
-                    float distance = Vector3.Distance(spawnPosition, playerPos);
+                    SpawnZone zone = anywhere
+                        ? SpawnZone.Ahead
+                        : ClassifyZone(position, room, playerRoom, playerPosition, camera);
+
+                    if (zone == SpawnZone.Rear && distance < RearDistanceMin)
+                    {
+                        continue;
+                    }
 
                     SpawnPointChoice choice = new SpawnPointChoice
                     {
-                        position = spawnPosition,
+                        spawn = spawn,
+                        position = position,
                         room = room,
                         distanceToPlayer = distance,
-                        source = "GameManager.orderedRooms NPCSpawn"
+                        zone = zone
                     };
 
-                    if (distance >= _spawnDistanceMin.Value && distance <= _spawnDistanceMax.Value)
+                    (distance <= DistanceMax ? strict : loose).For(zone).Add(choice);
+                }
+            }
+
+            if (anywhere)
+            {
+                return PickNearest(strict.Ahead, out result) || PickNearest(loose.Ahead, out result);
+            }
+
+            return PickByPlacement(strict, loose, camera, unit, out result);
+        }
+
+        private bool PickByPlacement(
+            ZoneBuckets strict,
+            ZoneBuckets loose,
+            Camera camera,
+            UnitSO unit,
+            out SpawnPointChoice result)
+        {
+            bool neverBehind = _settings.Position.Value == SpawnPosition.Ahead;
+            float roll = UnityEngine.Random.value;
+
+            // A weighted first choice keeps it unpredictable; the rest is what to fall back on.
+            SpawnZone first;
+            if (neverBehind)
+            {
+                first = roll < 0.7f ? SpawnZone.Ahead : SpawnZone.Side;
+            }
+            else
+            {
+                first = roll < 0.6f ? SpawnZone.Ahead : (roll < 0.9f ? SpawnZone.Side : SpawnZone.Rear);
+            }
+
+            SpawnZone[] order = OrderFrom(first, neverBehind);
+
+            // Rear only leads when the roll chose it; otherwise it is the last resort below.
+            foreach (ZoneBuckets band in new[] { strict, loose })
+            {
+                foreach (SpawnZone zone in order)
+                {
+                    if ((zone != SpawnZone.Rear || first == SpawnZone.Rear)
+                        && PickHidden(band.For(zone), camera, unit, out result))
                     {
-                        strictChoices.Add(choice);
-                    }
-                    else if (distance > _spawnDistanceMax.Value && distance <= _spawnDistanceMax.Value * 2f)
-                    {
-                        looseChoices.Add(choice);
+                        return true;
                     }
                 }
             }
 
-            if (strictChoices.Count > 0)
+            if (!neverBehind)
             {
-                result = PickNearestRandomized(strictChoices, playerPos);
-                return true;
+                foreach (ZoneBuckets band in new[] { strict, loose })
+                {
+                    if (PickHidden(band.Rear, camera, unit, out result))
+                    {
+                        return true;
+                    }
+                }
             }
 
-            if (looseChoices.Count > 0)
-            {
-                result = PickNearestRandomized(looseChoices, playerPos);
-                result.source += " / loose distance";
-                return true;
-            }
-
+            result = default(SpawnPointChoice);
             return false;
         }
 
-        private bool IsValidSpawnRoom(Room room)
+        private static SpawnZone[] OrderFrom(SpawnZone first, bool neverBehind)
         {
-            if (room == null)
-                return false;
+            if (neverBehind)
+            {
+                return first == SpawnZone.Ahead
+                    ? new[] { SpawnZone.Ahead, SpawnZone.Side }
+                    : new[] { SpawnZone.Side, SpawnZone.Ahead };
+            }
 
-            if (room.IsStartRoom)
-                return false;
+            switch (first)
+            {
+                case SpawnZone.Side:
+                    return new[] { SpawnZone.Side, SpawnZone.Ahead, SpawnZone.Rear };
+                case SpawnZone.Rear:
+                    return new[] { SpawnZone.Rear, SpawnZone.Ahead, SpawnZone.Side };
+                default:
+                    return new[] { SpawnZone.Ahead, SpawnZone.Side, SpawnZone.Rear };
+            }
+        }
 
-            if (room.IsEndRoom)
-                return false;
+        private static SpawnZone ClassifyZone(
+            Vector3 position,
+            Room room,
+            Room playerRoom,
+            Vector3 playerPosition,
+            Camera camera)
+        {
+            if (camera != null)
+            {
+                Vector3 forward = camera.transform.forward;
+                forward.y = 0f;
+                Vector3 toPoint = position - playerPosition;
+                toPoint.y = 0f;
 
-            if (room.disallowEnemySpawn)
-                return false;
+                if (forward.sqrMagnitude > 0.0001f
+                    && toPoint.sqrMagnitude > 0.0001f
+                    && Vector3.Dot(forward.normalized, toPoint.normalized) < RearDotThreshold)
+                {
+                    return SpawnZone.Rear;
+                }
+            }
 
-            // The per-room budget has to be applied while choosing the point, not after. Choice is
-            // made among the points nearest the player, so once the player's own room was full it
-            // kept winning the selection and then failing the budget check, which aborted the wave
-            // and left the neighbouring rooms untried for as long as the player stayed there.
-            int roomCount;
-            _modSpawnedPerRoom.TryGetValue(GetRoomId(room), out roomCount);
-            if (roomCount >= GetMaxModPerRoom())
-                return false;
+            return IsAheadOnRoute(position, room, playerRoom, playerPosition) ? SpawnZone.Ahead : SpawnZone.Side;
+        }
 
+        private static bool IsAheadOnRoute(Vector3 position, Room room, Room playerRoom, Vector3 playerPosition)
+        {
+            if (playerRoom == null)
+            {
+                return false;
+            }
+
+            if (room.lodRoomIndex != playerRoom.lodRoomIndex)
+            {
+                return room.lodRoomIndex > playerRoom.lodRoomIndex;
+            }
+
+            if (playerRoom.nextRoomConnector == null)
+            {
+                return false;
+            }
+
+            Vector3 exit = playerRoom.nextRoomConnector.transform.position;
+            return Vector3.Distance(position, exit) < Vector3.Distance(playerPosition, exit);
+        }
+
+        private bool PickHidden(
+            List<SpawnPointChoice> choices,
+            Camera camera,
+            UnitSO unit,
+            out SpawnPointChoice result)
+        {
+            result = default(SpawnPointChoice);
+            if (choices.Count == 0)
+            {
+                return false;
+            }
+
+            choices.Sort((a, b) => a.distanceToPlayer.CompareTo(b.distanceToPlayer));
+
+            List<SpawnPointChoice> hidden = new List<SpawnPointChoice>(NearestPointsToChooseFrom);
+            int checks = Mathf.Min(choices.Count, MaxLineChecksPerPick);
+            for (int i = 0; i < checks && hidden.Count < NearestPointsToChooseFrom; i++)
+            {
+                if (!IsExposed(camera, choices[i].position, unit))
+                {
+                    hidden.Add(choices[i]);
+                }
+            }
+
+            if (hidden.Count == 0)
+            {
+                return false;
+            }
+
+            result = hidden[UnityEngine.Random.Range(0, hidden.Count)];
             return true;
         }
 
-        private SpawnPointChoice PickNearestRandomized(List<SpawnPointChoice> choices, Vector3 playerPos)
+        private bool TryFindPointNear(GameManager gm, UnitSO unit, Vector3 anchor, out SpawnPointChoice result)
         {
-            choices.Sort((a, b) => a.distanceToPlayer.CompareTo(b.distanceToPlayer));
+            result = default(SpawnPointChoice);
 
-            int maxPick = Mathf.Min(choices.Count, 5);
-            return choices[UnityEngine.Random.Range(0, maxPick)];
-        }
+            Camera camera = PlayerCamera(gm);
+            bool anywhere = _settings.Position.Value == SpawnPosition.Anywhere;
+            bool neverBehind = _settings.Position.Value == SpawnPosition.Ahead;
+            float minimum = anywhere ? LegacyDistanceMin : FairDistanceMin;
+            Room playerRoom = GetUnitRoom(gm.PlayerUnit);
+            int checks = 0;
 
-        private int CalculateNpcPressure(Npc npc, float distance, bool targeting, bool knowsPlayer)
-        {
-            int pressure = 1;
-
-            if (npc != null && npc.unitSO != null)
+            List<Room> rooms = gm.orderedRooms;
+            for (int r = 0; r < rooms.Count; r++)
             {
-                pressure = Mathf.Clamp(npc.unitSO.SpawnCost, 1, 4);
-            }
-
-            if (distance <= _closeEnemyDistance.Value)
-            {
-                pressure += 1;
-            }
-
-            if (targeting)
-            {
-                pressure += 2;
-            }
-            else if (knowsPlayer)
-            {
-                pressure += 1;
-            }
-
-            return pressure;
-        }
-
-        private bool IsValidAliveNpc(Npc npc)
-        {
-            return npc != null && npc.gameObject != null && npc.IsAlive;
-        }
-
-        private bool IsHostileToPlayer(Npc npc)
-        {
-            try
-            {
-                return npc != null && npc.IsHostileTo(FactionIds.Player);
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private bool SafeTargetIsPlayer(Npc npc)
-        {
-            try
-            {
-                return npc != null && npc.targetIsPlayer;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private bool SafeHasKnownPlayerPosition(Npc npc, Unit playerUnit)
-        {
-            try
-            {
-                return npc != null && npc.AiAgent != null && playerUnit != null && npc.AiAgent.HasKnownPosition(playerUnit);
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Seconds since the last hit that actually took health off the player, or
-        /// <see cref="NeverDamagedSeconds"/> if that has not happened yet this session.
-        /// </summary>
-        /// <remarks>
-        /// This replaces the removed Unit.TimeSinceLastDamageTaken. The timestamp comes from
-        /// <see cref="OnUnitReceiveDamagePostfix"/>, so the value stays meaningful across level
-        /// transitions - the player Unit is destroyed and rebuilt on every level, but the clock
-        /// this reads is Time.time, which is not.
-        /// </remarks>
-        private static float PlayerTimeSinceDamage
-        {
-            get
-            {
-                if (_playerLastDamageTime <= NeverDamagedTime)
+                Room room = rooms[r];
+                if (!IsValidSpawnRoom(room, anywhere))
                 {
-                    return NeverDamagedSeconds;
+                    continue;
                 }
 
-                return Mathf.Clamp(Time.time - _playerLastDamageTime, 0f, NeverDamagedSeconds);
-            }
-        }
-
-        private float SafeGetPlayerHp(Unit playerUnit)
-        {
-            try
-            {
-                return playerUnit != null ? playerUnit.GetNormalizedHealth() : 0f;
-            }
-            catch
-            {
-                return 0f;
-            }
-        }
-
-        private Room GetUnitRoom(Unit unit)
-        {
-            if (unit == null)
-            {
-                return null;
-            }
-
-            if (unit.currentRoom != null)
-            {
-                return unit.currentRoom;
-            }
-
-            return unit.lastValidCurrentRoom;
-        }
-
-        private bool IsSameOrConnectedRoom(Room npcRoom, Room playerRoom)
-        {
-            if (npcRoom == null || playerRoom == null)
-            {
-                return false;
-            }
-
-            if (npcRoom == playerRoom)
-            {
-                return true;
-            }
-
-            if (playerRoom.connectedRooms == null)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < playerRoom.connectedRooms.Length; i++)
-            {
-                if (playerRoom.connectedRooms[i] == npcRoom)
+                NPCSpawn[] spawns = room.GetNPCSpawns();
+                if (spawns == null)
                 {
+                    continue;
+                }
+
+                for (int i = 0; i < spawns.Length && checks < MaxLineChecksPerPick; i++)
+                {
+                    NPCSpawn spawn = spawns[i];
+                    if (spawn == null || _usedThisBatch.Contains(spawn) || (spawn.usableByTypes & unit.unitType) == 0)
+                    {
+                        continue;
+                    }
+
+                    Vector3 position = spawn.transform.position;
+                    float distance = Vector3.Distance(position, gm.PlayerPosition);
+                    if (Vector3.Distance(position, anchor) > SurgeClusterRadius || distance < minimum)
+                    {
+                        continue;
+                    }
+
+                    SpawnZone zone = anywhere
+                        ? SpawnZone.Ahead
+                        : ClassifyZone(position, room, playerRoom, gm.PlayerPosition, camera);
+
+                    if (zone == SpawnZone.Rear && (neverBehind || distance < RearDistanceMin))
+                    {
+                        continue;
+                    }
+
+                    checks++;
+                    if (!anywhere && IsExposed(camera, position, unit))
+                    {
+                        continue;
+                    }
+
+                    result = new SpawnPointChoice
+                    {
+                        spawn = spawn,
+                        position = position,
+                        room = room,
+                        distanceToPlayer = distance,
+                        zone = zone
+                    };
                     return true;
                 }
             }
@@ -838,10 +670,79 @@ namespace Ryuka.Sulfur.DynamicPressure
             return false;
         }
 
-        private int GetRoomId(Room room)
+        private static bool PickNearest(List<SpawnPointChoice> choices, out SpawnPointChoice result)
         {
-            return room != null ? room.GetInstanceID() : 0;
+            result = default(SpawnPointChoice);
+            if (choices.Count == 0)
+            {
+                return false;
+            }
+
+            choices.Sort((a, b) => a.distanceToPlayer.CompareTo(b.distanceToPlayer));
+            result = choices[UnityEngine.Random.Range(0, Mathf.Min(choices.Count, NearestPointsToChooseFrom))];
+            return true;
         }
 
+        private static bool IsValidSpawnRoom(Room room, bool anywhere)
+        {
+            if (room == null || room.IsStartRoom || room.IsEndRoom || room.disallowEnemySpawn)
+            {
+                return false;
+            }
+
+            // Vanilla never places enemies in corridors.
+            return anywhere || room.roomSize != RoomSize.Corridor;
+        }
+
+        private static Camera PlayerCamera(GameManager gm)
+        {
+            // Not gm.currentCamera: that can be a cinematic or developer camera.
+            return gm.PlayerScript != null ? gm.PlayerScript.playerCamera : null;
+        }
+
+        /// <summary>True when a unit standing at the point would be in the player's view.</summary>
+        private static bool IsExposed(Camera camera, Vector3 position, UnitSO unit)
+        {
+            if (camera == null)
+            {
+                return false;
+            }
+
+            GameManager gm = StaticInstance<GameManager>.Instance;
+            if (gm == null)
+            {
+                return false;
+            }
+
+            if (CanSee(camera, position + Vector3.up * SightCheckHeight, gm))
+            {
+                return true;
+            }
+
+            return (unit.unitType & UnitType.Big) != 0
+                && CanSee(camera, position + Vector3.up * BigSightCheckHeight, gm);
+        }
+
+        private static bool CanSee(Camera camera, Vector3 point, GameManager gm)
+        {
+            Vector3 viewport = camera.WorldToViewportPoint(point);
+            if (viewport.z <= 0f
+                || viewport.x < -ViewportMargin || viewport.x > 1f + ViewportMargin
+                || viewport.y < -ViewportMargin || viewport.y > 1f + ViewportMargin)
+            {
+                return false;
+            }
+
+            return !Physics.Linecast(camera.transform.position, point, gm.enemyOcclusionLayers, QueryTriggerInteraction.Ignore);
+        }
+
+        private struct SpawnPointChoice
+        {
+            public NPCSpawn spawn;
+            public Vector3 position;
+            public Room room;
+            public float distanceToPlayer;
+            public SpawnZone zone;
+        }
     }
 }

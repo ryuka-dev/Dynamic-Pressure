@@ -17,52 +17,12 @@
       "value": "디버그 오버레이"
     },
     {
-      "key": "section.Pressure",
-      "value": "압박"
-    },
-    {
-      "key": "section.Safety",
-      "value": "안전"
-    },
-    {
-      "key": "section.Anti Loop",
-      "value": "루프 방지"
-    },
-    {
-      "key": "section.Candidates",
-      "value": "후보"
-    },
-    {
-      "key": "section.Spawn",
-      "value": "스폰"
-    },
-    {
-      "key": "section.Style 1 - Light",
-      "value": "스타일 1 - 가벼움"
-    },
-    {
-      "key": "section.Style 2 - Heavy",
-      "value": "스타일 2 - 강함"
-    },
-    {
-      "key": "section.Style 3 - Nightmare",
-      "value": "스타일 3 - 악몽"
-    },
-    {
       "key": "entry.General.EnableMod.name",
       "value": "Enable Mod"
     },
     {
       "key": "entry.General.EnableMod.description",
-      "value": "Enable Dynamic Pressure."
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.name",
-      "value": "Enable Auto Spawn"
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.description",
-      "value": "Enable automatic dynamic pressure spawning. Keep false for first debug testing."
+      "value": "동적 압박을 켜거나 끕니다."
     },
     {
       "key": "entry.General.PressureStyle.name",
@@ -70,7 +30,39 @@
     },
     {
       "key": "entry.General.PressureStyle.description",
-      "value": "1 = Light, 2 = Heavy, 3 = Nightmare."
+      "value": "디렉터가 얼마나 강하게 압박할지 정합니다. 높은 스타일일수록 증원이 더 자주 오고 강한 적이 더 일찍 등장합니다."
+    },
+    {
+      "key": "value.General.PressureStyle.Light",
+      "value": "가벼움"
+    },
+    {
+      "key": "value.General.PressureStyle.Heavy",
+      "value": "강함"
+    },
+    {
+      "key": "value.General.PressureStyle.Nightmare",
+      "value": "악몽"
+    },
+    {
+      "key": "entry.General.SpawnPosition.name",
+      "value": "스폰 위치"
+    },
+    {
+      "key": "entry.General.SpawnPosition.description",
+      "value": "증원이 나타나는 위치입니다. 균형: 주로 전방과 측면, 후방은 드뭅니다. 전방: 뒤에는 나타나지 않습니다. 어디서나: 모든 방향에서, 눈앞에도 나타날 수 있습니다."
+    },
+    {
+      "key": "value.General.SpawnPosition.Balanced",
+      "value": "균형"
+    },
+    {
+      "key": "value.General.SpawnPosition.Ahead",
+      "value": "전방"
+    },
+    {
+      "key": "value.General.SpawnPosition.Anywhere",
+      "value": "어디서나"
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.name",
@@ -78,7 +70,7 @@
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.description",
-      "value": "Show debug overlay."
+      "value": "디렉터 디버그 오버레이를 표시합니다."
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.name",
@@ -86,7 +78,7 @@
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.description",
-      "value": "Toggle overlay key."
+      "value": "디버그 오버레이를 표시하거나 숨기는 키입니다."
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.name",
@@ -94,247 +86,15 @@
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.description",
-      "value": "Manual debug spawn key."
+      "value": "테스트용으로 적 하나를 스폰합니다. 디버그 오버레이가 표시된 동안에만 작동합니다."
     },
     {
-      "key": "entry.Pressure.ScanInterval.name",
-      "value": "Scan Interval"
+      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
+      "value": "스폰 결정 로그 기록"
     },
     {
-      "key": "entry.Pressure.ScanInterval.description",
-      "value": "Seconds between pressure scans."
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.name",
-      "value": "Enemy Scan Radius"
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.description",
-      "value": "Nearby enemy scan radius."
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.name",
-      "value": "Close Enemy Distance"
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.description",
-      "value": "Enemies closer than this add extra pressure."
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.name",
-      "value": "Low Health Stop Threshold"
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.description",
-      "value": "Do not spawn if player health is below this normalized value."
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.name",
-      "value": "Recent Damage Stop Window"
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.description",
-      "value": "Do not spawn if player was damaged within this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.name",
-      "value": "Min Original Engaged Hostiles For Spawn"
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.description",
-      "value": "Require this many engaged original hostiles before spawning mod enemies."
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.name",
-      "value": "Cooldown After Mod Kill Only"
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.description",
-      "value": "If only mod enemies are dying, pause spawning for this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.name",
-      "value": "Max Seconds Without Original Kill"
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.description",
-      "value": "Stop spawning if no original enemy has died for this long after mod spawns."
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.name",
-      "value": "Max Mod Spawns Per Original Engaged"
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.description",
-      "value": "Soft budget: each engaged original enemy can support this many mod spawns."
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.name",
-      "value": "Allow Environment Fallback Candidates"
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.description",
-      "value": "Use current environment enemy metadata if current level alive NPC candidate pool is empty."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.name",
-      "value": "Spawn Distance Min"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.description",
-      "value": "Minimum spawn distance from player."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.name",
-      "value": "Spawn Distance Max"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.description",
-      "value": "Maximum spawn distance from player."
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
+      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
+      "value": "디렉터의 결정을 BepInEx 로그에 기록합니다. 진단 전용이며 스폰에 영향을 주지 않습니다."
     },
     {
       "key": "overlay.title",
@@ -345,12 +105,12 @@
       "value": "활성화"
     },
     {
-      "key": "overlay.autoSpawn",
-      "value": "자동 스폰"
-    },
-    {
       "key": "overlay.style",
       "value": "스타일"
+    },
+    {
+      "key": "overlay.position",
+      "value": "위치"
     },
     {
       "key": "overlay.gameState",
@@ -377,24 +137,12 @@
       "value": "없음"
     },
     {
-      "key": "overlay.alive",
-      "value": "생존"
-    },
-    {
       "key": "overlay.hp",
       "value": "HP"
     },
     {
-      "key": "overlay.damageAgo",
-      "value": "마지막 피해 이후"
-    },
-    {
-      "key": "overlay.never",
-      "value": "피해 없음"
-    },
-    {
-      "key": "overlay.unavailable",
-      "value": "사용 불가"
+      "key": "overlay.noHitSensor",
+      "value": "피격 감지 없음"
     },
     {
       "key": "overlay.updateFailure",
@@ -405,44 +153,44 @@
       "value": "방"
     },
     {
-      "key": "overlay.endRoom",
-      "value": "최종 방"
+      "key": "overlay.route",
+      "value": "경로"
     },
     {
-      "key": "overlay.section.pressure",
-      "value": "압박"
+      "key": "overlay.section.director",
+      "value": "디렉터"
     },
     {
-      "key": "overlay.originalHostileAlive",
-      "value": "원본 적 생존"
+      "key": "overlay.phase",
+      "value": "단계"
+    },
+    {
+      "key": "overlay.intensity",
+      "value": "강도"
+    },
+    {
+      "key": "overlay.pace",
+      "value": "페이스"
+    },
+    {
+      "key": "overlay.threat",
+      "value": "위협"
     },
     {
       "key": "overlay.engaged",
       "value": "교전 중"
     },
     {
-      "key": "overlay.targeting",
-      "value": "플레이어 조준"
+      "key": "overlay.present",
+      "value": "현장"
     },
     {
-      "key": "overlay.modHostileAlive",
+      "key": "overlay.modAlive",
       "value": "모드 적 생존"
     },
     {
-      "key": "overlay.originalPressure",
-      "value": "원본 압박"
-    },
-    {
-      "key": "overlay.modPressure",
-      "value": "모드 압박"
-    },
-    {
-      "key": "overlay.current",
-      "value": "현재"
-    },
-    {
-      "key": "overlay.deficit",
-      "value": "부족"
+      "key": "overlay.budget",
+      "value": "예산"
     },
     {
       "key": "overlay.section.spawnDecision",
@@ -457,48 +205,8 @@
       "value": "사유"
     },
     {
-      "key": "overlay.nextSpawnIn",
-      "value": "다음 스폰까지"
-    },
-    {
-      "key": "overlay.candidateSource",
-      "value": "후보 출처"
-    },
-    {
-      "key": "overlay.candidates",
-      "value": "후보 수"
-    },
-    {
-      "key": "overlay.section.modImpact",
-      "value": "모드 영향"
-    },
-    {
-      "key": "overlay.spawnedThisLevel",
-      "value": "이번 레벨 스폰 수"
-    },
-    {
-      "key": "overlay.spawnedSinceOriginalKill",
-      "value": "마지막 원본 처치 이후 스폰"
-    },
-    {
-      "key": "overlay.timeSinceOriginalKill",
-      "value": "마지막 원본 처치 이후"
-    },
-    {
-      "key": "overlay.timeSinceModKill",
-      "value": "마지막 모드 처치 이후"
-    },
-    {
-      "key": "overlay.wouldDelayAllDead",
-      "value": "OnAllEnemiesDead 지연됨"
-    },
-    {
       "key": "overlay.lastSpawn",
       "value": "마지막 스폰"
-    },
-    {
-      "key": "overlay.lastAggroReport",
-      "value": "마지막 어그로 보고"
     },
     {
       "key": "overlay.keys",
@@ -509,12 +217,12 @@
       "value": "최근 이벤트"
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
-      "value": "스폰 결정 로그 기록"
+      "key": "alert.surge",
+      "value": "무언가 다가온다..."
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
-      "value": "스폰 웨이브 결과 요약을 주기적으로 BepInEx 로그에 기록합니다. 진단 전용이며 스폰에 영향을 주지 않습니다."
+      "key": "alert.migrated",
+      "value": "동적 압박: 이전 조정값이 새 디렉터로 대체되었습니다."
     }
   ]
 }

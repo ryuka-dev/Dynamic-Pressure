@@ -17,52 +17,12 @@
       "value": "Felsökningsöverlägg"
     },
     {
-      "key": "section.Pressure",
-      "value": "Tryck"
-    },
-    {
-      "key": "section.Safety",
-      "value": "Säkerhet"
-    },
-    {
-      "key": "section.Anti Loop",
-      "value": "Anti-loop"
-    },
-    {
-      "key": "section.Candidates",
-      "value": "Kandidater"
-    },
-    {
-      "key": "section.Spawn",
-      "value": "Spawn"
-    },
-    {
-      "key": "section.Style 1 - Light",
-      "value": "Stil 1 - Lätt"
-    },
-    {
-      "key": "section.Style 2 - Heavy",
-      "value": "Stil 2 - Tung"
-    },
-    {
-      "key": "section.Style 3 - Nightmare",
-      "value": "Stil 3 - Mardröm"
-    },
-    {
       "key": "entry.General.EnableMod.name",
       "value": "Enable Mod"
     },
     {
       "key": "entry.General.EnableMod.description",
-      "value": "Enable Dynamic Pressure."
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.name",
-      "value": "Enable Auto Spawn"
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.description",
-      "value": "Enable automatic dynamic pressure spawning. Keep false for first debug testing."
+      "value": "Slår på eller av Dynamiskt tryck."
     },
     {
       "key": "entry.General.PressureStyle.name",
@@ -70,7 +30,39 @@
     },
     {
       "key": "entry.General.PressureStyle.description",
-      "value": "1 = Light, 2 = Heavy, 3 = Nightmare."
+      "value": "Hur hårt regissören pressar. Högre stilar skickar förstärkningar oftare och introducerar tuffare fiender tidigare."
+    },
+    {
+      "key": "value.General.PressureStyle.Light",
+      "value": "Lätt"
+    },
+    {
+      "key": "value.General.PressureStyle.Heavy",
+      "value": "Tung"
+    },
+    {
+      "key": "value.General.PressureStyle.Nightmare",
+      "value": "Mardröm"
+    },
+    {
+      "key": "entry.General.SpawnPosition.name",
+      "value": "Spawnposition"
+    },
+    {
+      "key": "entry.General.SpawnPosition.description",
+      "value": "Var förstärkningar dyker upp. Balanserad: mest framför och vid sidorna, sällan bakom. Framför: aldrig bakom dig. Var som helst: alla riktningar, och de kan dyka upp fullt synligt."
+    },
+    {
+      "key": "value.General.SpawnPosition.Balanced",
+      "value": "Balanserad"
+    },
+    {
+      "key": "value.General.SpawnPosition.Ahead",
+      "value": "Framför"
+    },
+    {
+      "key": "value.General.SpawnPosition.Anywhere",
+      "value": "Var som helst"
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.name",
@@ -78,7 +70,7 @@
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.description",
-      "value": "Show debug overlay."
+      "value": "Visar regissörens felsökningsöverlägg."
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.name",
@@ -86,7 +78,7 @@
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.description",
-      "value": "Toggle overlay key."
+      "value": "Tangent som visar eller döljer felsökningsöverlägget."
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.name",
@@ -94,247 +86,15 @@
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.description",
-      "value": "Manual debug spawn key."
+      "value": "Spawnar en fiende för testning. Fungerar bara medan felsökningsöverlägget visas."
     },
     {
-      "key": "entry.Pressure.ScanInterval.name",
-      "value": "Scan Interval"
+      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
+      "value": "Logga spawnbeslut"
     },
     {
-      "key": "entry.Pressure.ScanInterval.description",
-      "value": "Seconds between pressure scans."
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.name",
-      "value": "Enemy Scan Radius"
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.description",
-      "value": "Nearby enemy scan radius."
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.name",
-      "value": "Close Enemy Distance"
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.description",
-      "value": "Enemies closer than this add extra pressure."
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.name",
-      "value": "Low Health Stop Threshold"
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.description",
-      "value": "Do not spawn if player health is below this normalized value."
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.name",
-      "value": "Recent Damage Stop Window"
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.description",
-      "value": "Do not spawn if player was damaged within this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.name",
-      "value": "Min Original Engaged Hostiles For Spawn"
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.description",
-      "value": "Require this many engaged original hostiles before spawning mod enemies."
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.name",
-      "value": "Cooldown After Mod Kill Only"
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.description",
-      "value": "If only mod enemies are dying, pause spawning for this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.name",
-      "value": "Max Seconds Without Original Kill"
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.description",
-      "value": "Stop spawning if no original enemy has died for this long after mod spawns."
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.name",
-      "value": "Max Mod Spawns Per Original Engaged"
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.description",
-      "value": "Soft budget: each engaged original enemy can support this many mod spawns."
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.name",
-      "value": "Allow Environment Fallback Candidates"
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.description",
-      "value": "Use current environment enemy metadata if current level alive NPC candidate pool is empty."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.name",
-      "value": "Spawn Distance Min"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.description",
-      "value": "Minimum spawn distance from player."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.name",
-      "value": "Spawn Distance Max"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.description",
-      "value": "Maximum spawn distance from player."
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
+      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
+      "value": "Skriver regissörens beslut till BepInEx-loggen. Endast diagnostik; påverkar inte spawning."
     },
     {
       "key": "overlay.title",
@@ -345,12 +105,12 @@
       "value": "Aktiverad"
     },
     {
-      "key": "overlay.autoSpawn",
-      "value": "Auto-spawn"
-    },
-    {
       "key": "overlay.style",
       "value": "Stil"
+    },
+    {
+      "key": "overlay.position",
+      "value": "Position"
     },
     {
       "key": "overlay.gameState",
@@ -377,24 +137,12 @@
       "value": "Saknas"
     },
     {
-      "key": "overlay.alive",
-      "value": "Levande"
-    },
-    {
       "key": "overlay.hp",
       "value": "HP"
     },
     {
-      "key": "overlay.damageAgo",
-      "value": "Sedan senaste skada"
-    },
-    {
-      "key": "overlay.never",
-      "value": "aldrig"
-    },
-    {
-      "key": "overlay.unavailable",
-      "value": "otillgänglig"
+      "key": "overlay.noHitSensor",
+      "value": "ingen träffsensor"
     },
     {
       "key": "overlay.updateFailure",
@@ -405,44 +153,44 @@
       "value": "Rum"
     },
     {
-      "key": "overlay.endRoom",
-      "value": "Slutrum"
+      "key": "overlay.route",
+      "value": "Rutt"
     },
     {
-      "key": "overlay.section.pressure",
-      "value": "Tryck"
+      "key": "overlay.section.director",
+      "value": "Regissör"
     },
     {
-      "key": "overlay.originalHostileAlive",
-      "value": "Levande originalfiender"
+      "key": "overlay.phase",
+      "value": "Fas"
+    },
+    {
+      "key": "overlay.intensity",
+      "value": "Intensitet"
+    },
+    {
+      "key": "overlay.pace",
+      "value": "Tempo"
+    },
+    {
+      "key": "overlay.threat",
+      "value": "Hot"
     },
     {
       "key": "overlay.engaged",
       "value": "I strid"
     },
     {
-      "key": "overlay.targeting",
-      "value": "Siktar på spelaren"
+      "key": "overlay.present",
+      "value": "Närvarande"
     },
     {
-      "key": "overlay.modHostileAlive",
+      "key": "overlay.modAlive",
       "value": "Levande mod-fiender"
     },
     {
-      "key": "overlay.originalPressure",
-      "value": "Originaltryck"
-    },
-    {
-      "key": "overlay.modPressure",
-      "value": "Mod-tryck"
-    },
-    {
-      "key": "overlay.current",
-      "value": "Nuvarande"
-    },
-    {
-      "key": "overlay.deficit",
-      "value": "Underskott"
+      "key": "overlay.budget",
+      "value": "Budget"
     },
     {
       "key": "overlay.section.spawnDecision",
@@ -457,48 +205,8 @@
       "value": "Orsak"
     },
     {
-      "key": "overlay.nextSpawnIn",
-      "value": "Nästa spawn om"
-    },
-    {
-      "key": "overlay.candidateSource",
-      "value": "Kandidatkälla"
-    },
-    {
-      "key": "overlay.candidates",
-      "value": "Kandidater"
-    },
-    {
-      "key": "overlay.section.modImpact",
-      "value": "Modens påverkan"
-    },
-    {
-      "key": "overlay.spawnedThisLevel",
-      "value": "Spawnade i denna nivå"
-    },
-    {
-      "key": "overlay.spawnedSinceOriginalKill",
-      "value": "Spawnade sedan senaste originaldöd"
-    },
-    {
-      "key": "overlay.timeSinceOriginalKill",
-      "value": "Sedan senaste originaldöd"
-    },
-    {
-      "key": "overlay.timeSinceModKill",
-      "value": "Sedan senaste mod-död"
-    },
-    {
-      "key": "overlay.wouldDelayAllDead",
-      "value": "Skulle fördröja OnAllEnemiesDead"
-    },
-    {
       "key": "overlay.lastSpawn",
       "value": "Senaste spawn"
-    },
-    {
-      "key": "overlay.lastAggroReport",
-      "value": "Senaste aggro-rapport"
     },
     {
       "key": "overlay.keys",
@@ -509,12 +217,12 @@
       "value": "Senaste händelser"
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
-      "value": "Logga spawnbeslut"
+      "key": "alert.surge",
+      "value": "Något närmar sig..."
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
-      "value": "Skriver regelbundet en sammanfattning av spawnvågor till BepInEx-loggen. Endast diagnostik; påverkar inte spawning."
+      "key": "alert.migrated",
+      "value": "Dynamiskt tryck: dina gamla inställningar har ersatts av den nya regissören."
     }
   ]
 }

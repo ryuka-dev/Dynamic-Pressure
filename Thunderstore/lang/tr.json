@@ -17,52 +17,12 @@
       "value": "Hata ayıklama kaplaması"
     },
     {
-      "key": "section.Pressure",
-      "value": "Baskı"
-    },
-    {
-      "key": "section.Safety",
-      "value": "Güvenlik"
-    },
-    {
-      "key": "section.Anti Loop",
-      "value": "Döngü önleme"
-    },
-    {
-      "key": "section.Candidates",
-      "value": "Adaylar"
-    },
-    {
-      "key": "section.Spawn",
-      "value": "Doğma"
-    },
-    {
-      "key": "section.Style 1 - Light",
-      "value": "Stil 1 - Hafif"
-    },
-    {
-      "key": "section.Style 2 - Heavy",
-      "value": "Stil 2 - Ağır"
-    },
-    {
-      "key": "section.Style 3 - Nightmare",
-      "value": "Stil 3 - Kabus"
-    },
-    {
       "key": "entry.General.EnableMod.name",
       "value": "Enable Mod"
     },
     {
       "key": "entry.General.EnableMod.description",
-      "value": "Enable Dynamic Pressure."
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.name",
-      "value": "Enable Auto Spawn"
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.description",
-      "value": "Enable automatic dynamic pressure spawning. Keep false for first debug testing."
+      "value": "Dinamik Baskı'yı açar veya kapatır."
     },
     {
       "key": "entry.General.PressureStyle.name",
@@ -70,7 +30,39 @@
     },
     {
       "key": "entry.General.PressureStyle.description",
-      "value": "1 = Light, 2 = Heavy, 3 = Nightmare."
+      "value": "Yönetmenin ne kadar baskı yaptığı. Yüksek stiller daha sık takviye gönderir ve daha güçlü düşmanları daha erken getirir."
+    },
+    {
+      "key": "value.General.PressureStyle.Light",
+      "value": "Hafif"
+    },
+    {
+      "key": "value.General.PressureStyle.Heavy",
+      "value": "Ağır"
+    },
+    {
+      "key": "value.General.PressureStyle.Nightmare",
+      "value": "Kabus"
+    },
+    {
+      "key": "entry.General.SpawnPosition.name",
+      "value": "Doğma konumu"
+    },
+    {
+      "key": "entry.General.SpawnPosition.description",
+      "value": "Takviyelerin nerede belireceği. Dengeli: çoğunlukla önde ve yanlarda, nadiren arkada. Önde: asla arkanızda değil. Her yerde: her yönden, gözünüzün önünde de belirebilirler."
+    },
+    {
+      "key": "value.General.SpawnPosition.Balanced",
+      "value": "Dengeli"
+    },
+    {
+      "key": "value.General.SpawnPosition.Ahead",
+      "value": "Önde"
+    },
+    {
+      "key": "value.General.SpawnPosition.Anywhere",
+      "value": "Her yerde"
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.name",
@@ -78,7 +70,7 @@
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.description",
-      "value": "Show debug overlay."
+      "value": "Yönetmenin hata ayıklama kaplamasını gösterir."
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.name",
@@ -86,7 +78,7 @@
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.description",
-      "value": "Toggle overlay key."
+      "value": "Hata ayıklama kaplamasını gösteren veya gizleyen tuş."
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.name",
@@ -94,247 +86,15 @@
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.description",
-      "value": "Manual debug spawn key."
+      "value": "Test için bir düşman doğurur. Yalnızca hata ayıklama kaplaması görünürken çalışır."
     },
     {
-      "key": "entry.Pressure.ScanInterval.name",
-      "value": "Scan Interval"
+      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
+      "value": "Doğma kararlarını günlüğe yaz"
     },
     {
-      "key": "entry.Pressure.ScanInterval.description",
-      "value": "Seconds between pressure scans."
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.name",
-      "value": "Enemy Scan Radius"
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.description",
-      "value": "Nearby enemy scan radius."
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.name",
-      "value": "Close Enemy Distance"
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.description",
-      "value": "Enemies closer than this add extra pressure."
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.name",
-      "value": "Low Health Stop Threshold"
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.description",
-      "value": "Do not spawn if player health is below this normalized value."
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.name",
-      "value": "Recent Damage Stop Window"
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.description",
-      "value": "Do not spawn if player was damaged within this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.name",
-      "value": "Min Original Engaged Hostiles For Spawn"
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.description",
-      "value": "Require this many engaged original hostiles before spawning mod enemies."
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.name",
-      "value": "Cooldown After Mod Kill Only"
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.description",
-      "value": "If only mod enemies are dying, pause spawning for this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.name",
-      "value": "Max Seconds Without Original Kill"
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.description",
-      "value": "Stop spawning if no original enemy has died for this long after mod spawns."
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.name",
-      "value": "Max Mod Spawns Per Original Engaged"
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.description",
-      "value": "Soft budget: each engaged original enemy can support this many mod spawns."
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.name",
-      "value": "Allow Environment Fallback Candidates"
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.description",
-      "value": "Use current environment enemy metadata if current level alive NPC candidate pool is empty."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.name",
-      "value": "Spawn Distance Min"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.description",
-      "value": "Minimum spawn distance from player."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.name",
-      "value": "Spawn Distance Max"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.description",
-      "value": "Maximum spawn distance from player."
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
+      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
+      "value": "Yönetmenin kararlarını BepInEx günlüğüne yazar. Yalnızca tanılama; doğmayı etkilemez."
     },
     {
       "key": "overlay.title",
@@ -345,12 +105,12 @@
       "value": "Etkin"
     },
     {
-      "key": "overlay.autoSpawn",
-      "value": "Otomatik doğma"
-    },
-    {
       "key": "overlay.style",
       "value": "Stil"
+    },
+    {
+      "key": "overlay.position",
+      "value": "Konum"
     },
     {
       "key": "overlay.gameState",
@@ -377,24 +137,12 @@
       "value": "Yok"
     },
     {
-      "key": "overlay.alive",
-      "value": "Canlı"
-    },
-    {
       "key": "overlay.hp",
       "value": "CP"
     },
     {
-      "key": "overlay.damageAgo",
-      "value": "Son hasardan beri"
-    },
-    {
-      "key": "overlay.never",
-      "value": "hiç"
-    },
-    {
-      "key": "overlay.unavailable",
-      "value": "kullanılamıyor"
+      "key": "overlay.noHitSensor",
+      "value": "isabet algılayıcı yok"
     },
     {
       "key": "overlay.updateFailure",
@@ -405,44 +153,44 @@
       "value": "Oda"
     },
     {
-      "key": "overlay.endRoom",
-      "value": "Bitiş odası"
+      "key": "overlay.route",
+      "value": "Rota"
     },
     {
-      "key": "overlay.section.pressure",
-      "value": "Baskı"
+      "key": "overlay.section.director",
+      "value": "Yönetmen"
     },
     {
-      "key": "overlay.originalHostileAlive",
-      "value": "Yaşayan orijinal düşmanlar"
+      "key": "overlay.phase",
+      "value": "Aşama"
+    },
+    {
+      "key": "overlay.intensity",
+      "value": "Yoğunluk"
+    },
+    {
+      "key": "overlay.pace",
+      "value": "Tempo"
+    },
+    {
+      "key": "overlay.threat",
+      "value": "Tehdit"
     },
     {
       "key": "overlay.engaged",
       "value": "Çatışmada"
     },
     {
-      "key": "overlay.targeting",
-      "value": "Oyuncuyu hedefliyor"
-    },
-    {
-      "key": "overlay.modHostileAlive",
-      "value": "Yaşayan mod düşmanları"
-    },
-    {
-      "key": "overlay.originalPressure",
-      "value": "Orijinal baskı"
-    },
-    {
-      "key": "overlay.modPressure",
-      "value": "Mod baskısı"
-    },
-    {
-      "key": "overlay.current",
+      "key": "overlay.present",
       "value": "Mevcut"
     },
     {
-      "key": "overlay.deficit",
-      "value": "Açık"
+      "key": "overlay.modAlive",
+      "value": "Yaşayan mod düşmanları"
+    },
+    {
+      "key": "overlay.budget",
+      "value": "Bütçe"
     },
     {
       "key": "overlay.section.spawnDecision",
@@ -457,48 +205,8 @@
       "value": "Sebep"
     },
     {
-      "key": "overlay.nextSpawnIn",
-      "value": "Sonraki doğma"
-    },
-    {
-      "key": "overlay.candidateSource",
-      "value": "Aday kaynağı"
-    },
-    {
-      "key": "overlay.candidates",
-      "value": "Adaylar"
-    },
-    {
-      "key": "overlay.section.modImpact",
-      "value": "Mod etkisi"
-    },
-    {
-      "key": "overlay.spawnedThisLevel",
-      "value": "Bu bölümde doğanlar"
-    },
-    {
-      "key": "overlay.spawnedSinceOriginalKill",
-      "value": "Son orijinal ölümden beri doğanlar"
-    },
-    {
-      "key": "overlay.timeSinceOriginalKill",
-      "value": "Son orijinal ölümden beri"
-    },
-    {
-      "key": "overlay.timeSinceModKill",
-      "value": "Son mod ölümünden beri"
-    },
-    {
-      "key": "overlay.wouldDelayAllDead",
-      "value": "OnAllEnemiesDead geciktirilir"
-    },
-    {
       "key": "overlay.lastSpawn",
       "value": "Son doğma"
-    },
-    {
-      "key": "overlay.lastAggroReport",
-      "value": "Son aggro raporu"
     },
     {
       "key": "overlay.keys",
@@ -509,12 +217,12 @@
       "value": "Son olaylar"
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
-      "value": "Doğma kararlarını günlüğe yaz"
+      "key": "alert.surge",
+      "value": "Bir şey geliyor..."
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
-      "value": "Doğma dalgalarının özetini düzenli olarak BepInEx günlüğüne yazar. Yalnızca tanılama; doğmayı etkilemez."
+      "key": "alert.migrated",
+      "value": "Dinamik Baskı: Eski ayar değerleriniz yeni yönetmenle değiştirildi."
     }
   ]
 }

@@ -17,52 +17,12 @@
       "value": "تراكب التصحيح"
     },
     {
-      "key": "section.Pressure",
-      "value": "الضغط"
-    },
-    {
-      "key": "section.Safety",
-      "value": "الأمان"
-    },
-    {
-      "key": "section.Anti Loop",
-      "value": "منع التكرار"
-    },
-    {
-      "key": "section.Candidates",
-      "value": "المرشحون"
-    },
-    {
-      "key": "section.Spawn",
-      "value": "التوليد"
-    },
-    {
-      "key": "section.Style 1 - Light",
-      "value": "النمط 1 - خفيف"
-    },
-    {
-      "key": "section.Style 2 - Heavy",
-      "value": "النمط 2 - ثقيل"
-    },
-    {
-      "key": "section.Style 3 - Nightmare",
-      "value": "النمط 3 - كابوس"
-    },
-    {
       "key": "entry.General.EnableMod.name",
       "value": "Enable Mod"
     },
     {
       "key": "entry.General.EnableMod.description",
-      "value": "Enable Dynamic Pressure."
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.name",
-      "value": "Enable Auto Spawn"
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.description",
-      "value": "Enable automatic dynamic pressure spawning. Keep false for first debug testing."
+      "value": "يشغّل الضغط الديناميكي أو يوقفه."
     },
     {
       "key": "entry.General.PressureStyle.name",
@@ -70,7 +30,39 @@
     },
     {
       "key": "entry.General.PressureStyle.description",
-      "value": "1 = Light, 2 = Heavy, 3 = Nightmare."
+      "value": "مدى شدة ضغط المخرج. ترسل الأنماط الأعلى تعزيزات أكثر تكرارًا وتقدّم أعداء أقوى في وقت أبكر."
+    },
+    {
+      "key": "value.General.PressureStyle.Light",
+      "value": "خفيف"
+    },
+    {
+      "key": "value.General.PressureStyle.Heavy",
+      "value": "ثقيل"
+    },
+    {
+      "key": "value.General.PressureStyle.Nightmare",
+      "value": "كابوس"
+    },
+    {
+      "key": "entry.General.SpawnPosition.name",
+      "value": "موقع التوليد"
+    },
+    {
+      "key": "entry.General.SpawnPosition.description",
+      "value": "مكان ظهور التعزيزات. متوازن: غالبًا في الأمام وعلى الجانبين، ونادرًا من الخلف. في الأمام: لا تظهر خلفك أبدًا. في أي مكان: من أي اتجاه، وقد تظهر على مرأى منك."
+    },
+    {
+      "key": "value.General.SpawnPosition.Balanced",
+      "value": "متوازن"
+    },
+    {
+      "key": "value.General.SpawnPosition.Ahead",
+      "value": "في الأمام"
+    },
+    {
+      "key": "value.General.SpawnPosition.Anywhere",
+      "value": "في أي مكان"
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.name",
@@ -78,7 +70,7 @@
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.description",
-      "value": "Show debug overlay."
+      "value": "يعرض تراكب التصحيح الخاص بالمخرج."
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.name",
@@ -86,7 +78,7 @@
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.description",
-      "value": "Toggle overlay key."
+      "value": "المفتاح الذي يُظهر تراكب التصحيح أو يخفيه."
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.name",
@@ -94,247 +86,15 @@
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.description",
-      "value": "Manual debug spawn key."
+      "value": "يولّد عدوًا واحدًا للاختبار. يعمل فقط أثناء عرض تراكب التصحيح."
     },
     {
-      "key": "entry.Pressure.ScanInterval.name",
-      "value": "Scan Interval"
+      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
+      "value": "تسجيل قرارات التوليد"
     },
     {
-      "key": "entry.Pressure.ScanInterval.description",
-      "value": "Seconds between pressure scans."
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.name",
-      "value": "Enemy Scan Radius"
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.description",
-      "value": "Nearby enemy scan radius."
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.name",
-      "value": "Close Enemy Distance"
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.description",
-      "value": "Enemies closer than this add extra pressure."
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.name",
-      "value": "Low Health Stop Threshold"
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.description",
-      "value": "Do not spawn if player health is below this normalized value."
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.name",
-      "value": "Recent Damage Stop Window"
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.description",
-      "value": "Do not spawn if player was damaged within this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.name",
-      "value": "Min Original Engaged Hostiles For Spawn"
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.description",
-      "value": "Require this many engaged original hostiles before spawning mod enemies."
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.name",
-      "value": "Cooldown After Mod Kill Only"
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.description",
-      "value": "If only mod enemies are dying, pause spawning for this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.name",
-      "value": "Max Seconds Without Original Kill"
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.description",
-      "value": "Stop spawning if no original enemy has died for this long after mod spawns."
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.name",
-      "value": "Max Mod Spawns Per Original Engaged"
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.description",
-      "value": "Soft budget: each engaged original enemy can support this many mod spawns."
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.name",
-      "value": "Allow Environment Fallback Candidates"
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.description",
-      "value": "Use current environment enemy metadata if current level alive NPC candidate pool is empty."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.name",
-      "value": "Spawn Distance Min"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.description",
-      "value": "Minimum spawn distance from player."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.name",
-      "value": "Spawn Distance Max"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.description",
-      "value": "Maximum spawn distance from player."
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.name",
-      "value": "Target Pressure"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.name",
-      "value": "Spawn Cooldown"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.name",
-      "value": "Max Spawn Per Wave"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.name",
-      "value": "Max Mod Spawned Alive"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.name",
-      "value": "Max Mod Spawned Per Room"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.name",
-      "value": "Max Mod Spawned Per Level"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
+      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
+      "value": "يكتب قرارات المخرج في سجل BepInEx. للتشخيص فقط؛ لا يؤثر على التوليد."
     },
     {
       "key": "overlay.title",
@@ -345,12 +105,12 @@
       "value": "مُفعّل"
     },
     {
-      "key": "overlay.autoSpawn",
-      "value": "توليد تلقائي"
-    },
-    {
       "key": "overlay.style",
       "value": "النمط"
+    },
+    {
+      "key": "overlay.position",
+      "value": "الموقع"
     },
     {
       "key": "overlay.gameState",
@@ -377,24 +137,12 @@
       "value": "مفقود"
     },
     {
-      "key": "overlay.alive",
-      "value": "حي"
-    },
-    {
       "key": "overlay.hp",
       "value": "الصحة"
     },
     {
-      "key": "overlay.damageAgo",
-      "value": "منذ آخر ضرر"
-    },
-    {
-      "key": "overlay.never",
-      "value": "أبدًا"
-    },
-    {
-      "key": "overlay.unavailable",
-      "value": "غير متاح"
+      "key": "overlay.noHitSensor",
+      "value": "لا يوجد مستشعر إصابات"
     },
     {
       "key": "overlay.updateFailure",
@@ -405,44 +153,44 @@
       "value": "الغرفة"
     },
     {
-      "key": "overlay.endRoom",
-      "value": "الغرفة النهائية"
+      "key": "overlay.route",
+      "value": "المسار"
     },
     {
-      "key": "overlay.section.pressure",
-      "value": "الضغط"
+      "key": "overlay.section.director",
+      "value": "المخرج"
     },
     {
-      "key": "overlay.originalHostileAlive",
-      "value": "الأعداء الأصليون الأحياء"
+      "key": "overlay.phase",
+      "value": "المرحلة"
+    },
+    {
+      "key": "overlay.intensity",
+      "value": "الشدة"
+    },
+    {
+      "key": "overlay.pace",
+      "value": "الوتيرة"
+    },
+    {
+      "key": "overlay.threat",
+      "value": "التهديد"
     },
     {
       "key": "overlay.engaged",
       "value": "في اشتباك"
     },
     {
-      "key": "overlay.targeting",
-      "value": "يستهدفون اللاعب"
+      "key": "overlay.present",
+      "value": "الحاضرون"
     },
     {
-      "key": "overlay.modHostileAlive",
+      "key": "overlay.modAlive",
       "value": "أعداء المود الأحياء"
     },
     {
-      "key": "overlay.originalPressure",
-      "value": "الضغط الأصلي"
-    },
-    {
-      "key": "overlay.modPressure",
-      "value": "ضغط المود"
-    },
-    {
-      "key": "overlay.current",
-      "value": "الحالي"
-    },
-    {
-      "key": "overlay.deficit",
-      "value": "العجز"
+      "key": "overlay.budget",
+      "value": "الميزانية"
     },
     {
       "key": "overlay.section.spawnDecision",
@@ -457,48 +205,8 @@
       "value": "السبب"
     },
     {
-      "key": "overlay.nextSpawnIn",
-      "value": "التوليد التالي خلال"
-    },
-    {
-      "key": "overlay.candidateSource",
-      "value": "مصدر المرشحين"
-    },
-    {
-      "key": "overlay.candidates",
-      "value": "المرشحون"
-    },
-    {
-      "key": "overlay.section.modImpact",
-      "value": "تأثير المود"
-    },
-    {
-      "key": "overlay.spawnedThisLevel",
-      "value": "المولّدون في هذه المرحلة"
-    },
-    {
-      "key": "overlay.spawnedSinceOriginalKill",
-      "value": "المولّدون منذ آخر قتل أصلي"
-    },
-    {
-      "key": "overlay.timeSinceOriginalKill",
-      "value": "منذ آخر قتل أصلي"
-    },
-    {
-      "key": "overlay.timeSinceModKill",
-      "value": "منذ آخر قتل للمود"
-    },
-    {
-      "key": "overlay.wouldDelayAllDead",
-      "value": "سيؤخر OnAllEnemiesDead"
-    },
-    {
       "key": "overlay.lastSpawn",
       "value": "آخر توليد"
-    },
-    {
-      "key": "overlay.lastAggroReport",
-      "value": "آخر تقرير عدائية"
     },
     {
       "key": "overlay.keys",
@@ -509,12 +217,12 @@
       "value": "الأحداث الأخيرة"
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
-      "value": "تسجيل قرارات التوليد"
+      "key": "alert.surge",
+      "value": "شيء ما قادم..."
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
-      "value": "يكتب ملخصًا دوريًا لموجات التوليد في سجل BepInEx. للتشخيص فقط؛ لا يؤثر على التوليد."
+      "key": "alert.migrated",
+      "value": "الضغط الديناميكي: تم استبدال قيم الضبط القديمة بالمخرج الجديد."
     }
   ]
 }

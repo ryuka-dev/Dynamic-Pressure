@@ -17,52 +17,12 @@
       "value": "デバッグオーバーレイ"
     },
     {
-      "key": "section.Pressure",
-      "value": "プレッシャー"
-    },
-    {
-      "key": "section.Safety",
-      "value": "安全"
-    },
-    {
-      "key": "section.Anti Loop",
-      "value": "ループ防止"
-    },
-    {
-      "key": "section.Candidates",
-      "value": "候補"
-    },
-    {
-      "key": "section.Spawn",
-      "value": "スポーン"
-    },
-    {
-      "key": "section.Style 1 - Light",
-      "value": "スタイル 1 - 軽量"
-    },
-    {
-      "key": "section.Style 2 - Heavy",
-      "value": "スタイル 2 - 重め"
-    },
-    {
-      "key": "section.Style 3 - Nightmare",
-      "value": "スタイル 3 - ナイトメア"
-    },
-    {
       "key": "entry.General.EnableMod.name",
       "value": "有効化Mod"
     },
     {
       "key": "entry.General.EnableMod.description",
-      "value": "Enable Dynamic Pressure."
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.name",
-      "value": "有効化自動スポーン"
-    },
-    {
-      "key": "entry.General.EnableAutoSpawn.description",
-      "value": "Enable automatic dynamic pressure spawning. Keep false for first debug testing."
+      "value": "動的プレッシャーのオン/オフを切り替えます。"
     },
     {
       "key": "entry.General.PressureStyle.name",
@@ -70,7 +30,39 @@
     },
     {
       "key": "entry.General.PressureStyle.description",
-      "value": "1 = Light, 2 = Heavy, 3 = Nightmare."
+      "value": "ディレクターのプレッシャーの強さ。上のスタイルほど増援が頻繁に送られ、強い敵が早い段階で登場します。"
+    },
+    {
+      "key": "value.General.PressureStyle.Light",
+      "value": "軽量"
+    },
+    {
+      "key": "value.General.PressureStyle.Heavy",
+      "value": "重め"
+    },
+    {
+      "key": "value.General.PressureStyle.Nightmare",
+      "value": "ナイトメア"
+    },
+    {
+      "key": "entry.General.SpawnPosition.name",
+      "value": "スポーン位置"
+    },
+    {
+      "key": "entry.General.SpawnPosition.description",
+      "value": "増援の出現場所。バランス: 主に前方と側面で、背後はまれ。前方: 背後には出現しません。どこでも: あらゆる方向から、視界内にも出現します。"
+    },
+    {
+      "key": "value.General.SpawnPosition.Balanced",
+      "value": "バランス"
+    },
+    {
+      "key": "value.General.SpawnPosition.Ahead",
+      "value": "前方"
+    },
+    {
+      "key": "value.General.SpawnPosition.Anywhere",
+      "value": "どこでも"
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.name",
@@ -78,7 +70,7 @@
     },
     {
       "key": "entry.Debug Overlay.EnableOverlay.description",
-      "value": "Show debug overlay."
+      "value": "ディレクターのデバッグオーバーレイを表示します。"
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.name",
@@ -86,7 +78,7 @@
     },
     {
       "key": "entry.Debug Overlay.OverlayToggleKey.description",
-      "value": "Toggle overlay key."
+      "value": "デバッグオーバーレイの表示/非表示を切り替えるキーです。"
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.name",
@@ -94,247 +86,15 @@
     },
     {
       "key": "entry.Debug Overlay.ManualSpawnKey.description",
-      "value": "Manual debug spawn key."
+      "value": "テスト用に敵を1体スポーンします。デバッグオーバーレイの表示中のみ機能します。"
     },
     {
-      "key": "entry.Pressure.ScanInterval.name",
-      "value": "スキャン間隔"
+      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
+      "value": "スポーン判定をログ出力"
     },
     {
-      "key": "entry.Pressure.ScanInterval.description",
-      "value": "Seconds between pressure scans."
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.name",
-      "value": "敵スキャン半径"
-    },
-    {
-      "key": "entry.Pressure.EnemyScanRadius.description",
-      "value": "Nearby enemy scan radius."
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.name",
-      "value": "近距離敵距離"
-    },
-    {
-      "key": "entry.Pressure.CloseEnemyDistance.description",
-      "value": "Enemies closer than this add extra pressure."
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.name",
-      "value": "低体力停止しきい値"
-    },
-    {
-      "key": "entry.Safety.LowHealthStopThreshold.description",
-      "value": "Do not spawn if player health is below this normalized value."
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.name",
-      "value": "直近ダメージ停止期間"
-    },
-    {
-      "key": "entry.Safety.RecentDamageStopWindow.description",
-      "value": "Do not spawn if player was damaged within this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.name",
-      "value": "最小元交戦中敵対者Forスポーン"
-    },
-    {
-      "key": "entry.Anti Loop.MinOriginalEngagedHostilesForSpawn.description",
-      "value": "Require this many engaged original hostiles before spawning mod enemies."
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.name",
-      "value": "クールダウン後Modキルのみ"
-    },
-    {
-      "key": "entry.Anti Loop.CooldownAfterModKillOnly.description",
-      "value": "If only mod enemies are dying, pause spawning for this many seconds."
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.name",
-      "value": "最大秒なし元キル"
-    },
-    {
-      "key": "entry.Anti Loop.MaxSecondsWithoutOriginalKill.description",
-      "value": "Stop spawning if no original enemy has died for this long after mod spawns."
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.name",
-      "value": "最大ModSpawns毎元交戦中"
-    },
-    {
-      "key": "entry.Anti Loop.MaxModSpawnsPerOriginalEngaged.description",
-      "value": "Soft budget: each engaged original enemy can support this many mod spawns."
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.name",
-      "value": "許可環境代替候補"
-    },
-    {
-      "key": "entry.Candidates.AllowEnvironmentFallbackCandidates.description",
-      "value": "Use current environment enemy metadata if current level alive NPC candidate pool is empty."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.name",
-      "value": "スポーン距離最小"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMin.description",
-      "value": "Minimum spawn distance from player."
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.name",
-      "value": "スポーン距離最大"
-    },
-    {
-      "key": "entry.Spawn.SpawnDistanceMax.description",
-      "value": "Maximum spawn distance from player."
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.name",
-      "value": "目標プレッシャー"
-    },
-    {
-      "key": "entry.Style 1 - Light.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.name",
-      "value": "スポーンクールダウン"
-    },
-    {
-      "key": "entry.Style 1 - Light.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.name",
-      "value": "最大スポーン毎ウェーブ"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.name",
-      "value": "最大ModSpawned生存"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.name",
-      "value": "最大ModSpawned毎部屋"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.name",
-      "value": "最大ModSpawned毎レベル"
-    },
-    {
-      "key": "entry.Style 1 - Light.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.name",
-      "value": "目標プレッシャー"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.name",
-      "value": "スポーンクールダウン"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.name",
-      "value": "最大スポーン毎ウェーブ"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.name",
-      "value": "最大ModSpawned生存"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.name",
-      "value": "最大ModSpawned毎部屋"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.name",
-      "value": "最大ModSpawned毎レベル"
-    },
-    {
-      "key": "entry.Style 2 - Heavy.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.name",
-      "value": "目標プレッシャー"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.TargetPressure.description",
-      "value": "Target pressure."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.name",
-      "value": "スポーンクールダウン"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.SpawnCooldown.description",
-      "value": "Spawn cooldown."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.name",
-      "value": "最大スポーン毎ウェーブ"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxSpawnPerWave.description",
-      "value": "Max spawns per wave."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.name",
-      "value": "最大ModSpawned生存"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedAlive.description",
-      "value": "Max alive mod-spawned NPCs."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.name",
-      "value": "最大ModSpawned毎部屋"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerRoom.description",
-      "value": "Max mod spawns per room."
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.name",
-      "value": "最大ModSpawned毎レベル"
-    },
-    {
-      "key": "entry.Style 3 - Nightmare.MaxModSpawnedPerLevel.description",
-      "value": "Max mod spawns per level."
+      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
+      "value": "ディレクターの判定をBepInExログへ出力します。診断用のみで、スポーン動作には影響しません。"
     },
     {
       "key": "overlay.title",
@@ -345,12 +105,12 @@
       "value": "有効"
     },
     {
-      "key": "overlay.autoSpawn",
-      "value": "自動スポーン"
-    },
-    {
       "key": "overlay.style",
       "value": "スタイル"
+    },
+    {
+      "key": "overlay.position",
+      "value": "位置"
     },
     {
       "key": "overlay.gameState",
@@ -377,24 +137,12 @@
       "value": "なし"
     },
     {
-      "key": "overlay.alive",
-      "value": "生存"
-    },
-    {
       "key": "overlay.hp",
       "value": "HP"
     },
     {
-      "key": "overlay.damageAgo",
-      "value": "被弾からの経過"
-    },
-    {
-      "key": "overlay.never",
-      "value": "被弾なし"
-    },
-    {
-      "key": "overlay.unavailable",
-      "value": "利用不可"
+      "key": "overlay.noHitSensor",
+      "value": "被弾検知なし"
     },
     {
       "key": "overlay.updateFailure",
@@ -405,44 +153,44 @@
       "value": "ルーム"
     },
     {
-      "key": "overlay.endRoom",
-      "value": "最終ルーム"
+      "key": "overlay.route",
+      "value": "ルート"
     },
     {
-      "key": "overlay.section.pressure",
-      "value": "プレッシャー"
+      "key": "overlay.section.director",
+      "value": "ディレクター"
     },
     {
-      "key": "overlay.originalHostileAlive",
-      "value": "オリジナル敵の生存"
+      "key": "overlay.phase",
+      "value": "フェーズ"
+    },
+    {
+      "key": "overlay.intensity",
+      "value": "強度"
+    },
+    {
+      "key": "overlay.pace",
+      "value": "ペース"
+    },
+    {
+      "key": "overlay.threat",
+      "value": "脅威"
     },
     {
       "key": "overlay.engaged",
       "value": "交戦中"
     },
     {
-      "key": "overlay.targeting",
-      "value": "標的中"
+      "key": "overlay.present",
+      "value": "存在数"
     },
     {
-      "key": "overlay.modHostileAlive",
+      "key": "overlay.modAlive",
       "value": "Mod敵の生存"
     },
     {
-      "key": "overlay.originalPressure",
-      "value": "オリジナルプレッシャー"
-    },
-    {
-      "key": "overlay.modPressure",
-      "value": "Modプレッシャー"
-    },
-    {
-      "key": "overlay.current",
-      "value": "現在"
-    },
-    {
-      "key": "overlay.deficit",
-      "value": "不足"
+      "key": "overlay.budget",
+      "value": "予算"
     },
     {
       "key": "overlay.section.spawnDecision",
@@ -457,48 +205,8 @@
       "value": "理由"
     },
     {
-      "key": "overlay.nextSpawnIn",
-      "value": "次のスポーンまで"
-    },
-    {
-      "key": "overlay.candidateSource",
-      "value": "候補ソース"
-    },
-    {
-      "key": "overlay.candidates",
-      "value": "候補数"
-    },
-    {
-      "key": "overlay.section.modImpact",
-      "value": "Modの影響"
-    },
-    {
-      "key": "overlay.spawnedThisLevel",
-      "value": "このレベルの生成数"
-    },
-    {
-      "key": "overlay.spawnedSinceOriginalKill",
-      "value": "前回の撃破以降の生成数"
-    },
-    {
-      "key": "overlay.timeSinceOriginalKill",
-      "value": "オリジナル撃破からの経過"
-    },
-    {
-      "key": "overlay.timeSinceModKill",
-      "value": "Mod撃破からの経過"
-    },
-    {
-      "key": "overlay.wouldDelayAllDead",
-      "value": "全滅判定を遅延"
-    },
-    {
       "key": "overlay.lastSpawn",
       "value": "直近のスポーン"
-    },
-    {
-      "key": "overlay.lastAggroReport",
-      "value": "直近のアグロ報告"
     },
     {
       "key": "overlay.keys",
@@ -509,12 +217,12 @@
       "value": "最近のイベント"
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
-      "value": "スポーン判定をログ出力"
+      "key": "alert.surge",
+      "value": "何かが来る..."
     },
     {
-      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
-      "value": "スポーンウェーブの結果を定期的にBepInExログへ出力します。診断用のみで、スポーン動作には影響しません。"
+      "key": "alert.migrated",
+      "value": "動的プレッシャー: 以前の調整値は新しいディレクターに置き換えられました。"
     }
   ]
 }

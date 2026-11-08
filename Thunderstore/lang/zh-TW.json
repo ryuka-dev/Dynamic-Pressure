@@ -1,0 +1,228 @@
+{
+  "entries": [
+    {
+      "key": "plugin.name",
+      "value": "動態壓力"
+    },
+    {
+      "key": "plugin.description",
+      "value": "新增適應性敵人壓力與可選的動態生怪。"
+    },
+    {
+      "key": "section.General",
+      "value": "一般"
+    },
+    {
+      "key": "section.Debug Overlay",
+      "value": "除錯覆疊層"
+    },
+    {
+      "key": "entry.General.EnableMod.name",
+      "value": "啟用Mod"
+    },
+    {
+      "key": "entry.General.EnableMod.description",
+      "value": "開啟或關閉動態壓力。"
+    },
+    {
+      "key": "entry.General.PressureStyle.name",
+      "value": "壓力風格"
+    },
+    {
+      "key": "entry.General.PressureStyle.description",
+      "value": "導演施壓的力道。檔位越高,增援越頻繁,強敵也越早登場。"
+    },
+    {
+      "key": "value.General.PressureStyle.Light",
+      "value": "輕度"
+    },
+    {
+      "key": "value.General.PressureStyle.Heavy",
+      "value": "重度"
+    },
+    {
+      "key": "value.General.PressureStyle.Nightmare",
+      "value": "惡夢"
+    },
+    {
+      "key": "entry.General.SpawnPosition.name",
+      "value": "生怪位置"
+    },
+    {
+      "key": "entry.General.SpawnPosition.description",
+      "value": "增援出現的位置。均衡:多半在前方與兩側,很少在背後。前方:絕不會在背後。任意位置:任何方向都可能,甚至直接在視野內出現。"
+    },
+    {
+      "key": "value.General.SpawnPosition.Balanced",
+      "value": "均衡"
+    },
+    {
+      "key": "value.General.SpawnPosition.Ahead",
+      "value": "前方"
+    },
+    {
+      "key": "value.General.SpawnPosition.Anywhere",
+      "value": "任意位置"
+    },
+    {
+      "key": "entry.Debug Overlay.EnableOverlay.name",
+      "value": "啟用覆疊層"
+    },
+    {
+      "key": "entry.Debug Overlay.EnableOverlay.description",
+      "value": "顯示導演的除錯覆疊層。"
+    },
+    {
+      "key": "entry.Debug Overlay.OverlayToggleKey.name",
+      "value": "覆疊層切換鍵"
+    },
+    {
+      "key": "entry.Debug Overlay.OverlayToggleKey.description",
+      "value": "顯示或隱藏除錯覆疊層的按鍵。"
+    },
+    {
+      "key": "entry.Debug Overlay.ManualSpawnKey.name",
+      "value": "手動生怪鍵"
+    },
+    {
+      "key": "entry.Debug Overlay.ManualSpawnKey.description",
+      "value": "生成一個敵人供測試。僅在除錯覆疊層顯示時有效。"
+    },
+    {
+      "key": "entry.Debug Overlay.LogSpawnDecisions.name",
+      "value": "記錄生怪決策"
+    },
+    {
+      "key": "entry.Debug Overlay.LogSpawnDecisions.description",
+      "value": "將導演的決策寫入 BepInEx 記錄檔。僅供診斷,不影響生怪行為。"
+    },
+    {
+      "key": "overlay.title",
+      "value": "動態壓力除錯"
+    },
+    {
+      "key": "overlay.enabled",
+      "value": "啟用"
+    },
+    {
+      "key": "overlay.style",
+      "value": "檔位"
+    },
+    {
+      "key": "overlay.position",
+      "value": "位置"
+    },
+    {
+      "key": "overlay.gameState",
+      "value": "遊戲狀態"
+    },
+    {
+      "key": "overlay.safeZone",
+      "value": "安全區"
+    },
+    {
+      "key": "overlay.env",
+      "value": "環境"
+    },
+    {
+      "key": "overlay.player",
+      "value": "玩家"
+    },
+    {
+      "key": "overlay.ok",
+      "value": "正常"
+    },
+    {
+      "key": "overlay.missing",
+      "value": "遺失"
+    },
+    {
+      "key": "overlay.hp",
+      "value": "生命"
+    },
+    {
+      "key": "overlay.noHitSensor",
+      "value": "無受擊偵測"
+    },
+    {
+      "key": "overlay.updateFailure",
+      "value": "影格更新錯誤"
+    },
+    {
+      "key": "overlay.room",
+      "value": "房間"
+    },
+    {
+      "key": "overlay.route",
+      "value": "路線"
+    },
+    {
+      "key": "overlay.section.director",
+      "value": "導演"
+    },
+    {
+      "key": "overlay.phase",
+      "value": "階段"
+    },
+    {
+      "key": "overlay.intensity",
+      "value": "強度"
+    },
+    {
+      "key": "overlay.pace",
+      "value": "節奏"
+    },
+    {
+      "key": "overlay.threat",
+      "value": "威脅"
+    },
+    {
+      "key": "overlay.engaged",
+      "value": "交戰中"
+    },
+    {
+      "key": "overlay.present",
+      "value": "在場"
+    },
+    {
+      "key": "overlay.modAlive",
+      "value": "Mod 敵人存活"
+    },
+    {
+      "key": "overlay.budget",
+      "value": "預算"
+    },
+    {
+      "key": "overlay.section.spawnDecision",
+      "value": "生怪決策"
+    },
+    {
+      "key": "overlay.lastDecision",
+      "value": "上次決策"
+    },
+    {
+      "key": "overlay.reason",
+      "value": "原因"
+    },
+    {
+      "key": "overlay.lastSpawn",
+      "value": "上次生怪"
+    },
+    {
+      "key": "overlay.keys",
+      "value": "按鍵:F8 手動生怪 | F9 切換覆疊層"
+    },
+    {
+      "key": "overlay.section.recentEvents",
+      "value": "最近事件"
+    },
+    {
+      "key": "alert.surge",
+      "value": "有東西來了..."
+    },
+    {
+      "key": "alert.migrated",
+      "value": "動態壓力:你原本的調整數值已由新的導演系統取代。"
+    }
+  ]
+}

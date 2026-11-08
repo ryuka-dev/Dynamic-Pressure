@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using BepInEx;
-using BepInEx.Configuration;
 using HarmonyLib;
+using LevelGeneration;
 using PerfectRandom.Sulfur.Core;
 using PerfectRandom.Sulfur.Core.LevelGeneration;
+using PerfectRandom.Sulfur.Core.Stats;
+using PerfectRandom.Sulfur.Core.UI;
 using PerfectRandom.Sulfur.Core.Units;
 using PerfectRandom.Sulfur.Core.Units.AI;
 using PerfectRandom.Sulfur.Core.Utilities;
@@ -23,79 +23,40 @@ namespace Ryuka.Sulfur.DynamicPressure
     {
         public const string PluginGuid = "ryuka.sulfur.dynamicpressure";
         public const string PluginName = "Dynamic Pressure";
-        public const string PluginVersion = "0.1.9";
+        public const string PluginVersion = "0.2.0";
 
-        private static DynamicPressurePlugin _instance;
-        private Harmony _harmony;
-
-        private ConfigEntry<bool> _enableMod;
-        private ConfigEntry<bool> _enableAutoSpawn;
-        private ConfigEntry<int> _pressureStyle;
-
-        private ConfigEntry<bool> _enableOverlay;
-        private ConfigEntry<Key> _overlayToggleKey;
-        private ConfigEntry<Key> _manualSpawnKey;
-        private ConfigEntry<bool> _logSpawnDecisions;
-
-        private ConfigEntry<float> _scanInterval;
-        private ConfigEntry<float> _enemyScanRadius;
-        private ConfigEntry<float> _closeEnemyDistance;
-        private ConfigEntry<float> _lowHealthStopThreshold;
-        private ConfigEntry<float> _recentDamageStopWindow;
-
-        private ConfigEntry<int> _minOriginalEngagedHostilesForSpawn;
-        private ConfigEntry<float> _cooldownAfterModKillOnly;
-        private ConfigEntry<float> _maxSecondsWithoutOriginalKill;
-        private ConfigEntry<int> _maxModSpawnsPerOriginalEngaged;
-        private ConfigEntry<bool> _allowEnvironmentFallbackCandidates;
-
-        private ConfigEntry<float> _spawnDistanceMin;
-        private ConfigEntry<float> _spawnDistanceMax;
-        private ConfigEntry<float> _style1Cooldown;
-        private ConfigEntry<float> _style2Cooldown;
-        private ConfigEntry<float> _style3Cooldown;
-
-        private ConfigEntry<int> _style1TargetPressure;
-        private ConfigEntry<int> _style2TargetPressure;
-        private ConfigEntry<int> _style3TargetPressure;
-
-        private ConfigEntry<int> _style1MaxSpawnPerWave;
-        private ConfigEntry<int> _style2MaxSpawnPerWave;
-        private ConfigEntry<int> _style3MaxSpawnPerWave;
-
-        private ConfigEntry<int> _style1MaxModAlive;
-        private ConfigEntry<int> _style2MaxModAlive;
-        private ConfigEntry<int> _style3MaxModAlive;
-
-        private ConfigEntry<int> _style1MaxModPerRoom;
-        private ConfigEntry<int> _style2MaxModPerRoom;
-        private ConfigEntry<int> _style3MaxModPerRoom;
-
-        private ConfigEntry<int> _style1MaxModPerLevel;
-        private ConfigEntry<int> _style2MaxModPerLevel;
-        private ConfigEntry<int> _style3MaxModPerLevel;
-
-        // A wave that places nothing leaves the pressure deficit untouched, so the next Update()
-        // would re-enter the whole attempt immediately. Back off for this long instead.
-        private const float FailedWaveRetrySeconds = 1.0f;
-
-        // Diagnostics only. Wave outcomes are otherwise invisible to the log, which leaves a wave
-        // that keeps retrying without placing anything impossible to see after the fact. The
-        // per-window wave count is the number that matters: a blocked wave backs off for
-        // FailedWaveRetrySeconds, so a healthy window holds a handful of attempts and a window in
-        // the hundreds means the wave is repeating every frame.
+        private const float ScanIntervalSeconds = 0.5f;
         private const float DiagLogIntervalSeconds = 5.0f;
 
-        private readonly List<UnitSO> _candidatePool = new List<UnitSO>();
-        private readonly List<string> _recentEvents = new List<string>();
-        private readonly Dictionary<int, int> _modSpawnedPerRoom = new Dictionary<int, int>();
-        private readonly HashSet<int> _deadNpcIds = new HashSet<int>();
+        private const float NearbyThreatDistance = 40f;
+        private const float ModUnitTrackedDistance = 60f;
+        private const float OriginalThreatWeight = 0.5f;
 
-        private object _lastGraphContext;
+        // Used when a level has no vanilla enemy generation to measure.
+        private const float FallbackPackBudget = 12f;
+        private const float FallbackPackDensity = 1f;
+
+        private static DynamicPressurePlugin _instance;
+        private static int _levelGeneration;
+        private static int _capturedGeneration = -1;
+        private static float _capturedPackBudget;
+        private static float _capturedPackDensity;
+
+        private Harmony _harmony;
+        private Settings _settings;
+        private Director _director;
+
+        private readonly List<string> _recentEvents = new List<string>();
+
+        private int _seenGeneration;
+        private bool _levelStarted;
+        private PressureStyle _appliedStyle;
+        private float _packBudget;
+        private bool _lateGame;
         private float _nextScanTime;
-        private float _nextSpawnTime;
+        private float _lastTickTime;
         private float _nextDiagLogTime;
-        private int _diagWindowWaves;
+        private int _diagWindowBatches;
         private int _diagWindowSpawned;
         private string _pluginDirectory;
         private float _nextLanguageRetryTime;
@@ -104,20 +65,10 @@ namespace Ryuka.Sulfur.DynamicPressure
         private AsyncAssetLoading.OnLanguageChange _reloadOverlayLanguage;
         private bool _spawnInProgress;
         private bool _inLevelTransition;
+        private bool _hitPatchActive;
+        private bool _pendingMigrationNotice;
+        private float _pendingSurgeBudget;
         private int _waveId;
-        private int _spawnedThisLevel;
-        private int _spawnedSinceLastOriginalKill;
-        private float _lastOriginalKillTime = -9999f;
-        private float _lastModKillTime = -9999f;
-
-        // Game 0.19.7 removed Unit.TimeSinceLastDamageTaken, which used to answer "how long has it
-        // been since the player was hit". Both readers of it were about the player only - one
-        // safety gate, one overlay readout - so Dynamic Pressure keeps the timestamp itself from
-        // the damage call rather than depending on a property the game may rename or drop again.
-        private const float NeverDamagedTime = -99999f;
-        private const float NeverDamagedSeconds = 9999f;
-        private static float _playerLastDamageTime = NeverDamagedTime;
-        private static bool _playerDamageTimerActive;
 
         private string _lastUpdateFailure;
         private int _updateFailureCount;
@@ -126,12 +77,18 @@ namespace Ryuka.Sulfur.DynamicPressure
         private SpawnBlockReason _lastBlockReason = SpawnBlockReason.None;
         private string _lastDecision = "None";
         private string _lastSpawnSummary = "None";
-        private string _lastAggroReport = "None";
+
+        private PressurePreset CurrentPreset
+        {
+            get { return PressurePreset.For(_settings.EffectiveStyle); }
+        }
 
         private void Awake()
         {
             _instance = this;
-            BindConfig();
+            _settings = Settings.Bind(Config);
+            _pendingMigrationNotice = ConfigMigration.Run(Config, _settings, Logger);
+            _director = new Director((min, max) => UnityEngine.Random.Range(min, max));
 
             // The loader searches lang/ under here and, for managers that flatten a package, this
             // folder itself.
@@ -139,9 +96,9 @@ namespace Ryuka.Sulfur.DynamicPressure
 
             _harmony = new Harmony(PluginGuid);
             TryPatchTransitions();
-            TryPatchNpcDie();
             TryPatchAllDeadTrigger();
-            TryPatchPlayerDamageTimer();
+            TryPatchPlayerHits();
+            TryPatchLevelBudget();
 
             Log("Loaded.");
         }
@@ -170,7 +127,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             HandleKeys();
             EnsureLanguageSubscription();
 
-            if (!_enableMod.Value)
+            if (!_settings.EnableMod.Value)
             {
                 _lastDecision = "BLOCKED";
                 _lastBlockReason = SpawnBlockReason.Disabled;
@@ -179,44 +136,448 @@ namespace Ryuka.Sulfur.DynamicPressure
 
             try
             {
-                UpdatePressure();
+                UpdateDirector();
             }
             catch (Exception e)
             {
                 ReportUpdateFailure(e);
             }
 
-            LogSpawnDiagnostics();
+            LogDirectorDiagnostics();
         }
 
-        private void UpdatePressure()
+        private void UpdateDirector()
         {
             GameManager gm = StaticInstance<GameManager>.Instance;
-            if (gm != null && gm.graphContext != null && !ReferenceEquals(_lastGraphContext, gm.graphContext))
+            if (_seenGeneration != _levelGeneration)
             {
-                _lastGraphContext = gm.graphContext;
-                ResetRuntimeState("New graphContext");
+                _seenGeneration = _levelGeneration;
+                ResetLevelState("New level");
+                _inLevelTransition = false;
             }
 
-            if (Time.time >= _nextScanTime)
+            if (Time.time < _nextScanTime)
             {
-                _nextScanTime = Time.time + Mathf.Max(0.2f, _scanInterval.Value);
-                ScanPressure();
+                return;
             }
 
-            if (_enableAutoSpawn.Value && !_spawnInProgress && Time.time >= _nextSpawnTime)
+            _nextScanTime = Time.time + ScanIntervalSeconds;
+
+            if (!_levelStarted && gm != null && CanBeginLevel(gm))
             {
-                TryAutoSpawn();
+                BeginLevel(gm);
             }
+            else if (_levelStarted && _appliedStyle != _settings.EffectiveStyle)
+            {
+                _appliedStyle = _settings.EffectiveStyle;
+                _director.ChangeStyle(CurrentPreset);
+            }
+
+            Snapshot snapshot = ScanWorld(gm);
+            _snapshot = snapshot;
+
+            float delta = _lastTickTime > 0f ? Time.time - _lastTickTime : 0f;
+            _lastTickTime = Time.time;
+
+            DirectorOrders orders = _director.Tick(new DirectorInput
+            {
+                Now = Time.time,
+                DeltaSeconds = delta,
+                SpawningAllowed = snapshot.spawningAllowed,
+                Engaged = snapshot.engaged,
+                PlayerHealthFraction = snapshot.hasPlayer ? snapshot.playerHp : 1f,
+                RouteRoomIndex = snapshot.routeRoomIndex,
+                WeightedThreat = snapshot.weightedThreat,
+                ModAliveCost = snapshot.modAliveCost
+            });
+
+            CarryOutOrders(orders);
+        }
+
+        private void CarryOutOrders(DirectorOrders orders)
+        {
+            if (orders.SurgeWarning)
+            {
+                ShowAlert(OverlayText.Get("alert.surge", "Something is coming..."));
+                AddEvent("Surge warned");
+            }
+
+            // The player was warned, so a surge waits out a batch still placing rather than vanish.
+            _pendingSurgeBudget += orders.SurgeBudget;
+
+            if (_spawnInProgress)
+            {
+                return;
+            }
+
+            if (_pendingSurgeBudget > 0f)
+            {
+                float surgeBudget = _pendingSurgeBudget;
+                _pendingSurgeBudget = 0f;
+                _ = SpawnBatchAsync(surgeBudget, SurgeMaxUnits, true, false, "Surge");
+            }
+            else if (orders.TrickleBudget > 0f)
+            {
+                _ = SpawnBatchAsync(orders.TrickleBudget, TrickleMaxUnits, false, false, "Trickle");
+            }
+        }
+
+        private bool CanBeginLevel(GameManager gm)
+        {
+            // The old player object is destroyed before generation starts, so a live player after
+            // a transition belongs to the new level.
+            return !_inLevelTransition
+                && gm.PlayerUnit != null
+                && gm.graphContext != null
+                && gm.orderedRooms != null
+                && gm.orderedRooms.Count > 0
+                && gm.gameState.ToString() == "Running"
+                && !gm.awaitingStartLevel;
+        }
+
+        private void BeginLevel(GameManager gm)
+        {
+            List<Room> rooms = gm.orderedRooms;
+            int spawnableRooms = 0;
+            int routeRooms = 0;
+
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                Room room = rooms[i];
+                if (room == null)
+                {
+                    continue;
+                }
+
+                routeRooms = Mathf.Max(routeRooms, room.lodRoomIndex + 1);
+
+                if (room.roomSize != RoomSize.Corridor && !room.disallowEnemySpawn)
+                {
+                    spawnableRooms++;
+                }
+            }
+
+            bool measured = _capturedGeneration == _levelGeneration && _capturedPackBudget > 0f;
+            _packBudget = measured ? _capturedPackBudget : FallbackPackBudget;
+            float density = measured ? _capturedPackDensity : FallbackPackDensity;
+
+            _lateGame = IsLateGame(gm);
+            _appliedStyle = _settings.EffectiveStyle;
+            PressurePreset preset = CurrentPreset;
+
+            List<UnitSO> eligible = new List<UnitSO>();
+            Roster.CollectEligible(gm, preset, _packBudget, _lateGame, eligible);
+
+            float averageCost = eligible.Count > 0 ? (float)eligible.Average(u => u.SpawnCost) : 0f;
+
+            _director.StartLevel(
+                new LevelCalibration
+                {
+                    PackBudget = _packBudget,
+                    PackDensity = density,
+                    SpawnableRooms = spawnableRooms,
+                    RouteRooms = routeRooms,
+                    AverageUnitCost = averageCost
+                },
+                preset);
+
+            _levelStarted = true;
+            _lastTickTime = 0f;
+
+            // Load them now so the first surge does not hitch in the middle of a fight.
+            for (int i = 0; i < eligible.Count; i++)
+            {
+                eligible[i].FetchAndLoadUnitLoader();
+            }
+
+            if (_pendingMigrationNotice)
+            {
+                _pendingMigrationNotice = false;
+                ShowAlert(OverlayText.Get(
+                    "alert.migrated",
+                    "Dynamic Pressure: your old tuning values were replaced by the new director."));
+            }
+
+            AddEvent("Level start: budget " + _director.TotalBudget.ToString("0") + (measured ? string.Empty : " (estimated)"));
+
+            if (_settings.LogSpawnDecisions.Value)
+            {
+                Logger.LogInfo(
+                    "Level start | style " + _appliedStyle
+                    + " | packBudget " + _packBudget + (measured ? string.Empty : " (fallback)")
+                    + " | density " + density
+                    + " | rooms " + spawnableRooms + "/" + routeRooms
+                    + " | eligible " + eligible.Count + " avg " + averageCost.ToString("0.0")
+                    + " | total budget " + _director.TotalBudget.ToString("0")
+                    + " | target " + _director.TargetThreat.ToString("0.0")
+                    + " | late " + _lateGame);
+            }
+        }
+
+        private static bool IsLateGame(GameManager gm)
+        {
+            if (gm.environmentsInOrder == null || gm.currentEnvironment == null)
+            {
+                return false;
+            }
+
+            List<WorldEnvironmentIds> order = gm.environmentsInOrder.environmentsOnOrder;
+            int current = order.IndexOf(gm.currentEnvironment.id);
+            int firstLate = order.IndexOf(WorldEnvironmentIds.Act_02_Forest);
+            return current >= 0 && firstLate >= 0 && current >= firstLate;
+        }
+
+        private static void ShowAlert(string text)
+        {
+            UIManager ui = StaticInstance<UIManager>.Instance;
+            if (ui != null)
+            {
+                ui.ShowSmallAlert(text);
+            }
+        }
+
+        private void HandleKeys()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null)
+            {
+                return;
+            }
+
+            if (keyboard[_settings.OverlayToggleKey.Value].wasPressedThisFrame)
+            {
+                _settings.EnableOverlay.Value = !_settings.EnableOverlay.Value;
+            }
+
+            if (_settings.EnableOverlay.Value
+                && keyboard[_settings.ManualSpawnKey.Value].wasPressedThisFrame
+                && !_spawnInProgress)
+            {
+                _ = SpawnBatchAsync(0f, 1, false, true, "Manual debug spawn");
+            }
+        }
+
+        private Snapshot ScanWorld(GameManager gm)
+        {
+            Snapshot s = new Snapshot();
+
+            if (gm == null)
+            {
+                s.blockReason = SpawnBlockReason.NoGameManager;
+                return s;
+            }
+
+            s.hasGameManager = true;
+            s.gameState = gm.gameState.ToString();
+            s.inSafeZone = gm.InSafeZone;
+            s.currentEnvironment = gm.currentEnvironment != null ? gm.currentEnvironment.id.ToString() : "null";
+
+            if (gm.PlayerUnit == null || gm.PlayerObject == null)
+            {
+                s.blockReason = SpawnBlockReason.NoPlayer;
+                return s;
+            }
+
+            Unit player = gm.PlayerUnit;
+            Room playerRoom = GetUnitRoom(player);
+
+            s.hasPlayer = true;
+            s.playerAlive = player.IsAlive;
+            s.playerHp = SafeGetPlayerHp(player);
+            s.playerRoomName = playerRoom != null ? playerRoom.name : "null";
+            s.routeRoomIndex = playerRoom != null ? playerRoom.lodRoomIndex : 0;
+
+            bool bossFight = false;
+            List<Npc> alive = gm.aliveNpcs;
+
+            if (alive != null)
+            {
+                for (int i = 0; i < alive.Count; i++)
+                {
+                    Npc npc = alive[i];
+                    if (!IsActiveThreat(npc))
+                    {
+                        continue;
+                    }
+
+                    bool targeting = SafeTargetIsPlayer(npc);
+                    bool knows = SafeHasKnownPlayerPosition(npc, player);
+
+                    if (npc.IsBoss)
+                    {
+                        bossFight |= targeting || npc.hasBeenAggroedOnce;
+                        continue;
+                    }
+
+                    float distance = Vector3.Distance(npc.transform.position, gm.PlayerPosition);
+                    bool isMod = npc.GetComponent<DynamicPressureSpawnMarker>() != null;
+                    int cost = npc.unitSO.SpawnCost;
+
+                    if (isMod && (distance <= ModUnitTrackedDistance || targeting))
+                    {
+                        s.modAliveCost += cost;
+                        s.modAlive++;
+                    }
+
+                    bool present = IsSameOrConnectedRoom(GetUnitRoom(npc), playerRoom)
+                        || (targeting && distance <= NearbyThreatDistance);
+
+                    if (!present)
+                    {
+                        continue;
+                    }
+
+                    s.weightedThreat += isMod ? cost : cost * OriginalThreatWeight;
+                    s.threatsPresent++;
+                    s.engaged |= targeting || knows;
+                }
+            }
+
+            s.blockReason = FindBlockReason(gm, player, playerRoom, bossFight);
+            s.spawningAllowed = s.blockReason == SpawnBlockReason.None;
+
+            if (!s.spawningAllowed)
+            {
+                _lastDecision = "BLOCKED";
+                _lastBlockReason = s.blockReason;
+            }
+
+            return s;
+        }
+
+        private SpawnBlockReason FindBlockReason(GameManager gm, Unit player, Room playerRoom, bool bossFight)
+        {
+            if (_inLevelTransition)
+            {
+                return SpawnBlockReason.LevelTransition;
+            }
+
+            if (!_levelStarted)
+            {
+                return SpawnBlockReason.WaitingForLevel;
+            }
+
+            if (gm.gameState.ToString() != "Running" || gm.awaitingStartLevel)
+            {
+                return SpawnBlockReason.GameStateNotRunning;
+            }
+
+            if (gm.InSafeZone || gm.IsPlayerAtChurch || gm.IsOnboarding)
+            {
+                return SpawnBlockReason.SafeZone;
+            }
+
+            if (gm.IsEndless || CryptUI.IsRunning)
+            {
+                return SpawnBlockReason.ChallengeMode;
+            }
+
+            if (!player.IsAlive)
+            {
+                return SpawnBlockReason.PlayerDead;
+            }
+
+            if (bossFight)
+            {
+                return SpawnBlockReason.BossFight;
+            }
+
+            if (playerRoom != null && playerRoom.IsEndRoom)
+            {
+                return SpawnBlockReason.EndRoomBlocked;
+            }
+
+            return SpawnBlockReason.None;
+        }
+
+        private static bool IsActiveThreat(Npc npc)
+        {
+            return npc != null
+                && npc.IsAlive
+                && npc.unitSO != null
+                && npc.gameObject.activeInHierarchy
+                && !npc.unitSO.isCivilian
+                && npc.unitSO.id.value != UnitIds.BlackGuildMachinegunEmplacement.value
+                && IsHostileToPlayer(npc);
+        }
+
+        private static bool IsHostileToPlayer(Npc npc)
+        {
+            try
+            {
+                return npc.IsHostileTo(FactionIds.Player);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool SafeTargetIsPlayer(Npc npc)
+        {
+            try
+            {
+                return npc != null && npc.targetIsPlayer;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool SafeHasKnownPlayerPosition(Npc npc, Unit playerUnit)
+        {
+            try
+            {
+                return npc != null && npc.AiAgent != null && playerUnit != null && npc.AiAgent.HasKnownPosition(playerUnit);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static float SafeGetPlayerHp(Unit playerUnit)
+        {
+            try
+            {
+                return playerUnit != null ? playerUnit.GetNormalizedHealth() : 0f;
+            }
+            catch
+            {
+                return 0f;
+            }
+        }
+
+        private static Room GetUnitRoom(Unit unit)
+        {
+            if (unit == null)
+            {
+                return null;
+            }
+
+            return unit.currentRoom != null ? unit.currentRoom : unit.lastValidCurrentRoom;
+        }
+
+        private static bool IsSameOrConnectedRoom(Room npcRoom, Room playerRoom)
+        {
+            if (npcRoom == null || playerRoom == null)
+            {
+                return false;
+            }
+
+            if (npcRoom == playerRoom)
+            {
+                return true;
+            }
+
+            return playerRoom.connectedRooms != null && Array.IndexOf(playerRoom.connectedRooms, npcRoom) >= 0;
         }
 
         /// <summary>
         /// A game update that removes or renames something read every frame used to take the whole
-        /// plugin down with it and bury the player's log: 0.19.7 dropping
-        /// Unit.TimeSinceLastDamageTaken threw on the first frame of the session and wrote roughly
-        /// 27000 stack traces into a single run, with no working overlay left to say why. Report a
-        /// given failure once, count the repeats, and leave the overlay and the keys alive so the
-        /// cause is still visible in game.
+        /// plugin down with it and bury the player's log. Report a given failure once, count the
+        /// repeats, and leave the overlay and the keys alive so the cause is still visible in game.
         /// </summary>
         private void ReportUpdateFailure(Exception e)
         {
@@ -226,33 +587,26 @@ namespace Ryuka.Sulfur.DynamicPressure
             {
                 _lastUpdateFailure = signature;
                 _updateFailureCount = 0;
-                AddEvent("Pressure update failed: " + e.GetType().Name);
-                Logger.LogError(
-                    "Pressure update failed. Repeats of this same failure are counted, not logged."
-                );
+                AddEvent("Director update failed: " + e.GetType().Name);
+                Logger.LogError("Director update failed. Repeats of this same failure are counted, not logged.");
                 Logger.LogError(e);
             }
 
             _updateFailureCount++;
-
-            // Nothing below this point produced a decision, so do not leave the last successful one
-            // on screen as though it still described the current frame.
             _lastDecision = "FAILED";
             _lastBlockReason = SpawnBlockReason.UpdateFailed;
         }
 
         /// <summary>
-        /// Rate-limited spawn-wave summary. Purely observational: nothing here feeds a spawn
-        /// decision, and with the setting off the method costs one bool read per frame.
+        /// Rate-limited summary of what the director is doing. Purely observational: nothing here
+        /// feeds a decision, and with the setting off the method costs one bool read per frame.
         /// </summary>
-        private void LogSpawnDiagnostics()
+        private void LogDirectorDiagnostics()
         {
-            if (!_logSpawnDecisions.Value)
+            if (!_settings.LogSpawnDecisions.Value)
             {
-                // Keep the window aligned with the moment logging is switched on, so the first
-                // line covers a full interval instead of however long the setting sat off.
                 _nextDiagLogTime = Time.time + DiagLogIntervalSeconds;
-                _diagWindowWaves = 0;
+                _diagWindowBatches = 0;
                 _diagWindowSpawned = 0;
                 return;
             }
@@ -264,70 +618,53 @@ namespace Ryuka.Sulfur.DynamicPressure
 
             _nextDiagLogTime = Time.time + DiagLogIntervalSeconds;
 
-            if (_diagWindowWaves > 0)
-            {
-                Logger.LogInfo(
-                    "Spawn waves in last " + DiagLogIntervalSeconds.ToString("0") + "s: " + _diagWindowWaves
-                    + " | placed: " + _diagWindowSpawned
-                    + " | last decision: " + _lastDecision + " / " + _lastBlockReason
-                    + " | room: " + _snapshot.playerRoomName
-                    + " | mod alive: " + _snapshot.modHostileAlive
-                    + " | this level: " + _spawnedThisLevel + "/" + GetMaxModPerLevel());
-            }
+            Logger.LogInfo(
+                "Director " + _director.Phase
+                + " | intensity " + _director.Intensity.ToString("0.00")
+                + " | pace " + _director.Pace.ToString("0.00")
+                + " | threat " + _snapshot.weightedThreat.ToString("0.0") + "/" + _director.TargetThreat.ToString("0.0")
+                + " | mod alive " + _snapshot.modAliveCost + "/" + _director.AliveCap.ToString("0")
+                + " | spent " + _director.SpentThreat.ToString("0") + "/" + _director.UnlockedBudget.ToString("0")
+                + "/" + _director.TotalBudget.ToString("0")
+                + " | batches " + _diagWindowBatches + " placed " + _diagWindowSpawned
+                + " | last " + _lastDecision + "/" + _lastBlockReason);
 
-            _diagWindowWaves = 0;
+            _diagWindowBatches = 0;
             _diagWindowSpawned = 0;
         }
 
-        private void HandleKeys()
+        private void ResetLevelState(string reason)
         {
-            Keyboard keyboard = Keyboard.current;
-            if (keyboard == null)
+            _recentEvents.Clear();
+            _waveId = 0;
+            _levelStarted = false;
+            _lastTickTime = 0f;
+            _pendingSurgeBudget = 0f;
+            _lastDecision = "Reset";
+            _lastBlockReason = SpawnBlockReason.None;
+            _lastSpawnSummary = "None";
+            AddEvent("Reset: " + reason);
+        }
+
+        private static void OnSpawnEnemiesExecutePrefix(SpawnEnemiesNode __instance)
+        {
+            if (__instance == null)
             {
                 return;
             }
 
-            if (keyboard[_overlayToggleKey.Value].wasPressedThisFrame)
-            {
-                _enableOverlay.Value = !_enableOverlay.Value;
-            }
-
-            if (keyboard[_manualSpawnKey.Value].wasPressedThisFrame)
-            {
-                if (!_spawnInProgress)
-                {
-                    _ = SpawnWaveAsync(1, "Manual debug spawn");
-                }
-            }
-        }
-
-        private void ResetRuntimeState(string reason)
-        {
-            _candidatePool.Clear();
-            _recentEvents.Clear();
-            _modSpawnedPerRoom.Clear();
-            _deadNpcIds.Clear();
-
-            _waveId = 0;
-            _spawnedThisLevel = 0;
-            _spawnedSinceLastOriginalKill = 0;
-            _lastOriginalKillTime = Time.time;
-            _lastModKillTime = -9999f;
-            _lastDecision = "Reset";
-            _lastBlockReason = SpawnBlockReason.None;
-            _lastSpawnSummary = "None";
-            _lastAggroReport = "None";
-            _inLevelTransition = false;
-            _nextSpawnTime = Time.time + 3f;
-
-            AddEvent("Reset: " + reason);
+            // Kept against the generation it belongs to: a level with no enemy generation must not
+            // inherit the numbers of the level before it.
+            _capturedGeneration = _levelGeneration;
+            _capturedPackBudget = __instance.packBudget;
+            _capturedPackDensity = __instance.packDensity;
         }
 
         /// <summary>
-        /// Dynamic Pressure enemies are ambient pressure additions, not scripted
-        /// encounter objectives. AllDeadTrigger can capture later-spawned NPCs from
-        /// GameManager.aliveNpcs, including NPCs outside the encounter room. Remove
-        /// marked NPCs immediately before the original completion check.
+        /// Dynamic Pressure enemies are ambient pressure additions, not scripted encounter
+        /// objectives. AllDeadTrigger can capture later-spawned NPCs from GameManager.aliveNpcs,
+        /// including NPCs outside the encounter room. Remove marked NPCs immediately before the
+        /// original completion check.
         /// </summary>
         private static void OnAllDeadTriggerCheckAllDeadPrefix(List<Npc> ___allAliveNpcs)
         {
@@ -340,9 +677,9 @@ namespace Ryuka.Sulfur.DynamicPressure
         }
 
         /// <summary>
-        /// AllDeadTrigger subscribes RegisterDeath to NPCs captured after Start.
-        /// Ignore a stale callback from a Dynamic Pressure NPC after it has already
-        /// been excluded from the encounter's tracked list.
+        /// AllDeadTrigger subscribes RegisterDeath to NPCs captured after Start. Ignore a stale
+        /// callback from a Dynamic Pressure NPC after it has already been excluded from the
+        /// encounter's tracked list.
         /// </summary>
         private static bool OnAllDeadTriggerRegisterDeathPrefix(Unit __0)
         {
@@ -355,45 +692,14 @@ namespace Ryuka.Sulfur.DynamicPressure
             return npc != null && npc.GetComponent<DynamicPressureSpawnMarker>() != null;
         }
 
-        private static void OnNpcDiePostfix(Npc __instance)
+        /// <summary>
+        /// Counts levels. GameManager keeps one graphContext for the whole session and reuses it,
+        /// so object identity cannot tell two levels apart; this routine is where every level
+        /// change converges, right before the new level is generated.
+        /// </summary>
+        private static void OnStartLevelRoutinePrefix()
         {
-            if (_instance == null || __instance == null)
-            {
-                return;
-            }
-
-            _instance.HandleNpcDeath(__instance);
-        }
-
-        private void HandleNpcDeath(Npc npc)
-        {
-            int id = npc.GetInstanceID();
-            if (_deadNpcIds.Contains(id))
-            {
-                return;
-            }
-
-            _deadNpcIds.Add(id);
-
-            bool isMod = npc.GetComponent<DynamicPressureSpawnMarker>() != null;
-            bool hostile = IsHostileToPlayer(npc);
-
-            if (!hostile)
-            {
-                return;
-            }
-
-            if (isMod)
-            {
-                _lastModKillTime = Time.time;
-                AddEvent("Mod NPC died: " + npc.name);
-            }
-            else
-            {
-                _lastOriginalKillTime = Time.time;
-                _spawnedSinceLastOriginalKill = 0;
-                AddEvent("Original NPC died: " + npc.name);
-            }
+            _levelGeneration++;
         }
 
         private static void OnLevelTransitionPrefix()
@@ -403,8 +709,38 @@ namespace Ryuka.Sulfur.DynamicPressure
                 return;
             }
 
+            _instance.ResetLevelState("Level transition");
             _instance._inLevelTransition = true;
-            _instance.ResetRuntimeState("Level transition");
+        }
+
+        private static void OnPlayerDamagePrefix(Unit __instance, out float __state)
+        {
+            __state = -1f;
+
+            if (__instance != null && __instance.isPlayer && _instance != null)
+            {
+                __state = __instance.GetCurrentHealth();
+            }
+        }
+
+        /// <summary>
+        /// Feeds the director what a hit actually took off the player's health, after armour and
+        /// the game's own damage scaling, which is what the player feels.
+        /// </summary>
+        private static void OnPlayerDamagePostfix(Unit __instance, bool __result, float __state, DamageSourceData sourceData)
+        {
+            if (!__result || __state < 0f || _instance == null || __instance == null)
+            {
+                return;
+            }
+
+            float maxHealth = __instance.Stats.GetAttribute(EntityAttributes.Stat_MaxHealth);
+            if (maxHealth > 0f)
+            {
+                _instance._director.ReportPlayerHit(
+                    (__state - __instance.GetCurrentHealth()) / maxHealth,
+                    sourceData.states.isPeriodicModifier);
+            }
         }
 
         private void TryPatchTransitions()
@@ -417,34 +753,24 @@ namespace Ryuka.Sulfur.DynamicPressure
             TryPatchAllNamedMethods(typeof(GameManager), "GoToChurchHub", prefix);
             TryPatchAllNamedMethods(typeof(GameManager), "GoToCarHub", prefix);
 
-            // GameManager.SwitchLevel is deliberately not in that list. The actual level swap lives
-            // in the private coroutine SwitchLevelRoutine, and every way in already goes through a
-            // target above: GoToChurchHub and GoToCarHub both delegate to GoToLevel, and the two
-            // direct StartCoroutine(SwitchLevelRoutine(...)) calls are inside the routine that
-            // CompleteLevel starts. Asking for a public "SwitchLevel" only produced a startup
-            // warning about a method that has never existed in any shipped build.
-        }
-
-        /// <summary>
-        /// Records when the player last took damage. Unit.ReceiveDamage returns true only once the
-        /// hit has survived armour, mitigation, invulnerability and the player's i-frame window and
-        /// has been applied to health, which is exactly the "player is under fire" signal the
-        /// safety gate wants.
-        /// </summary>
-        private static void OnUnitReceiveDamagePostfix(Unit __instance, bool __result)
-        {
-            if (__result && __instance != null && __instance.isPlayer)
+            MethodInfo levelRoutine = AccessTools.Method(typeof(GameManager), "StartLevelRoutineGraph");
+            MethodInfo levelPrefix = AccessTools.Method(typeof(DynamicPressurePlugin), nameof(OnStartLevelRoutinePrefix));
+            if (levelRoutine == null || levelPrefix == null)
             {
-                _playerLastDamageTime = Time.time;
+                Logger.LogError("GameManager.StartLevelRoutineGraph was not found. The director cannot tell levels apart and will not add enemies after the first transition.");
+                return;
             }
+
+            _harmony.Patch(levelRoutine, prefix: new HarmonyMethod(levelPrefix));
+            Log("Patched GameManager.StartLevelRoutineGraph (level counter).");
         }
 
         /// <summary>
         /// Patches the single damage entry point every hit funnels into. The other overload builds
         /// a DamageSourceData and calls this one, and Npc's override ends in base.ReceiveDamage, so
-        /// one patch on Unit sees every unit's damage; the postfix filters down to the player.
+        /// one patch on Unit sees every unit's damage; the patch filters down to the player.
         /// </summary>
-        private void TryPatchPlayerDamageTimer()
+        private void TryPatchPlayerHits()
         {
             try
             {
@@ -453,53 +779,44 @@ namespace Ryuka.Sulfur.DynamicPressure
                     "ReceiveDamage",
                     new[] { typeof(float), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) }
                 );
-                MethodInfo postfix = AccessTools.Method(
-                    typeof(DynamicPressurePlugin),
-                    nameof(OnUnitReceiveDamagePostfix)
-                );
+                MethodInfo prefix = AccessTools.Method(typeof(DynamicPressurePlugin), nameof(OnPlayerDamagePrefix));
+                MethodInfo postfix = AccessTools.Method(typeof(DynamicPressurePlugin), nameof(OnPlayerDamagePostfix));
 
-                if (target == null || postfix == null)
+                if (target == null || prefix == null || postfix == null)
                 {
-                    Logger.LogWarning(
-                        "Failed to patch Unit.ReceiveDamage: method not found. The RecentDamage "
-                        + "safety hold is inactive - waves will not wait out incoming player damage."
-                    );
+                    Logger.LogWarning("Failed to patch Unit.ReceiveDamage: method not found. The director will not feel incoming damage.");
                     return;
                 }
 
-                _harmony.Patch(target, postfix: new HarmonyMethod(postfix));
-                _playerDamageTimerActive = true;
-                Log("Patched Unit.ReceiveDamage (player damage timer).");
+                _harmony.Patch(target, prefix: new HarmonyMethod(prefix), postfix: new HarmonyMethod(postfix));
+                _hitPatchActive = true;
+                Log("Patched Unit.ReceiveDamage (player hits).");
             }
             catch (Exception e)
             {
-                Logger.LogWarning(
-                    "Failed to patch Unit.ReceiveDamage: " + e.Message
-                    + " | The RecentDamage safety hold is inactive."
-                );
+                Logger.LogWarning("Failed to patch Unit.ReceiveDamage: " + e.Message + " | The director will not feel incoming damage.");
             }
         }
 
-        private void TryPatchNpcDie()
+        private void TryPatchLevelBudget()
         {
             try
             {
-                MethodInfo target = AccessTools.Method(typeof(Npc), "Die");
-                MethodInfo postfix = AccessTools.Method(typeof(DynamicPressurePlugin), nameof(OnNpcDiePostfix));
+                MethodInfo target = AccessTools.Method(typeof(SpawnEnemiesNode), "Execute");
+                MethodInfo prefix = AccessTools.Method(typeof(DynamicPressurePlugin), nameof(OnSpawnEnemiesExecutePrefix));
 
-                if (target != null && postfix != null)
+                if (target == null || prefix == null)
                 {
-                    _harmony.Patch(target, postfix: new HarmonyMethod(postfix));
-                    Log("Patched Npc.Die.");
+                    Logger.LogWarning("Failed to patch SpawnEnemiesNode.Execute: method not found. Budgets will use estimates.");
+                    return;
                 }
-                else
-                {
-                    Logger.LogWarning("Failed to patch Npc.Die: method not found.");
-                }
+
+                _harmony.Patch(target, prefix: new HarmonyMethod(prefix));
+                Log("Patched SpawnEnemiesNode.Execute (level budget).");
             }
             catch (Exception e)
             {
-                Logger.LogWarning("Failed to patch Npc.Die: " + e.Message);
+                Logger.LogWarning("Failed to patch SpawnEnemiesNode.Execute: " + e.Message + " | Budgets will use estimates.");
             }
         }
 
@@ -507,31 +824,14 @@ namespace Ryuka.Sulfur.DynamicPressure
         {
             try
             {
-                MethodInfo checkAllDead = AccessTools.Method(
-                    typeof(AllDeadTrigger),
-                    "CheckAllDead",
-                    Type.EmptyTypes
-                );
-                MethodInfo registerDeath = AccessTools.Method(
-                    typeof(AllDeadTrigger),
-                    "RegisterDeath",
-                    new[] { typeof(Unit) }
-                );
-                MethodInfo checkPrefix = AccessTools.Method(
-                    typeof(DynamicPressurePlugin),
-                    nameof(OnAllDeadTriggerCheckAllDeadPrefix)
-                );
-                MethodInfo registerPrefix = AccessTools.Method(
-                    typeof(DynamicPressurePlugin),
-                    nameof(OnAllDeadTriggerRegisterDeathPrefix)
-                );
+                MethodInfo checkAllDead = AccessTools.Method(typeof(AllDeadTrigger), "CheckAllDead", Type.EmptyTypes);
+                MethodInfo registerDeath = AccessTools.Method(typeof(AllDeadTrigger), "RegisterDeath", new[] { typeof(Unit) });
+                MethodInfo checkPrefix = AccessTools.Method(typeof(DynamicPressurePlugin), nameof(OnAllDeadTriggerCheckAllDeadPrefix));
+                MethodInfo registerPrefix = AccessTools.Method(typeof(DynamicPressurePlugin), nameof(OnAllDeadTriggerRegisterDeathPrefix));
 
-                if (checkAllDead == null || registerDeath == null ||
-                    checkPrefix == null || registerPrefix == null)
+                if (checkAllDead == null || registerDeath == null || checkPrefix == null || registerPrefix == null)
                 {
-                    Logger.LogWarning(
-                        "Failed to patch AllDeadTrigger: expected methods were not found."
-                    );
+                    Logger.LogWarning("Failed to patch AllDeadTrigger: expected methods were not found.");
                     return;
                 }
 
@@ -606,14 +906,6 @@ namespace Ryuka.Sulfur.DynamicPressure
             Logger.LogInfo(text);
         }
 
-        private struct SpawnPointChoice
-        {
-            public Vector3 position;
-            public Room room;
-            public float distanceToPlayer;
-            public string source;
-        }
-
         private sealed class Snapshot
         {
             public bool hasGameManager;
@@ -624,36 +916,17 @@ namespace Ryuka.Sulfur.DynamicPressure
             public string currentEnvironment = "Unknown";
 
             public float playerHp;
-            public float playerTimeSinceDamage;
             public string playerRoomName = "null";
-            public bool playerRoomIsEndRoom;
+            public int routeRoomIndex;
 
-            public int aliveNpcs;
-            public int originalHostileAlive;
-            public int originalEngagedHostiles;
-            public int nearbyOriginalHostiles;
-            public int originalTargetingPlayer;
+            public int threatsPresent;
+            public bool engaged;
+            public float weightedThreat;
+            public int modAlive;
+            public float modAliveCost;
 
-            public int modHostileAlive;
-            public int nearbyModHostiles;
-            public int modTargetingPlayer;
-
-            public int originalPressure;
-            public int modPressure;
-            public int currentPressure;
-            public int targetPressure;
-            public int deficit;
-
-            public int candidateCount;
-            public string candidateSource = "None";
-
-            public int spawnedThisLevel;
-            public int spawnedSinceLastOriginalKill;
-            public float timeSinceLastOriginalKill;
-            public float timeSinceLastModKill;
-            public float nextSpawnIn;
-
-            public bool wouldDelayOnAllEnemiesDead;
+            public bool spawningAllowed;
+            public SpawnBlockReason blockReason;
         }
     }
 
@@ -665,11 +938,6 @@ namespace Ryuka.Sulfur.DynamicPressure
         public Room spawnRoom;
         public string spawnReason;
         public int waveId;
-
-        public bool aggroReported;
-        public float lastAggroReportTime;
-        public bool targetingPlayerAfterReport;
-        public bool hasKnownPlayerPositionAfterReport;
     }
 
     public enum SpawnBlockReason
@@ -680,26 +948,15 @@ namespace Ryuka.Sulfur.DynamicPressure
         NoPlayer,
         PlayerDead,
         SafeZone,
+        ChallengeMode,
         GameStateNotRunning,
-        LowHealth,
-        RecentDamage,
-        EndRoomBlocked,
-        SpawnRoomIsEndRoom,
-        NoOriginalHostiles,
-        NoEngagedOriginalHostiles,
-        NotEnoughOriginalHostiles,
-        NoCandidateUnits,
-        NoValidNpcSpawnPoint,
-        Cooldown,
-        MaxModSpawnedAlive,
-        RoomSpawnBudgetExceeded,
-        LevelSpawnBudgetExceeded,
-        PressureAlreadyHigh,
-        SpawnAsyncFailed,
+        WaitingForLevel,
         LevelTransition,
-        RecentModKillOnly,
-        NoOriginalKillProgress,
-        SpawnBudgetPerOriginalExceeded,
+        BossFight,
+        EndRoomBlocked,
+        NoCandidateUnits,
+        NoFairSpawnPoint,
+        SpawnAsyncFailed,
         UpdateFailed
     }
 }
