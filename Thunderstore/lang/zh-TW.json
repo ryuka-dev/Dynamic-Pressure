@@ -101,6 +101,14 @@
       "value": "調整突變增援出現的機率。設為 0 時也會移除重型單位。對未使用這些敵人的檔位沒有作用。"
     },
     {
+      "key": "entry.Tuning.BossHealthMultiplier.name",
+      "value": "首領生命倍率"
+    },
+    {
+      "key": "entry.Tuning.BossHealthMultiplier.description",
+      "value": "按此倍率提高所有首領的生命。1 表示不改變。從下一關開始生效。連線時使用主機的設定。"
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "啟用覆疊層"
     },
@@ -199,6 +207,18 @@
     {
       "key": "overlay.route",
       "value": "路線"
+    },
+    {
+      "key": "overlay.coop",
+      "value": "連線"
+    },
+    {
+      "key": "overlay.bossHealth",
+      "value": "首領生命"
+    },
+    {
+      "key": "overlay.notices",
+      "value": "通知"
     },
     {
       "key": "overlay.section.director",

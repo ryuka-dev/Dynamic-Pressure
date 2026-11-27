@@ -10,6 +10,9 @@
     <SulfurGaleProfileDir Condition="'$(SulfurGaleProfileDir)' == ''">C:\Users\LingYun67\AppData\Roaming\com.kesomannen.gale\sulfur\profiles\其他mod开发</SulfurGaleProfileDir>
     <SulfurBepInExCoreDir Condition="'$(SulfurBepInExCoreDir)' == ''">$(SulfurGaleProfileDir)\BepInEx\core</SulfurBepInExCoreDir>
     <SulfurBepInExPluginsDir Condition="'$(SulfurBepInExPluginsDir)' == ''">$(SulfurGaleProfileDir)\BepInEx\plugins</SulfurBepInExPluginsDir>
+    <!-- Compile-time only: the installed SULFUR Together plugin provides this assembly at run time. -->
+    <SulfurTogetherDir Condition="'$(SulfurTogetherDir)' == ''">C:\Users\LingYun67\source\SULFUR Together</SulfurTogetherDir>
+    <SulfurTogetherAssembly Condition="'$(SulfurTogetherAssembly)' == ''">$(SulfurTogetherDir)\bin\Release\net472\SULFUR Together.dll</SulfurTogetherAssembly>
     <ThunderstoreDir Condition="'$(ThunderstoreDir)' == ''">$(MSBuildThisFileDirectory)Thunderstore</ThunderstoreDir>
   </PropertyGroup>
 </Project>

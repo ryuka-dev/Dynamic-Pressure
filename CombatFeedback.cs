@@ -161,6 +161,8 @@ namespace Ryuka.Sulfur.DynamicPressure
                 "reinforcement", _settings.ReinforcementMultiplier.Value,
                 "rest", _settings.RestMultiplier.Value,
                 "elite", _settings.EliteMultiplier.Value,
+                "boss_health", _bossHealth.Effective,
+                "coop", _coopSync.Role.ToString(),
                 "pack_budget", _packBudget,
                 "density", _levelDensity,
                 "rooms", _levelSpawnableRooms,

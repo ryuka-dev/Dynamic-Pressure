@@ -101,6 +101,14 @@
       "value": "Ajusta la probabilidad de refuerzos mutados. 0 también elimina las unidades pesadas. No tiene efecto en los estilos que no los usan."
     },
     {
+      "key": "entry.Tuning.BossHealthMultiplier.name",
+      "value": "Multiplicador de vida de jefes"
+    },
+    {
+      "key": "entry.Tuning.BossHealthMultiplier.description",
+      "value": "Multiplica la vida de todos los jefes. 1 deja a los jefes como están. Se aplica a partir del siguiente nivel. En cooperativo se usa el valor del anfitrión."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -199,6 +207,18 @@
     {
       "key": "overlay.route",
       "value": "Ruta"
+    },
+    {
+      "key": "overlay.coop",
+      "value": "Cooperativo"
+    },
+    {
+      "key": "overlay.bossHealth",
+      "value": "PV del jefe"
+    },
+    {
+      "key": "overlay.notices",
+      "value": "Avisos"
     },
     {
       "key": "overlay.section.director",

@@ -101,6 +101,14 @@
       "value": "调整变异增援出现的几率。设为 0 时也会移除重型单位。对不使用它们的档位无效。"
     },
     {
+      "key": "entry.Tuning.BossHealthMultiplier.name",
+      "value": "Boss 生命倍率"
+    },
+    {
+      "key": "entry.Tuning.BossHealthMultiplier.description",
+      "value": "按此倍率提高所有 Boss 的生命。1 表示不改变。从下一关开始生效。联机时使用主机的设置。"
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "启用覆盖层"
     },
@@ -199,6 +207,18 @@
     {
       "key": "overlay.route",
       "value": "路线"
+    },
+    {
+      "key": "overlay.coop",
+      "value": "联机"
+    },
+    {
+      "key": "overlay.bossHealth",
+      "value": "Boss 生命"
+    },
+    {
+      "key": "overlay.notices",
+      "value": "通知"
     },
     {
       "key": "overlay.section.director",

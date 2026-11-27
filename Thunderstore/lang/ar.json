@@ -101,6 +101,14 @@
       "value": "يضبط فرصة ظهور التعزيزات المتحوّرة. القيمة 0 تزيل الوحدات الثقيلة أيضًا. لا تأثير لها على الأنماط التي لا تستخدمها."
     },
     {
+      "key": "entry.Tuning.BossHealthMultiplier.name",
+      "value": "مضاعف صحة الزعماء"
+    },
+    {
+      "key": "entry.Tuning.BossHealthMultiplier.description",
+      "value": "يضاعف صحة كل زعيم. القيمة 1 تبقي الزعماء كما هم. يسري التغيير من المستوى التالي. في اللعب الجماعي تُستخدم قيمة المضيف."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -199,6 +207,18 @@
     {
       "key": "overlay.route",
       "value": "المسار"
+    },
+    {
+      "key": "overlay.coop",
+      "value": "اللعب الجماعي"
+    },
+    {
+      "key": "overlay.bossHealth",
+      "value": "صحة الزعيم"
+    },
+    {
+      "key": "overlay.notices",
+      "value": "الإشعارات"
     },
     {
       "key": "overlay.section.director",

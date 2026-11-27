@@ -101,6 +101,14 @@
       "value": "변이된 증원이 나올 확률을 조절합니다. 0이면 중장 유닛도 나오지 않습니다. 이를 사용하지 않는 스타일에는 효과가 없습니다."
     },
     {
+      "key": "entry.Tuning.BossHealthMultiplier.name",
+      "value": "보스 체력 배율"
+    },
+    {
+      "key": "entry.Tuning.BossHealthMultiplier.description",
+      "value": "모든 보스의 체력에 이 배율을 곱합니다. 1이면 보스는 그대로입니다. 다음 레벨부터 적용됩니다. 협동 플레이에서는 호스트의 값이 사용됩니다."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -199,6 +207,18 @@
     {
       "key": "overlay.route",
       "value": "경로"
+    },
+    {
+      "key": "overlay.coop",
+      "value": "협동"
+    },
+    {
+      "key": "overlay.bossHealth",
+      "value": "보스 체력"
+    },
+    {
+      "key": "overlay.notices",
+      "value": "알림"
     },
     {
       "key": "overlay.section.director",

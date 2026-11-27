@@ -101,6 +101,14 @@
       "value": "Regola la probabilità di rinforzi mutati. 0 rimuove anche le unità pesanti. Non ha effetto sugli stili che non li utilizzano."
     },
     {
+      "key": "entry.Tuning.BossHealthMultiplier.name",
+      "value": "Moltiplicatore salute boss"
+    },
+    {
+      "key": "entry.Tuning.BossHealthMultiplier.description",
+      "value": "Moltiplica la salute di tutti i boss. 1 lascia i boss invariati. Ha effetto dal livello successivo. In cooperativa si usa il valore dell'host."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -199,6 +207,18 @@
     {
       "key": "overlay.route",
       "value": "Percorso"
+    },
+    {
+      "key": "overlay.coop",
+      "value": "Cooperativa"
+    },
+    {
+      "key": "overlay.bossHealth",
+      "value": "PV boss"
+    },
+    {
+      "key": "overlay.notices",
+      "value": "Avvisi"
     },
     {
       "key": "overlay.section.director",

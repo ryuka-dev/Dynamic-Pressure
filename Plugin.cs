@@ -19,6 +19,7 @@ using UnityEngine.InputSystem;
 namespace Ryuka.Sulfur.DynamicPressure
 {
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
+    [BepInDependency(CoopLinks.TogetherGuid, BepInDependency.DependencyFlags.SoftDependency)]
     public sealed partial class DynamicPressurePlugin : BaseUnityPlugin
     {
         public const string PluginGuid = "ryuka.sulfur.dynamicpressure";
@@ -45,6 +46,9 @@ namespace Ryuka.Sulfur.DynamicPressure
         private Harmony _harmony;
         private Settings _settings;
         private Director _director;
+        private readonly BossHealthScaler _bossHealth = new BossHealthScaler();
+        private ICoopLink _coop;
+        private CoopSync _coopSync;
 
         private readonly List<string> _recentEvents = new List<string>();
 
@@ -91,6 +95,13 @@ namespace Ryuka.Sulfur.DynamicPressure
             _pendingMigrationNotice = ConfigMigration.Run(Config, _settings, Logger);
             _director = new Director((min, max) => UnityEngine.Random.Range(min, max));
             CreateRecorder();
+            _bossHealth.BeginLevel(ConfiguredBossHealth());
+
+            // In co-op only the host's director adds enemies, and the session copies them to
+            // everyone else. Declaring this as their spawner is harmless offline.
+            _coop = CoopLinks.Create(Logger);
+            _coop.DeclareSpawner(this);
+            _coopSync = new CoopSync(_coop, _bossHealth, Logger);
 
             // The loader searches lang/ under here and, for managers that flatten a package, this
             // folder itself.
@@ -102,6 +113,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             TryPatchPlayerHits();
             TryPatchNpcDeath();
             TryPatchLevelBudget();
+            TryPatchBossSpawn();
 
             Log("Loaded.");
         }
@@ -111,6 +123,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             StopFollowingLanguage();
             RecordLevelEnd();
             _recorder?.Stop();
+            _coop?.Dispose();
 
             try
             {
@@ -131,6 +144,16 @@ namespace Ryuka.Sulfur.DynamicPressure
         {
             HandleKeys();
             EnsureLanguageSubscription();
+
+            // Kept apart: the recorder is diagnostics, and a failure there must not stop co-op.
+            try
+            {
+                _coopSync.Tick();
+            }
+            catch (Exception e)
+            {
+                ReportUpdateFailure(e);
+            }
 
             try
             {
@@ -168,6 +191,20 @@ namespace Ryuka.Sulfur.DynamicPressure
                 _seenGeneration = _levelGeneration;
                 ResetLevelState("New level");
                 _inLevelTransition = false;
+            }
+
+            // The host owns the world in co-op; a client's own director would add enemies only
+            // that client can see.
+            if (_coopSync.Role == CoopRole.Client)
+            {
+                if (_levelStarted)
+                {
+                    ResetLevelState("Joined a co-op session");
+                }
+
+                _lastDecision = "BLOCKED";
+                _lastBlockReason = SpawnBlockReason.CoopClient;
+                return;
             }
 
             if (Time.time < _nextScanTime)
@@ -387,7 +424,8 @@ namespace Ryuka.Sulfur.DynamicPressure
             if (_settings.EnableOverlay.Value
                 && _settings.ManualSpawnKey.Value != Key.None
                 && keyboard[_settings.ManualSpawnKey.Value].wasPressedThisFrame
-                && !_spawnInProgress)
+                && !_spawnInProgress
+                && _coopSync.Role != CoopRole.Client)
             {
                 _ = SpawnBatchAsync(0f, 1, false, true, "Manual debug spawn");
             }
@@ -750,6 +788,42 @@ namespace Ryuka.Sulfur.DynamicPressure
         private static void OnStartLevelRoutinePrefix()
         {
             _levelGeneration++;
+
+            if (_instance != null)
+            {
+                _instance._bossHealth.BeginLevel(_instance.ConfiguredBossHealth());
+                _instance._coopSync.OnNewLevel();
+            }
+        }
+
+        /// <summary>The boss health this machine's own settings ask for; the master switch turns it off.</summary>
+        private float ConfiguredBossHealth()
+        {
+            return _settings.EnableMod.Value ? _settings.BossHealthMultiplier.Value : 1f;
+        }
+
+        private static void OnUnitSpawnPostfix(Unit __instance)
+        {
+            if (_instance == null || __instance == null)
+            {
+                return;
+            }
+
+            try
+            {
+                if (_instance._bossHealth.OnUnitSpawned(__instance) && _instance._settings.LogSpawnDecisions.Value)
+                {
+                    _instance.Logger.LogInfo(
+                        "Boss health | " + __instance.unitSO.name
+                        + " x" + _instance._bossHealth.Effective.ToString("0.##")
+                        + (_instance._bossHealth.FollowingHost ? " (host)" : string.Empty)
+                        + " | max " + __instance.Stats.GetAttribute(EntityAttributes.Stat_MaxHealth).ToString("0"));
+                }
+            }
+            catch (Exception e)
+            {
+                _instance.ReportUpdateFailure(e);
+            }
         }
 
         private static void OnGoToMainMenuPrefix()
@@ -940,6 +1014,33 @@ namespace Ryuka.Sulfur.DynamicPressure
             }
         }
 
+        /// <summary>
+        /// Every unit gets its starting health in Unit.Spawn: level generation, runtime spawns and
+        /// the game's own spawn helpers all call SetStats and then Spawn, and Npc's override calls
+        /// the base first.
+        /// </summary>
+        private void TryPatchBossSpawn()
+        {
+            try
+            {
+                MethodInfo target = AccessTools.DeclaredMethod(typeof(Unit), "Spawn", Type.EmptyTypes);
+                MethodInfo postfix = AccessTools.Method(typeof(DynamicPressurePlugin), nameof(OnUnitSpawnPostfix));
+
+                if (target == null || postfix == null)
+                {
+                    Logger.LogWarning("Failed to patch Unit.Spawn: method not found. Boss Health Multiplier will have no effect.");
+                    return;
+                }
+
+                _harmony.Patch(target, postfix: new HarmonyMethod(postfix));
+                Log("Patched Unit.Spawn (boss health).");
+            }
+            catch (Exception e)
+            {
+                Logger.LogWarning("Failed to patch Unit.Spawn: " + e.Message + " | Boss Health Multiplier will have no effect.");
+            }
+        }
+
         private void TryPatchAllDeadTrigger()
         {
             try
@@ -1085,6 +1186,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         NoCandidateUnits,
         NoFairSpawnPoint,
         SpawnAsyncFailed,
-        UpdateFailed
+        UpdateFailed,
+        CoopClient
     }
 }

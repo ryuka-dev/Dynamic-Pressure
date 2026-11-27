@@ -16,6 +16,11 @@ Director.cs                pacing and budgets; plain C#, no Unity types
 Spawner.cs                 unit placement
 Roster.cs                  the enemies the director may add
 Settings.cs                player settings
+BossHealthScaler.cs        the Boss Health Multiplier
+CoopLink.cs                what the mod needs from a co-op session, offline default
+TogetherLink.cs            the only file that uses SULFUR Together's API
+CoopProtocol.cs            host-to-client messages and their validation
+CoopSync.cs                host announcements, client application
 ConfigMigration.cs         one-time move from the 0.1.x config layout
 Overlay.cs                 debug overlay
 CombatFeedback.cs          opt-in combat data collection and export
@@ -37,6 +42,12 @@ Build output (`bin/`, `obj/`, the DLL, the zip) is not committed.
 ```powershell
 dotnet build "Dynamic Pressure.csproj" -c Release
 ```
+
+SULFUR Together is an optional dependency at run time, but the build references
+its DLL (`SulfurTogetherAssembly`, never copied to the output). No field in this
+assembly may have a SULFUR Together type: the game enumerates every loaded
+assembly's types when it loads a save, and such a field makes that throw for
+players who don't have SULFUR Together.
 
 Paths come from `Directory.Build.props` and can be overridden per machine
 without editing anything tracked:
@@ -65,7 +76,7 @@ then build the package with the shared packaging script. It re-generates
 
 ## Game version
 
-Targets SULFUR 1.0.x (last verified on 1.0.5). The director reads
+Targets SULFUR 1.0.x (last verified on Steam build 26756522, after 1.0.6). The director reads
 `SpawnEnemiesNode.packBudget` and patches `GameManager.StartLevelRoutineGraph`;
 if a game update removes the latter the director stops after the first level
 transition and logs an error.

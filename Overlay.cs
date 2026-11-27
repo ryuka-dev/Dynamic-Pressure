@@ -113,6 +113,18 @@ namespace Ryuka.Sulfur.DynamicPressure
             Row(Label("overlay.room", "Room") + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.playerRoomName)
                 + Separator() + Label("overlay.route", "Route") + OverlayPalette.Tint(OverlayPalette.Value, _snapshot.routeRoomIndex));
 
+            Row(Label("overlay.coop", "Co-op")
+                + OverlayPalette.Tint(_coopSync.Role == CoopRole.Offline ? OverlayPalette.Muted : OverlayPalette.Accent, _coopSync.Role)
+                + OverlayPalette.Tint(OverlayPalette.Muted, " (" + _coopSync.LinkName + ")")
+                + Separator() + Label("overlay.bossHealth", "Boss HP")
+                + OverlayPalette.Tint(OverlayPalette.Value, "x" + _bossHealth.Effective.ToString("0.##"))
+                + OverlayPalette.Tint(OverlayPalette.Muted, " / " + _bossHealth.BossesThisLevel)
+                + (_coopSync.Role == CoopRole.Offline
+                    ? string.Empty
+                    : Separator() + Label("overlay.notices", "Notices")
+                        + OverlayPalette.Tint(OverlayPalette.Value, _coopSync.NoticesSent + "/" + _coopSync.NoticesApplied)
+                        + OverlayPalette.Tint(_coopSync.NoticesDropped > 0 ? OverlayPalette.Warn : OverlayPalette.Muted, " -" + _coopSync.NoticesDropped)));
+
             GUILayout.Space(8f);
             Row(Header("overlay.section.director", "Director"));
             Row(Label("overlay.phase", "Phase") + OverlayPalette.Tint(OverlayPalette.Accent, _director.Phase)

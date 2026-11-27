@@ -101,6 +101,14 @@
       "value": "Ajuste la probabilité de renforts mutés. 0 supprime aussi les unités lourdes. Sans effet sur les styles qui ne les utilisent pas."
     },
     {
+      "key": "entry.Tuning.BossHealthMultiplier.name",
+      "value": "Multiplicateur de PV des boss"
+    },
+    {
+      "key": "entry.Tuning.BossHealthMultiplier.description",
+      "value": "Multiplie les points de vie de tous les boss. 1 laisse les boss tels quels. Prend effet au niveau suivant. En coop, la valeur de l'hôte est utilisée."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -199,6 +207,18 @@
     {
       "key": "overlay.route",
       "value": "Itinéraire"
+    },
+    {
+      "key": "overlay.coop",
+      "value": "Coop"
+    },
+    {
+      "key": "overlay.bossHealth",
+      "value": "PV du boss"
+    },
+    {
+      "key": "overlay.notices",
+      "value": "Avis"
     },
     {
       "key": "overlay.section.director",

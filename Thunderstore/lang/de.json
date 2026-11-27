@@ -101,6 +101,14 @@
       "value": "Skaliert die Chance auf mutierte Verstärkung. 0 entfernt außerdem schwere Einheiten. Hat keine Wirkung auf Stile, die sie nicht verwenden."
     },
     {
+      "key": "entry.Tuning.BossHealthMultiplier.name",
+      "value": "Boss-Lebenspunkte-Multiplikator"
+    },
+    {
+      "key": "entry.Tuning.BossHealthMultiplier.description",
+      "value": "Multipliziert die Lebenspunkte aller Bosse. 1 lässt Bosse unverändert. Wirkt ab dem nächsten Level. Im Koop gilt der Wert des Hosts."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -199,6 +207,18 @@
     {
       "key": "overlay.route",
       "value": "Route"
+    },
+    {
+      "key": "overlay.coop",
+      "value": "Koop"
+    },
+    {
+      "key": "overlay.bossHealth",
+      "value": "Boss-LP"
+    },
+    {
+      "key": "overlay.notices",
+      "value": "Meldungen"
     },
     {
       "key": "overlay.section.director",

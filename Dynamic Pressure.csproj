@@ -55,6 +55,11 @@
     <Reference Include="PerfectRandom.Sulfur.LevelGeneration">
       <HintPath>$(SulfurManagedDir)\PerfectRandom.Sulfur.LevelGeneration.dll</HintPath>
     </Reference>
+    <!-- Never copied: a player without SULFUR Together never loads the code that uses it. -->
+    <Reference Include="SULFUR Together">
+      <HintPath>$(SulfurTogetherAssembly)</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -114,9 +119,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BossHealthScaler.cs" />
     <Compile Include="CombatFeedback.cs" />
     <Compile Include="CombatRecorder.cs" />
     <Compile Include="ConfigMigration.cs" />
+    <Compile Include="CoopLink.cs" />
+    <Compile Include="CoopProtocol.cs" />
+    <Compile Include="CoopSync.cs" />
+    <Compile Include="TogetherLink.cs" />
     <Compile Include="Director.cs" />
     <Compile Include="Overlay.cs" />
     <Compile Include="Plugin.cs" />

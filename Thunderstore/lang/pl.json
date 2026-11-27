@@ -101,6 +101,14 @@
       "value": "Skaluje szansę na zmutowane posiłki. 0 usuwa także ciężkie jednostki. Nie ma wpływu na style, które ich nie używają."
     },
     {
+      "key": "entry.Tuning.BossHealthMultiplier.name",
+      "value": "Mnożnik zdrowia bossów"
+    },
+    {
+      "key": "entry.Tuning.BossHealthMultiplier.description",
+      "value": "Mnoży zdrowie wszystkich bossów. 1 pozostawia bossów bez zmian. Działa od następnego poziomu. W kooperacji używana jest wartość hosta."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -199,6 +207,18 @@
     {
       "key": "overlay.route",
       "value": "Trasa"
+    },
+    {
+      "key": "overlay.coop",
+      "value": "Kooperacja"
+    },
+    {
+      "key": "overlay.bossHealth",
+      "value": "PŻ bossa"
+    },
+    {
+      "key": "overlay.notices",
+      "value": "Powiadomienia"
     },
     {
       "key": "overlay.section.director",

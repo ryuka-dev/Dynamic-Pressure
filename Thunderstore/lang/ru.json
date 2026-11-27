@@ -101,6 +101,14 @@
       "value": "Определяет шанс появления мутировавших подкреплений. При 0 также исчезают тяжёлые юниты. Не влияет на стили, которые их не используют."
     },
     {
+      "key": "entry.Tuning.BossHealthMultiplier.name",
+      "value": "Множитель здоровья боссов"
+    },
+    {
+      "key": "entry.Tuning.BossHealthMultiplier.description",
+      "value": "Умножает здоровье всех боссов. При 1 боссы не меняются. Действует со следующего уровня. В кооперативе используется значение хоста."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -199,6 +207,18 @@
     {
       "key": "overlay.route",
       "value": "Маршрут"
+    },
+    {
+      "key": "overlay.coop",
+      "value": "Кооператив"
+    },
+    {
+      "key": "overlay.bossHealth",
+      "value": "ХП босса"
+    },
+    {
+      "key": "overlay.notices",
+      "value": "Уведомления"
     },
     {
       "key": "overlay.section.director",

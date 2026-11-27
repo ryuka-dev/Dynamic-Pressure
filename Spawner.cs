@@ -30,7 +30,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         private const float SightCheckHeight = 1.2f;
         private const float BigSightCheckHeight = 2.5f;
 
-        private static readonly MutationDefinitions[] AllowedMutations =
+        internal static readonly MutationDefinitions[] AllowedMutations =
         {
             MutationDefinitions.Mutation_Big,
             MutationDefinitions.Mutation_Fire,
@@ -274,6 +274,7 @@ namespace Ryuka.Sulfur.DynamicPressure
             // no encounter waits on it, but it is not charged to the new level.
             if (generation != _levelGeneration)
             {
+                _coopSync.NoteHostSpawn(npc, MutationDefinitions.None);
                 return false;
             }
 
@@ -281,7 +282,9 @@ namespace Ryuka.Sulfur.DynamicPressure
             npc.lastValidCurrentRoom = point.room;
             npc.lastRoomCalcPosition = npc.transform.position;
 
-            string mutation = TryApplyMutation(gm, npc, unit);
+            MutationDefinitions rolled = TryApplyMutation(gm, npc, unit);
+            _coopSync.NoteHostSpawn(npc, rolled);
+            string mutation = rolled != MutationDefinitions.None ? rolled.ToString() : null;
 
             if (chargeBudget)
             {
@@ -308,7 +311,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         /// Rolls the style's chance of a mutated enemy, using the same entry point Endless mode
         /// calls right after spawning.
         /// </summary>
-        private string TryApplyMutation(GameManager gm, Npc npc, UnitSO unit)
+        private MutationDefinitions TryApplyMutation(GameManager gm, Npc npc, UnitSO unit)
         {
             PressurePreset preset = CurrentPreset;
             float chance = preset.MutationChance * _settings.EliteMultiplier.Value;
@@ -319,7 +322,7 @@ namespace Ryuka.Sulfur.DynamicPressure
                 || unit.availableMutations == null
                 || UnityEngine.Random.value > chance)
             {
-                return null;
+                return MutationDefinitions.None;
             }
 
             _mutationChoices.Clear();
@@ -337,12 +340,12 @@ namespace Ryuka.Sulfur.DynamicPressure
 
             if (_mutationChoices.Count == 0)
             {
-                return null;
+                return MutationDefinitions.None;
             }
 
             MutationDefinitions chosen = _mutationChoices[UnityEngine.Random.Range(0, _mutationChoices.Count)];
             npc.ToggleMutation(chosen, state: true);
-            return chosen.ToString();
+            return chosen;
         }
 
         private IEnumerator ReportPlayerPositionLater(Npc npc)

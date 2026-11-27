@@ -59,18 +59,20 @@ Off by default. See Helping With Balance below.
 
 ### Fine Tuning
 
-Turn on the Advanced filter in SULFUR Config to get three multipliers. They work with any style and all default to 1.
+Turn on the Advanced filter in SULFUR Config to get four multipliers. They work with any style and all default to 1.
 
 ```ini
 [Tuning]
 ReinforcementMultiplier = 1
 RestMultiplier = 1
 EliteMultiplier = 1
+BossHealthMultiplier = 1
 ```
 
 * **Reinforcement Multiplier:** how many extra enemies a level can get, from 0.5 to 2.
 * **Rest Multiplier:** how long the breaks last, from 0.5 to 2.
 * **Elite Multiplier:** the chance of mutated enemies, from 0 to 2. At 0 you won't get heavy enemies either. It does nothing on Light, since Light doesn't use them.
+* **Boss Health Multiplier:** boss health, from 1 to 3. It applies to every part of a boss, the Emperor's worm segments too. Changes kick in on the next level. Endless and Crypt bosses aren't affected.
 
 ## Where Enemies Appear
 
@@ -99,6 +101,14 @@ If you had Enable Auto Spawn off, the mod is now off through Enable Mod instead.
 
 Press F9 to see what the director is doing: its phase, intensity, threat and budget. The overlay settings are under the Advanced filter in SULFUR Config.
 
+## Co-op
+
+Works with SULFUR Together. Only the host's game adds enemies, and everyone sees the same ones, mutations included.
+
+The host's settings are the ones that count, including boss health. Breaks and surges follow how the host's fights are going, and enemies spawn out of the host's sight, not necessarily yours.
+
+Everyone should have the same version of the mod.
+
 ## Progression
 
 Extra enemies never count toward encounters, so they can't keep a gate locked once the required enemies are dead.
@@ -110,8 +120,6 @@ Balance is still being worked on, so let me know how it feels.
 Enemies that spawn far ahead can take a while to reach you.
 
 In very open areas there may be no hidden spot nearby. On Ahead, the director waits instead of spawning anything behind you.
-
-I haven't tested this version with SULFUR Together.
 
 ## Localization
 

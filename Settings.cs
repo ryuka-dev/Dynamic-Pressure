@@ -23,6 +23,7 @@ namespace Ryuka.Sulfur.DynamicPressure
         public ConfigEntry<float> ReinforcementMultiplier { get; private set; }
         public ConfigEntry<float> RestMultiplier { get; private set; }
         public ConfigEntry<float> EliteMultiplier { get; private set; }
+        public ConfigEntry<float> BossHealthMultiplier { get; private set; }
 
         public ConfigEntry<bool> EnableOverlay { get; private set; }
         public ConfigEntry<Key> OverlayToggleKey { get; private set; }
@@ -102,6 +103,11 @@ namespace Ryuka.Sulfur.DynamicPressure
                 "EliteMultiplier",
                 1f,
                 new ConfigDescription("Scales the chance of mutated reinforcements. 0 also removes heavy units. Has no effect on styles that do not use them.", new AcceptableValueRange<float>(0f, 2f), AdvancedTag));
+            settings.BossHealthMultiplier = config.Bind(
+                TuningSection,
+                "BossHealthMultiplier",
+                1f,
+                new ConfigDescription("Multiplies boss health. 1 is normal health. Changes take effect on the next level. In co-op the host's setting applies.", new AcceptableValueRange<float>(BossHealthScaler.MinMultiplier, BossHealthScaler.MaxMultiplier), AdvancedTag));
 
             settings.EnableOverlay = config.Bind(
                 OverlaySection,

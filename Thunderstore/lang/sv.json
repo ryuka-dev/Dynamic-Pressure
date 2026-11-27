@@ -101,6 +101,14 @@
       "value": "Skalar chansen för muterade förstärkningar. 0 tar även bort tunga enheter. Har ingen effekt på stilar som inte använder dem."
     },
     {
+      "key": "entry.Tuning.BossHealthMultiplier.name",
+      "value": "Bosshälsomultiplikator"
+    },
+    {
+      "key": "entry.Tuning.BossHealthMultiplier.description",
+      "value": "Multiplicerar hälsan hos alla bossar. 1 lämnar bossarna som de är. Gäller från nästa nivå. I co-op gäller värdens inställning."
+    },
+    {
       "key": "entry.Debug Overlay.EnableOverlay.name",
       "value": "Enable Overlay"
     },
@@ -199,6 +207,18 @@
     {
       "key": "overlay.route",
       "value": "Rutt"
+    },
+    {
+      "key": "overlay.coop",
+      "value": "Co-op"
+    },
+    {
+      "key": "overlay.bossHealth",
+      "value": "Boss-HP"
+    },
+    {
+      "key": "overlay.notices",
+      "value": "Aviseringar"
     },
     {
       "key": "overlay.section.director",
