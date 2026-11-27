@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0
+
+* Added a Boss Health Multiplier, from 1 to 3, under the Advanced filter in SULFUR Config. Changes kick in on the next level.
+* Added SULFUR Together support. Only the host's game adds enemies, and everyone sees the same ones, mutations included.
+
 ## 2.0.0
 
 The mod has been rebuilt around a pacing director.

@@ -1,6 +1,6 @@
 {
   "name": "DynamicPressure",
-  "version_number": "2.0.0",
+  "version_number": "2.1.0",
   "website_url": "https://github.com/ryuka-dev/Dynamic-Pressure",
   "description": "Adds extra enemies based on how your fights are going. They keep coming while you're winning and ease off once you're hurt. Light, Heavy and Nightmare styles.",
   "dependencies": [
